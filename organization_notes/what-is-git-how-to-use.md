@@ -69,7 +69,7 @@ which commits the modified file. And then checking the status, it should show th
 Now I'm going to send the change back to GitHub the code repository. To do so I do
 
 ```
-git push --all
+git push
 ```
 
 which then pushes these files back to where they came from. Here a window may pop up asking for your username and login for GitHub.
@@ -129,6 +129,9 @@ Another thing that you can do is to use wildcard notation or``*``. So for exampl
 git add test\*
 ```
 which says add everything (this is what the wildcard ``*`` does) in the test folder.
+
+---
+#### Danger Zone
 
 **How to Get Rid of Files**
 
