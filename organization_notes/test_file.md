@@ -9,3 +9,6 @@ Then edit this file and do the following:
 - ``git commit -am "a test"``
 
 - ``git push``
+
+
+Now I just made a change
