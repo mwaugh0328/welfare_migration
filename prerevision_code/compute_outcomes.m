@@ -140,7 +140,7 @@ for xxx = 1:n_types
     
     params = [R, solve_types(xxx,:),  m, m_temp, lambda, pi_prob];
     
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex(assets(:,:,:,xxx), move(:,:,:,xxx),...
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(assets(:,:,:,xxx), move(:,:,:,xxx),...
         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks');
     
 %     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
@@ -203,7 +203,7 @@ for xxx = 1:n_types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment_mex(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
+    [assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
@@ -218,7 +218,7 @@ for xxx = 1:n_types
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_mex(assets(:,:,:,xxx), move(:,:,:,xxx), ...
+        = experiment_driver(assets(:,:,:,xxx), move(:,:,:,xxx), ...
           assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx), cons_eqiv(:,:,:,xxx),...
           params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
          

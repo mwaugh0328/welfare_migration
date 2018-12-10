@@ -10,9 +10,9 @@ z_rural = params(2); z_urban = params(3);
 
 beta = params(4); m = params(5); gamma = 2; abar = params(7);
 
-ubar = params(8); lambda = params(9); pi_prob = lambda;
+ubar = params(8); lambda = params(9); pi_prob = params(10);
 
-m_seasn = params(10);
+m_seasn = params(11);
 
 shocks_rural = shocks(:,1); shocks_urban = shocks(:,2);
 
@@ -30,7 +30,7 @@ A = (1-gamma).^-1;
 % Set up grid for asset holdings. This is the same across locations.
 n_asset_states = 100;
 
-asset_space = linspace(0,6,100);
+asset_space = linspace(0,6,n_asset_states);
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);
@@ -515,6 +515,7 @@ for zzz = 1:n_shocks
 % I'm moving out of urban area. 
 
     value_fun = bsxfun(@plus,utility_move_urban(:,:,zzz), expected_value_rural_exp);
+
     
     [v_move_urban_old, p_asset_move_urban_old] = max(value_fun,[],2);
     
@@ -596,7 +597,4 @@ vguess(:,:,5) = v_prime_urban_new;
 vguess(:,:,6) = v_prime_urban_old;
 
 end
-
-
-
 

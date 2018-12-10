@@ -1,4 +1,4 @@
-function [assets_temp_move, move] = field_experiment(grid,params,shocks,tmat,value_funs)
+function [assets_temp_move, move] = field_experiment(params,shocks,tmat,value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This solves for the policy functions for the field experiment. The idea
@@ -34,9 +34,9 @@ v_hat_urban_old  = value_funs(:,:,6);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
-n_asset_states = grid(1);
+n_asset_states = 100;
 
-asset_space = linspace(grid(2),grid(3),grid(1));
+asset_space = linspace(0,6,100);
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);
@@ -202,6 +202,9 @@ for zzz = 1:n_shocks
     policy_assets_rural_exp(:,zzz) = diag(p_asset_stay_rural_all_e(:, policy_move_rural_exp(:,zzz)));
 
 end
+
+assets_temp_move = zeros(n_asset_states,n_shocks,2);
+move = zeros(n_asset_states,n_shocks,2);
 
 assets_temp_move(:,:,1) = policy_assets_rural_not;
 assets_temp_move(:,:,2) = policy_assets_rural_exp;
