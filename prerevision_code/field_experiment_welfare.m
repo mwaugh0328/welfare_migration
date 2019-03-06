@@ -1,4 +1,4 @@
-function [assets_temp_move, move, cons_eqiv] = field_experiment_welfare(grid, params,shocks,tmat,value_funs)
+function [assets_temp_move, move, cons_eqiv] = field_experiment_welfare(grid, params, shocks, tmat, value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This solves for the policy functions for the field experiment. The idea
