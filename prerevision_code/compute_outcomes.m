@@ -1,7 +1,7 @@
 function [targets] = compute_outcomes(params, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This is the driver file for the code (08/2016) which is consistent with
-% the results presented in Minnesota Macro....
+% This is the driver file for the code which is consistent with RR paper at
+% Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 gamma = 2; 
@@ -318,6 +318,7 @@ m_consumption = [mean((data_panel(rural,2))), mean((data_panel(~rural,2)))];
 avg_rural = sum(rural)./length(data_panel);
 
 var_income = [var(log(data_panel(rural,1))), var(log(data_panel(~rural,1)))];
+% No emasurment error here, we add it on expost. 
 
 var_consumption = [var(log(data_panel(rural,2))), var(log(data_panel(~rural,2)))];
 
@@ -418,8 +419,6 @@ cons_drop = mean(log(control_data(~temp_migrate_cntr,2,1))-log(control_data(~tem
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% m_error = (0.12 - var_consumption_no_migrate_control).^.5;
-% 
 cons_data_no_error_r1 = [control_data(:,2,1); expermt_data(:,2,1)];
 cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
 
@@ -431,6 +430,9 @@ cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
             
 cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
 var_cons_growth = std(cons_model_growth);
+% Again, no measurment error here, we can add it on expost. Need
+% consistency in language. 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
