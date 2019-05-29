@@ -76,6 +76,6 @@ theta = g_theta'*W*g_theta;
 
 elseif flag == 2
     
-theta = g_theta';
+theta = yyy;
 
 end
