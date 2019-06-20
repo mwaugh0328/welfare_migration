@@ -94,7 +94,7 @@ asset_space = linspace(grid(2),grid(3),grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
-n_sims = 10000;
+n_sims = 3000;
 time_series = 50000;
 N_obs = 25000;
 

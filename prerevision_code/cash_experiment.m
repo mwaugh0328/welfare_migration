@@ -74,6 +74,8 @@ feasible_move_seasn = false(n_asset_states,n_asset_states,n_shocks);
 net_assets = R.*asset_grid' - asset_grid;
 
 cash_transfer = 0.56.*m_seasn;
+% This is where we would want to adjust to make the comparision to the
+% unconditional cash transfer
 
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
