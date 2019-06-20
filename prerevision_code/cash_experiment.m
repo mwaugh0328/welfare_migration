@@ -1,12 +1,10 @@
-function [assets_temp_move, move, cons_eqiv] = field_experiment(grid, params,shocks,tmat,value_funs)
+function [assets_temp_move, move, cons_eqiv] = cash_experiment(grid, params,shocks,tmat,value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This solves for the policy functions for the field experiment. The idea
 % is to take the optimal value functions, then solve for the optimal policy
 % functions given the one time move. See the notes for more description.
 %
-% Update, now will dompute welfare gains in units of lifetime consumption
-% equivalent and one-time consumption equivalent. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 R = params(1); 
@@ -50,18 +48,15 @@ asset_grid  = meshgrid(asset_space,asset_space);
 
 policy_assets_rural_not = zeros(n_asset_states,n_shocks);
 policy_move_rural_not = zeros(n_asset_states,n_shocks);
-policy_assets_rural_not_gift = zeros(n_asset_states,n_shocks);
 
 policy_assets_rural_exp = zeros(n_asset_states,n_shocks);
 policy_move_rural_exp = zeros(n_asset_states,n_shocks);
 
 v_expr_rural_not = zeros(n_asset_states,n_shocks);
 v_expr_rural_exp = zeros(n_asset_states,n_shocks);
-v_expr_rural_not_gift = zeros(n_asset_states,n_shocks);
 
 u_opt_not = zeros(n_asset_states,n_shocks);
 u_opt_exp = zeros(n_asset_states,n_shocks);
-% This is the period utility function when confronted with the transfer.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Preallocate stuff that stays fixed (specifically potential period utility and
@@ -78,24 +73,28 @@ feasible_move_seasn = false(n_asset_states,n_asset_states,n_shocks);
 
 net_assets = R.*asset_grid' - asset_grid;
 
+cash_transfer = 0.56.*m_seasn;
+
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - abar;
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - abar;
+    % Providing Cash (Unconditionally)
     
     feasible_rural(:,:,zzz) = consumption > 0;
     
     utility_rural(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - abar;
-    % NO MOVING COST HERE!!!!!!!!!!!
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - abar - m_seasn;
+    % Providing Cash (Unconditionally)
     
     feasible_move_seasn(:,:,zzz) = consumption > 0;
     
     utility_move_seasn(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
   
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - m - abar;
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - m - abar;
+    % Providing Cash (Unconditionally)
     
     feasible_move_rural(:,:,zzz) = consumption > 0;
     
@@ -112,8 +111,6 @@ end
 for zzz = 1:n_shocks
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    
      
     expected_value_rural_not = beta.*(trans_mat(zzz,:)*v_hat_rural_not');
     
@@ -126,7 +123,7 @@ for zzz = 1:n_shocks
     expected_value_seasn_not = beta.*(trans_mat(zzz,:)*v_hat_seasn_not');
     
     expected_value_seasn_exp = beta.*(trans_mat(zzz,:)*v_hat_seasn_exp');
-    
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           NOT-EXPERIENCED
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,7 +136,7 @@ for zzz = 1:n_shocks
     [v_stay_rural_not, p_asset_stay_rural_not] = max(value_fun,[],2);
     
     u_rural = diag(utility_rural(:,p_asset_stay_rural_not,zzz));
-    e_value_rural = expected_value_rural_not(p_asset_stay_rural_not)';
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the value of being being a seasonal migrant...NOTE NO MOVING COST
 % HERE THIS IS THE EXPERIMENT
@@ -151,7 +148,7 @@ for zzz = 1:n_shocks
     [v_move_seasn_not, p_asset_move_seasn_not] = max(value_fun,[],2);
     
     u_move_seasn = diag(utility_move_seasn(:,p_asset_move_seasn_not,zzz));
-    e_value_move_seasn = expected_value_seasn_not(p_asset_move_seasn_not)';     
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute value of moving...here I get the expected value of being in the
 % urban area because I'm moving out the rural area and I become a new guy.
@@ -163,11 +160,11 @@ for zzz = 1:n_shocks
     [v_move_rural_not, p_asset_move_rural_not] = max(value_fun,[],2);
     
     u_move_rural = diag(utility_move_rural(:,p_asset_move_rural_not,zzz));
-    e_value_move_rural = expected_value_urban_new(p_asset_move_rural_not)'; 
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     p_asset_stay_rural_all_not = [ p_asset_stay_rural_not , p_asset_move_seasn_not , p_asset_move_rural_not ];
-           
+        
     [v_expr_rural_not(:,zzz), policy_move_rural_not(:,zzz)] = max([ v_stay_rural_not , v_move_seasn_not, v_move_rural_not],[],2) ;
 
     policy_assets_rural_not(:,zzz) = diag(p_asset_stay_rural_all_not(:, policy_move_rural_not(:,zzz)));
@@ -175,44 +172,6 @@ for zzz = 1:n_shocks
     u_all_not = [u_rural, u_move_seasn, u_move_rural];
     
     u_opt_not(:,zzz) = diag(u_all_not(:,policy_move_rural_not(:,zzz)));
-    
-    e_value_all = [e_value_rural, e_value_move_seasn, e_value_move_rural];
-    
-    e_value_opt(:,zzz) = diag(e_value_all(:,policy_move_rural_not(:,zzz)));
-    
-    % This process will extract the period utility function and then the
-    % continuation value. So the sum of u_opt_not + e_value_opt =
-    % val_expr_rural_not. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This part asks, what is the value IF EXPERINCE WAS GIVEN, holding fixed
-% policy... the idea here is to try and tease out how much the ubar is
-% eating into the welfare gains...
-
-    value_fun = bsxfun(@plus,utility_move_seasn(:,:,zzz),expected_value_seasn_exp);
-    % this the is the value fun if given experince...
-    
-    value_fun(~feasible_move_seasn(:,:,zzz)) = -1e10;
-    
-    [v_move_seasn_gift, p_asset_move_seasn_gift] = max(value_fun,[],2);
-    
-    v_expr_rural_not_gift(:,zzz) = v_expr_rural_not(:,zzz);
-    % Everything is the same as if you had no experince...
-    
-    %v_expr_rural_not_gift(policy_move_rural_not(:,zzz)== 2,zzz) = v_move_seasn_gift(policy_move_rural_not(:,zzz)== 2);
-    
-    v_expr_rural_not_gift(policy_move_rural_not(:,zzz)== 2,zzz) = v_expr_rural_not(policy_move_rural_not(:,zzz)== 2,zzz)...
-        -expected_value_seasn_not(policy_move_rural_not(:,zzz)== 2)' + expected_value_seasn_exp(policy_move_rural_not(:,zzz)== 2)'; 
-    
-    test = 1;
-    % but those guys who moved, get the expeince...
-    
-%     u_opt_not_gift(:,zzz) = u_opt_not(:,zzz);
-%     u_opt_not_gift(:,zzz) = utility_move_seasn(policy_move_rural_not(:,zzz)== 2,p_asset_move_seasn_gift,zzz);
-    
-%     policy_assets_rural_not_gift(:,zzz) = policy_assets_rural_not(:,zzz);
-%     policy_assets_rural_not_gift(policy_move_rural_not(:,zzz)== 2,zzz) = p_asset_move_seasn_gift(policy_move_rural_not(:,zzz)== 2);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           EXPERIENCED
@@ -256,7 +215,7 @@ for zzz = 1:n_shocks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     p_asset_stay_rural_all_e = [ p_asset_stay_rural_exp , p_asset_move_seasn_exp , p_asset_move_rural_exp ];
-           
+            
     [v_expr_rural_exp(:,zzz), policy_move_rural_exp(:,zzz)] = max([ v_stay_rural_exp , v_move_seasn_exp, v_move_rural_exp],[],2) ;
 
     policy_assets_rural_exp(:,zzz) = diag(p_asset_stay_rural_all_e(:, policy_move_rural_exp(:,zzz)));
@@ -274,14 +233,12 @@ move = zeros(n_asset_states,n_shocks,2);
 % This generates the permenant percent increse... uncomment the first line
 % to get the ``gift of experince'' result
 
-%cons_eqiv(:,:,1) = ((v_expr_rural_not_gift./v_hat_rural_not)).^(1./(1-gamma)) - 1;
 cons_eqiv(:,:,1) = ((v_expr_rural_not./v_hat_rural_not)).^(1./(1-gamma)) - 1;
 cons_eqiv(:,:,2) = ((v_expr_rural_exp./v_hat_rural_exp)).^(1./(1-gamma)) - 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This generates the one time equivalent variation...
 
-% cons_eqiv(:,:,1) = (((v_expr_rural_not_gift-v_hat_rural_not)./u_opt_not + 1)).^(1./(1-gamma))- 1;
 % cons_eqiv(:,:,1) = (((v_expr_rural_not-v_hat_rural_not)./u_opt_not + 1)).^(1./(1-gamma))- 1;
 % cons_eqiv(:,:,2) = (((v_expr_rural_exp-v_hat_rural_exp)./u_opt_exp + 1)).^(1./(1-gamma))- 1;
 

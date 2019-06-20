@@ -19,7 +19,7 @@ params = new_cal;
 
 n_params = length(params); % how many paramters we need to do...
 
-eps = 1+0.05; % This is the change. One issue is that some of this stuff was
+eps = 1+0.01; % This is the change. One issue is that some of this stuff was
 % not changing that much, this is a question of how accuratly we are
 % solving it, here is an area of investigation.
 
