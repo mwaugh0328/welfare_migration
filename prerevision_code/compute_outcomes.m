@@ -493,14 +493,14 @@ disp(m_income_season(1)/m_income_season(2))
 disp('Consumption Drop')
 disp(cons_drop)
 
-cd('C:\Users\mwaugh.NYC-STERN\Dropbox\LMW\Programs\Simple + Seasonal\Experience\Analysis')
+cd('.\Analysis')
 
 m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
 m_rates = 100.*m_rates';
 
 plot_migration
 
-cd('C:\Users\mwaugh.NYC-STERN\Dropbox\LMW\Programs\Simple + Seasonal\Experience\HPZ620')
+cd('..')
 
 figure
 
