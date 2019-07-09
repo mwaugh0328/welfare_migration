@@ -1,4 +1,4 @@
-function [assets, move, vguess] = rural_urban_value(params,shocks,tmat)%#codegen
+function [assets, move, vguess] = rural_urban_value_addit(params,shocks,tmat)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This solves for value and policy function for the rural-urban location problem
 % described in the extensions of my notes with permanent``Roy'' like
@@ -211,7 +211,7 @@ for iter = 1:n_iterations
 % This is the value of a seasonal migrant...once in the ubran area...
 % Note the TRANSITION to being experinced...
      
-    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz).*ubar) ,...
+    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz) + ubar) ,...
         (lambda.*expected_value_rural_not + (1-lambda).*expected_value_rural_exp));
   
     
@@ -277,7 +277,7 @@ for iter = 1:n_iterations
 % This is the value of an recent urban resident staying in the uban area. Note how
 % the ubar is preseant.  
 
-    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz).*ubar) , ...
+    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz) + ubar) , ...
         (lambda.*expected_value_urban_new + (1-lambda).*expected_value_urban_old) );
         
     [v_stay_urban_new, ~] = max(value_fun,[],2);
@@ -299,7 +299,7 @@ for iter = 1:n_iterations
     
     [v_move_urban_old, ~] = max(value_fun,[],2);
     
-    value_fun = bsxfun(@plus,utility_move_urban(:,:,zzz).*ubar, expected_value_rural_not);
+    value_fun = bsxfun(@plus,utility_move_urban(:,:,zzz) + ubar, expected_value_rural_not);
 
            
     [v_move_urban_new, ~] = max(value_fun,[],2);
@@ -428,7 +428,7 @@ for zzz = 1:n_shocks
 % This is the value of a seasonal migrant...once in the ubran area...
 % Note the TRANSITION to being experinced...
      
-    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz).*ubar) ,...
+    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz) + ubar) ,...
         (lambda.*expected_value_rural_not + (1-lambda).*expected_value_rural_exp));
     
     [v_seasn_not, policy_assets_seasn_not(:,zzz)] = max(value_fun,[],2);
@@ -495,7 +495,7 @@ for zzz = 1:n_shocks
 % This is the value of an recent urban resident staying in the uban area. Note how
 % the ubar is preseant.  
 
-    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz).*ubar) , ...
+    value_fun = bsxfun(@plus, (utility_urban(:,:,zzz) + ubar) , ...
         (lambda.*expected_value_urban_new + (1-lambda).*expected_value_urban_old) );
 
         
@@ -519,7 +519,7 @@ for zzz = 1:n_shocks
     
     [v_move_urban_old, p_asset_move_urban_old] = max(value_fun,[],2);
     
-    value_fun = bsxfun(@plus,utility_move_urban(:,:,zzz).*ubar, expected_value_rural_not);
+    value_fun = bsxfun(@plus,utility_move_urban(:,:,zzz) + ubar, expected_value_rural_not);
            
     [v_move_urban_new, p_asset_move_urban_new] = max(value_fun,[],2);
     

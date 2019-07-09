@@ -122,9 +122,12 @@ parfor xxx = 1:n_types
     
     params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
 
-    [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
-        rural_urban_value_mex(params, trans_shocks, trans_mat);
+%     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+%         rural_urban_value(params, trans_shocks, trans_mat);
 
+    
+    [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+        rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
