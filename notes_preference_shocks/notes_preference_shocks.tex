@@ -8,7 +8,7 @@
 \usepackage[longnamesfirst]{natbib}
 \usepackage{cite}
 \usepackage[paperwidth=8.5in,
-left=0.5in,right=0.5in,paperheight=11.0in,textheight=10in,centering]{geometry}
+left=0.5in,right=0.5in,paperheight=11.0in,textheight=9.5in,centering]{geometry}
 
 \bibliographystyle{ecta}
 \definecolor{nblue}{RGB}{0,0,128}
@@ -59,6 +59,8 @@ Before describing the value functions of a household, it is important to have a 
 
 \item \textbf{Transitory productivity state.} Each household is subject to transitory productivity shocks, $s$.
 
+\item \textbf{Transitory moving shock.} Each household is subject to i.i.d. moving shocks $\nu$.
+
 \item \textbf{Endogenous state variables.} There are three endogenous (individual) state variables. The first is the household's asset holdings, $a$. The second is a composite variable that describes the household's location and migration status. The possible states are: rural, seasonal-migrant (living in the rural area but working in the urban area for one period), and urban. The third is whether or not the household is an inexperienced migrant, $x$, and, thus, whether or not it suffers disutility $\bar u$ from locating in the urban area.
 
 \item \textbf{Aggregate state variables.} There are two aggregate state variables: the season, $i \in \{g,\ell \}$, and the number of workers in the rural area, $N_r$. The season determines the current and future productivity in the rural area, and jointly, the two aggregate states determine the current wage per efficiency unit as in equation \eqref{eq:wage_per_efficiency_units}.
@@ -68,24 +70,43 @@ We begin with the problem of a rural household. Because $z$ is time-invariant fo
 \textbf{Rural Households.} A rural household with productivity $z$ solves the following problem:
 \begin{align}
 \small
-v(a, r, s, x, i, N_r) =& \nonumber \\
-  \max \bigg\{ \ v(a, r,  s, & x, i, N_r, | \ \mbox{stay}),  \ v(a, r, s, x, i, N_r, | \ \mbox{seas}),\  v(a, r, s, x, i, N_r, | \ \mbox{perm}) \ \bigg \},
+v(a, r, s, \nu, x, i, N_r) =& \nonumber \\
+  \max \bigg\{ \ v(a, r,  s, & x, i, N_r| \ \mbox{stay}) + \nu^{\tiny\mbox{stay}},  \ v(a, r, s, x, i, N_r | \ \mbox{seas}) + \nu^{\tiny\mbox{seas}},\  v(a, r, s, x, i, N_r | \ \mbox{perm})+ \nu^{\tiny\mbox{perm}} \ \bigg \},
 \label{eq:value_fun_rural}
 \end{align}
-where a household chooses among staying in the the rural area, seasonally moving, and permanently moving. Conditional on staying in the rural area, the value function is:
+where a household chooses among staying in the rural area, seasonally moving, and permanently moving. Influencing this choice is the value function associated with each option and the household's taste shock associated with each choice. Here we will follow the literature and assume that these taste shocks are independently and identically distributed across time and is distributed Type 1 extreme value distribution with scale parameter $\sigma_{\nu}$.
+
+The distributional assumption on the taste shocks implies that the choice probability to stay in a location, for example, is:
+\begin{eqnarray*}
+\small
+P(a, r, s, x, i, N_r| \ \mbox{stay}) = \frac{\exp\{\sigma_{\nu}^{-1} v(a, r,  s, x, i, N_r | \ \mbox{stay}\}}{\sum_{j_r} \exp\{\sigma_{\nu}^{-1} v(a, r,  s, x, i, N_r, | \ j_r)\}}
+%\frac{\exp\{ \sigma_{\nu}^{-1} v(a, r,  s, & x, i, N_r, | \ \mbox{stay})\}}{\exp\{ \sigma_{\nu}^{-1} v(a, r,  s, & x, i, N_r, | \ \mbox{stay})\}
+\end{eqnarray*}
+where the sum across $j$'s are the different choices. Another important feature to note with this specification is that the expected value function (with respect to the preference shocks) is
+\begin{eqnarray*}
+\small
+E_{\nu} v(a, r, s, \nu, x, i, N_r) = \sigma_{\nu} \log \left( \sum_{j_r} \exp\{\sigma_{\nu}^{-1} v(a, r,  s, x, i, N_r, | \ j_r)\} \right).
+\end{eqnarray*}
+An important feature here is that this is not a simple probability weighted sum. The reason is that the taste shock is ``felt'' and the household is choosing over it. In other words, it's the expectation over the max operator, hence, this funky feature.
+
+Below, the value functions conditional on a choice are described. 
+
+Conditional on staying in the rural area, the value function is:
 \begin{align}
-v(a, r, s, x, i, N_r | \ \mbox{stay}) =  \max_{a'\in \mathcal{A}}\bigg  \{ u(Ra + w_{r}(s, i, N_r) - a' ) + \beta \, \mathbb{E} [v(a',r, s',x',i',N_r')]  \bigg\},
+v(a, r, s, x, i, N_r | \ \mbox{stay}) =  \max_{a'\in \mathcal{A}}\bigg  \{ u(Ra + w_{r}(s, i, N_r) - a' )  + \beta \, \mathbb{E} [v(a',r, s',\nu', x',i',N_r')]  \bigg\},
 \label{eq:bellman_rural_stay}
 \end{align}
 which says that the household chooses future asset holdings to maximize the expected present discounted value of utility. The asset holdings must respect the borrowing constraint and, thus, must lie in the set $\mathcal{A}$. Given asset choices, a household's consumption equals the gross return on current asset holdings, $Ra$, plus labor income from working in the rural area, $w_{r}(z, s, i)$, minus future asset holdings. Next period's state variables are the new asset holdings, location in the rural area, the transitory productivity shock, the experience level, the subsequent season, and the aggregate rural efficiency units in the next period. The expectation operator is defined over two uncertain outcomes: the transitory shocks and the change in experience. Recall, that if the household is experienced, it stays that way with probability $\pi$ and becomes inexperienced with probability $1-\pi$; if the household is inexperienced, then it stays inexperienced.
 
 The value function associated with a permanent move is:
 \begin{align}
-v(a, r, s, x, i, N_r | \ \mbox{perm})  = \max_{a'\in \mathcal{A}} \bigg\{ u(Ra + w_r(z, s, i, N_r) - a' - m_{p} ) + \beta \, \mathbb{E} [v(a',u, s', x', i',N_r')] \bigg\}.
+v(a, r, s, x, i, N_r | \ \mbox{perm})  = \max_{a'\in \mathcal{A}} \bigg\{ u(Ra + w_r(z, s, i, N_r) - a' - m_{p} )  + \beta \, \mathbb{E} [v(a',u, s',\nu', x', i',N_r')] \bigg\}.
 %\label{eq:bellman_rural_perm_move}
 \nonumber
 \end{align}
 While similar to the staying value function, there are several points of difference. First, the agent must pay $m_p$ to make the permanent move, and this costs resources. Second, the continuation value function denotes that the household's location changes from the rural to the urban area.
+
+\textbf{NEED TO THINK ABOUT!!!} What to do with the shock when the guy is on a seasonal move. Does he get hit with a preference shock? Does it make a difference as I think with one choice, the expected value just becomes the regular value function...
 
 The value function associated with a seasonal move is:
 \begin{align}
@@ -94,7 +115,7 @@ The value function associated with a seasonal move is:
 \end{align}
 If a household decides to move seasonally, it pays the moving cost $m_T$, and works in the urban area in the next period. The key distinction between the permanent move and the seasonal move is that the seasonal move is for just one period. Hence, the location state variable is $seas$ and not $u$, as this indicates that the household is going to work in the urban area and return in the next period. The value function associated with a seasonal move while in the urban area is:
 \begin{align}
-v(a',seas, s',x', i',N_r')&=  \max_{a''\in \mathcal{A}}\bigg[ u(Ra' + w_u(z, s') - a'')\bar u^{x'} + \beta \, \mathbb{E} [v(a'',r, s'', x'', i'',N_r'')] \bigg].
+v(a',seas, s',x', i',N_r')&=  \max_{a''\in \mathcal{A}}\bigg[ u(Ra' + w_u(z, s') - a'')\bar u^{x'} + \beta \, \mathbb{E} [v(a'',r, s'', \nu'', x'', i'',N_r'')] \bigg].
 \label{eq:bellman_rural_sm}
 \end{align}
 There are several important points to take note of in (\ref{eq:bellman_rural_sm}). First, this household has only one choice: how to adjust its asset holdings. By the definition of a seasonal move, the household works in the urban area for one period and then returns to the rural area. Second, note how the disutility from living in the urban area appears (i.e., the presence of $\bar u$). Moreover, the state variable of a household's experience $x$ determines whether or not the disutility is experienced.
@@ -103,9 +124,25 @@ Equations (\ref{eq:bellman_rural_seas_move}) and (\ref{eq:bellman_rural_sm}) ill
 
 \textbf{Urban Households.} Urban households face problems similar to those described above, though they choose between just two options: staying or making a permanent move. For a household with productivity level $z$, the problem is:
 \begin{align}
-v(a, u, s, x, N_r, i) = \max \bigg\{ \ v(a, u, s, x, N_r, i| \ \mbox{stay}), \  v(a, u, s, x, N_r,  i| \ \mbox{perm}) \ \bigg \}.
+v(a, u, s, \nu, x, N_r, i) = \max \bigg\{ \ v(a, u, s, x, N_r, i| \ \mbox{stay}) + \nu^{\tiny\mbox{stay}}, \  v(a, u, s, x, N_r,  i| \ \mbox{perm}) + \nu^{\tiny\mbox{perm}} \ \bigg \}.
 \label{eq:bellman_urban}
 \end{align}
+Again, influencing this choice is the value function associated with each option and the household's taste shock associated with each choice. These taste shocks are independently and identically distributed across time and distributed Type 1 extreme value distribution with the same scale parameter $\sigma_{\nu}$. The distributional assumption on the taste shocks implies that the choice probability to stay in a location, for example, is:
+\begin{eqnarray*}
+\small
+P(a, u, s, x, i, N_r| \ \mbox{stay}) = \frac{\exp\{\sigma_{\nu}^{-1} v(a, u, s, x, N_r, i| \ \mbox{stay})  \}}{\sum_{j_u} \exp\{\sigma_{\nu}^{-1} v(a, u, s, x, N_r, i| \ j_u)\}}
+%\frac{\exp\{ \sigma_{\nu}^{-1} v(a, r,  s, & x, i, N_r, | \ \mbox{stay})\}}{\exp\{ \sigma_{\nu}^{-1} v(a, r,  s, & x, i, N_r, | \ \mbox{stay})\}
+\end{eqnarray*}
+where the sum across $j_u$'s are the different choices available to the urban household. As above the expected value function (with respect to the preference shocks) is
+\begin{eqnarray*}
+\small
+E_{\nu} v(a, u, s, \nu, x, i, N_r) = \sigma_{\nu} \log \left( \sum_{j_u} \exp\{\sigma_{\nu}^{-1} v(a, u,  s, x, i, N_r, | \ j_u)\} \right).
+\end{eqnarray*}
+\textbf{NOTE} Mechanically, this is lowering utility in the urban area because they have less options. In the urban area you get two draws, yet in the rural area you get three. From a preference standpoint, the rural area will naturally deliver higher expected utility, and will be a force to keep people in the urban area. This force has to be present in the old version of the model, i.e. the rural area will deliver more option value, but this will amplify the option value.  
+
+
+
+
 Conditional on staying in the urban area, the value is:
 \begin{align}
 \hspace{-0.60cm}v(a, u, s, x, i, N_r, | \ \mbox{stay}) =  \max_{a'\in \mathcal{A}}\bigg\{ u(Ra + w_{u}(z,s) - a' )\bar u^{x} + \beta \, \mathbb{E} [v(a',u,s',x',i',N_r')] \bigg\}.
@@ -120,6 +157,6 @@ The value function associated with a permanent move back to the rural area is:
 \hspace{-0.60cm} v(a, u, s, x, i, N_r | \ \mbox{perm}) = \max_{a'\in \mathcal{A}} \bigg[ u(Ra + w_{u}(z,s) - a' - m_{p} )\bar u^{x} + \beta \, \mathbb{E} [v(a',r, s', x', i',N_r')] \bigg].
 \label{eq:bellman_urban_perm_move}
 \end{align}
-Here, the agent must pay $m_p$ to make the permanent move. Furthermore, the continuation value function denotes the household's location changes from the urban to the rural area. After a permanent move to the rural area, experienced households keep their experience with probability $\pi$ and lose it with probability $1-\pi$. 
+Here, the agent must pay $m_p$ to make the permanent move. Furthermore, the continuation value function denotes the household's location changes from the urban to the rural area. After a permanent move to the rural area, experienced households keep their experience with probability $\pi$ and lose it with probability $1-\pi$.
 
 \end{document}  
