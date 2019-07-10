@@ -1,0 +1,125 @@
+\documentclass[pdftex,11pt]{article}
+\usepackage[pdftex]{graphicx,color}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb}
+\usepackage{titlesec}
+\usepackage{subfigure}
+\usepackage{fancyhdr}
+\usepackage[longnamesfirst]{natbib}
+\usepackage{cite}
+\usepackage[paperwidth=8.5in,
+left=0.5in,right=0.5in,paperheight=11.0in,textheight=10in,centering]{geometry}
+
+\bibliographystyle{ecta}
+\definecolor{nblue}{RGB}{0,0,128}
+
+\usepackage[colorlinks=true, linkcolor=nblue,
+citecolor=black, urlcolor=nblue, bookmarks=false,
+pdfstartview={XYZ null null 0.90},
+pdftitle={Redistributing the Gains From Trade Through Progressive Taxation},
+pdfauthor={Spencer G. Lyon, Michael E. Waugh},
+pdfkeywords={economics, trade, dynamics, quant econ, lyon, waugh, incomplete markets, taxes, redistribution, progressivity, inequality, Ricardo, julia, migration, taxation, social insurance}
+]{hyperref}
+
+\usepackage{setspace}
+
+\onehalfspace
+
+\renewcommand{\baselinestretch}{1.1}
+\renewcommand{\arraystretch}{.7}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{.1in}
+\renewcommand\familydefault{\sfdefault}
+
+\titleformat{\section}{\large\bf}{\thesection.}{.5em}{}
+\titleformat{\subsection}{\normalsize\bf}{\thesubsection.}{.5em}{}
+\titleformat{\subsubsection}{\normalsize\bf}{\thesubsubsection.}{.5em}{}
+
+\def\thesection{\arabic{section}}
+\def\thesubsection{\Alph{subsection}}
+\def\thesubsubsection{\Roman{subsubsection}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+
+\pagestyle{fancy}
+\rhead{}
+\lhead{}
+\cfoot{\thepage}
+\lfoot{}
+\lfoot{Revised: \today}
+\renewcommand{\headrulewidth}{0pt}
+
+
+\begin{document}
+
+Before describing the value functions of a household, it is important to have a complete accounting of the state space. The state variables for a household can be divided into objects that are permanent, transitory, endogenous and aggregate.
+\begin{itemize}
+\item \textbf{Permanent productivity state.} Each household is endowed with $z$ efficiency units in the urban area and one efficiency unit in the rural area. This is the ``static Roy model'' aspect of the model.
+
+\item \textbf{Transitory productivity state.} Each household is subject to transitory productivity shocks, $s$.
+
+\item \textbf{Endogenous state variables.} There are three endogenous (individual) state variables. The first is the household's asset holdings, $a$. The second is a composite variable that describes the household's location and migration status. The possible states are: rural, seasonal-migrant (living in the rural area but working in the urban area for one period), and urban. The third is whether or not the household is an inexperienced migrant, $x$, and, thus, whether or not it suffers disutility $\bar u$ from locating in the urban area.
+
+\item \textbf{Aggregate state variables.} There are two aggregate state variables: the season, $i \in \{g,\ell \}$, and the number of workers in the rural area, $N_r$. The season determines the current and future productivity in the rural area, and jointly, the two aggregate states determine the current wage per efficiency unit as in equation \eqref{eq:wage_per_efficiency_units}.
+\end{itemize}
+We begin with the problem of a rural household. Because $z$ is time-invariant for each household, we omit it from the formulation of the household's problem below.
+
+\textbf{Rural Households.} A rural household with productivity $z$ solves the following problem:
+\begin{align}
+\small
+v(a, r, s, x, i, N_r) =& \nonumber \\
+  \max \bigg\{ \ v(a, r,  s, & x, i, N_r, | \ \mbox{stay}),  \ v(a, r, s, x, i, N_r, | \ \mbox{seas}),\  v(a, r, s, x, i, N_r, | \ \mbox{perm}) \ \bigg \},
+\label{eq:value_fun_rural}
+\end{align}
+where a household chooses among staying in the the rural area, seasonally moving, and permanently moving. Conditional on staying in the rural area, the value function is:
+\begin{align}
+v(a, r, s, x, i, N_r | \ \mbox{stay}) =  \max_{a'\in \mathcal{A}}\bigg  \{ u(Ra + w_{r}(s, i, N_r) - a' ) + \beta \, \mathbb{E} [v(a',r, s',x',i',N_r')]  \bigg\},
+\label{eq:bellman_rural_stay}
+\end{align}
+which says that the household chooses future asset holdings to maximize the expected present discounted value of utility. The asset holdings must respect the borrowing constraint and, thus, must lie in the set $\mathcal{A}$. Given asset choices, a household's consumption equals the gross return on current asset holdings, $Ra$, plus labor income from working in the rural area, $w_{r}(z, s, i)$, minus future asset holdings. Next period's state variables are the new asset holdings, location in the rural area, the transitory productivity shock, the experience level, the subsequent season, and the aggregate rural efficiency units in the next period. The expectation operator is defined over two uncertain outcomes: the transitory shocks and the change in experience. Recall, that if the household is experienced, it stays that way with probability $\pi$ and becomes inexperienced with probability $1-\pi$; if the household is inexperienced, then it stays inexperienced.
+
+The value function associated with a permanent move is:
+\begin{align}
+v(a, r, s, x, i, N_r | \ \mbox{perm})  = \max_{a'\in \mathcal{A}} \bigg\{ u(Ra + w_r(z, s, i, N_r) - a' - m_{p} ) + \beta \, \mathbb{E} [v(a',u, s', x', i',N_r')] \bigg\}.
+%\label{eq:bellman_rural_perm_move}
+\nonumber
+\end{align}
+While similar to the staying value function, there are several points of difference. First, the agent must pay $m_p$ to make the permanent move, and this costs resources. Second, the continuation value function denotes that the household's location changes from the rural to the urban area.
+
+The value function associated with a seasonal move is:
+\begin{align}
+\hspace{-0.60cm}v(a, r, s, x, i, N_r | \ \mbox{seas}) = \max_{a'\in \mathcal{A}}&\bigg\{ u(Ra + w_r(s, i, N_r) - a' - m_T ) + \beta \, \mathbb{E} [v(a',seas, s', x', i', N_r')] \bigg\}.
+\label{eq:bellman_rural_seas_move}
+\end{align}
+If a household decides to move seasonally, it pays the moving cost $m_T$, and works in the urban area in the next period. The key distinction between the permanent move and the seasonal move is that the seasonal move is for just one period. Hence, the location state variable is $seas$ and not $u$, as this indicates that the household is going to work in the urban area and return in the next period. The value function associated with a seasonal move while in the urban area is:
+\begin{align}
+v(a',seas, s',x', i',N_r')&=  \max_{a''\in \mathcal{A}}\bigg[ u(Ra' + w_u(z, s') - a'')\bar u^{x'} + \beta \, \mathbb{E} [v(a'',r, s'', x'', i'',N_r'')] \bigg].
+\label{eq:bellman_rural_sm}
+\end{align}
+There are several important points to take note of in (\ref{eq:bellman_rural_sm}). First, this household has only one choice: how to adjust its asset holdings. By the definition of a seasonal move, the household works in the urban area for one period and then returns to the rural area. Second, note how the disutility from living in the urban area appears (i.e., the presence of $\bar u$). Moreover, the state variable of a household's experience $x$ determines whether or not the disutility is experienced.
+
+Equations (\ref{eq:bellman_rural_seas_move}) and (\ref{eq:bellman_rural_sm}) illustrate the forces that shape the decision to move seasonally and, in turn, our inferences from the experimental and survey results. Generally, the choice to move seasonally will relate to a household's comparative earnings advantage in the urban area relative to the rural area. However, several forces may lead a household with a permanent comparative advantage in the city not to move. First, the urban disutility may prevent the household from moving, even though its comparative advantage in the urban area is expected to be high. Second, there is risk associated with the move. A household does not know $s'$, and, hence, there is a chance that the income realization in the urban area will not be favorable. Third, the household may have limited assets that simply make a move infeasible or not sufficient to insure against a bad outcome in the urban area.
+
+\textbf{Urban Households.} Urban households face problems similar to those described above, though they choose between just two options: staying or making a permanent move. For a household with productivity level $z$, the problem is:
+\begin{align}
+v(a, u, s, x, N_r, i) = \max \bigg\{ \ v(a, u, s, x, N_r, i| \ \mbox{stay}), \  v(a, u, s, x, N_r,  i| \ \mbox{perm}) \ \bigg \}.
+\label{eq:bellman_urban}
+\end{align}
+Conditional on staying in the urban area, the value is:
+\begin{align}
+\hspace{-0.60cm}v(a, u, s, x, i, N_r, | \ \mbox{stay}) =  \max_{a'\in \mathcal{A}}\bigg\{ u(Ra + w_{u}(z,s) - a' )\bar u^{x} + \beta \, \mathbb{E} [v(a',u,s',x',i',N_r')] \bigg\}.
+\label{eq:bellman_urban_stay}
+\end{align}
+Households staying in the urban area have several key differences from those staying in the rural area. First, their wage depends on their permanent productivity level, $z$, and not on the season or number of aggregate efficiency units in the rural areas. Moreover, the transitory productivity shocks may have more or less volatility relative to the rural area, as modulated by the $\gamma$ parameter (see equation (\ref{eq:wages})). Third, the disutility from living in the urban area appears (i.e., the presence of $\bar u$), and the state variable of a household's experience $x$ determines whether or not the disutility is experienced.
+
+Finally, as with rural households, expectations are taken with respect to the transitory shock $s$ and the change in experience. However, as these households are in the urban area, inexperienced households stay that way in the next period with probability $\lambda$ and become experienced with probability $1-\lambda$. Experienced households retain their experience.
+
+The value function associated with a permanent move back to the rural area is:
+\begin{align}
+\hspace{-0.60cm} v(a, u, s, x, i, N_r | \ \mbox{perm}) = \max_{a'\in \mathcal{A}} \bigg[ u(Ra + w_{u}(z,s) - a' - m_{p} )\bar u^{x} + \beta \, \mathbb{E} [v(a',r, s', x', i',N_r')] \bigg].
+\label{eq:bellman_urban_perm_move}
+\end{align}
+Here, the agent must pay $m_p$ to make the permanent move. Furthermore, the continuation value function denotes the household's location changes from the urban to the rural area. After a permanent move to the rural area, experienced households keep their experience with probability $\pi$ and lose it with probability $1-\pi$. 
+
+\end{document}  

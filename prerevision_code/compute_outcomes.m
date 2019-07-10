@@ -31,8 +31,8 @@ gamma_urban = params(8); % Gamma parameter (set to 1?)
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
  
-n_perm_shocks = 48; 
-n_tran_shocks = 30;
+n_perm_shocks = 24; %48
+n_tran_shocks = 15; %30
 % Number of permenant and transitory types. 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,6 +115,7 @@ pref_shocks = rand(time_series,1);
 
 assets = zeros(n_asset_states,n_shocks,6,n_types);
 move = zeros(n_asset_states,n_shocks,4,n_types);
+vguess = zeros(n_asset_states,n_shocks,6,n_types);
 
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 
