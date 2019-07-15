@@ -182,9 +182,9 @@ means_test = median(data_panel(rural_not_monga,3));
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
 
-assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
-move_temp = zeros(n_asset_states,n_shocks,2,n_types);
-cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
+% assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
+% move_temp = zeros(n_asset_states,n_shocks,2,n_types);
+% cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
 
 % assets_surv = zeros(n_asset_states,n_shocks,n_types);
 % move_surv = zeros(n_asset_states,n_shocks,n_types);
@@ -209,39 +209,27 @@ for xxx = 1:n_types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment_welfare(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
+    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(grid, params, trans_shocks, trans_mat, vguess(xxx));
     
     %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
     % provides the asset policy conditional on a temporary move. 
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% perform the survey... tic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 
-%     [assets_surv(:,:,xxx), move_surv(:,:,xxx)] = survey_results(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
    
-     rng(02071983+xxx)
-    monga_index = monga(randi(length(monga),1,n_sims))';
-
-    [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver(assets(:,:,:,xxx), move(:,:,:,xxx), ...
-          assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx), cons_eqiv(:,:,:,xxx),...
-          params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
+%     rng(02071983+xxx)
+%     
+%     monga_index = monga(randi(length(monga),1,n_sims))';
+% 
+%     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
+%         = experiment_driver(assets(xxx), move(xxx), ...
+%           assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
+%           params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then
-    % after a period of time, implements the experirment. 
-    
-% if flag == 1
-%     [assets_surv(:,:,xxx), move_surv(:,:,xxx)] = survey_results(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
-%     
-%     [sim_surv_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-%         = experiment_driver_mex(assets(:,:,:,xxx), move(:,:,:,xxx), ...
-%           assets_surv(:,:,xxx), move_surv(:,:,xxx),...
-%           params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
-% end
-    
+    % after a period of time, implements the experirment.     
 end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
