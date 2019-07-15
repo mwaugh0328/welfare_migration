@@ -1,27 +1,30 @@
-function [assets, move, vfinal] = rural_urban_value_prefshock(params,shocks,tmat)%#codegen
+function [assets, move, vfinal] = rural_urban_value_prefshock(params,perm_types,shocks,tmat)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This solves for value and policy function for the rural-urban location problem
 % described in the extensions of my notes with permanent``Roy'' like
 % shocks. So each period, people can switch locations...
 
-sigma_nu = 0.10;
+sigma_nu = params.sigma_nu;
 
-n_rural_options = 3;
-n_urban_options = 2;
+n_rural_options = params.rural_options;
+n_urban_options = params.urban_options;
 
-R = params(1); 
-z_rural = params(2); z_urban = params(3);
+R = params.R; 
+z_rural = perm_types(1);
+z_urban = perm_types(2);
 % These are the permanent shocks. 
 
-beta = params(4); m = params(5); gamma = 2; abar = params(7);
+beta = params.beta; m = params.m; gamma = 2; abar = params.abar;
 
-ubar = params(8); lambda = params(9); pi_prob = params(10);
+ubar = params.ubar; lambda = params.lambda; pi_prob = params.pi_prob;
 
-m_seasn = params(11);
+m_seasn = params.m_season;
 
 shocks_rural = shocks(:,1); shocks_urban = shocks(:,2);
 
 trans_mat = tmat;
+
+grid = params.grid;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_iterations = 200;
@@ -33,9 +36,9 @@ A = (1-gamma).^-1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
-n_asset_states = 100;
+n_asset_states = grid(1);
 
-asset_space = linspace(0,6,n_asset_states);
+asset_space = linspace(grid(2),grid(3),grid(1));
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);

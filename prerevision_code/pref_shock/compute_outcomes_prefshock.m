@@ -1,32 +1,36 @@
-function [targets] = compute_outcomes_prefshock(params, flag)
+function [targets] = compute_outcomes_prefshock(cal_params, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR paper at
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-gamma = 2; 
+params.sigma_nu = 0.25;
 
-R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
+params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
-beta = 0.95;  abar = 0; % Discount factor
+params.beta = 0.95;  params.abar = 0; % Discount factor
 
-ubar = params(5);   lambda = params(6); pi_prob = params(7);
+params.ubar = cal_params(5);   params.lambda = cal_params(6); params.pi_prob = cal_params(7);
+
+params.rural_options = 3;
+params.urban_options = 2;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Shocks...
-shock_rho = params(4); % Persistance of shocks
-shock_std = params(1).*sqrt((1-shock_rho).^2); % Standard Deviation of shocks
+shock_rho = cal_params(4); % Persistance of shocks
+shock_std = cal_params(1).*sqrt((1-shock_rho).^2); % Standard Deviation of shocks
 
-perm_shock_u_std = params(2); % Permenant ability differs in the urban area.
+perm_shock_u_std = cal_params(2); % Permenant ability differs in the urban area.
 
-urban_tfp = params(3); rural_tfp = 1./urban_tfp; % Urban TFP
+urban_tfp = cal_params(3); rural_tfp = 1./urban_tfp; % Urban TFP
 
 seasonal_factor = 0.55; % The seasonal fluctuation part. 
 
-m = 0.16; % This is the moving cost. 
-m_temp = 0.08; % This is the bus ticket
+params.m = 0.16; % This is the moving cost. 
+params.m_season = 0.08; % This is the bus ticket
 
-gamma_urban = params(8); % Gamma parameter (set to 1?)
+gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
@@ -87,16 +91,17 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-grid = [100, 0, 6];
-n_asset_states = grid(1);
+params.grid = [100, 0, 6];
 
-asset_space = linspace(grid(2),grid(3),grid(1));
+asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
 n_sims = 3000;
 time_series = 50000;
 N_obs = 25000;
+
+params.N_obs = N_obs;
 
 rng(03281978)
 
@@ -120,12 +125,13 @@ move_shocks = rand(time_series,1);
 
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 tic
+
 parfor xxx = 1:n_types 
-    
-    params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
+        
+    %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
 
     [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value_prefshock(params, trans_shocks, trans_mat);
+        rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
 
 %     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
 %         rural_urban_value_addit(params, trans_shocks, trans_mat);
@@ -142,11 +148,9 @@ tic
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
-    
-    params = [R, solve_types(xxx,:),  m, m_temp, lambda, pi_prob];
-    
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(assets(xxx), move(xxx),...
-        grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',move_shocks);
+        
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
+        assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks',move_shocks);
     
 %     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
@@ -176,7 +180,7 @@ for xxx = 1:n_types
 end
 
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
-means_test = median(data_panel(rural_not_monga,3));
+params.means_test = median(data_panel(rural_not_monga,3));
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,15 +208,11 @@ move_shocks = move_shocks((N_obs+1):end,1);
 tic
 
 for xxx = 1:n_types     
-    
-    params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, m_temp, pi_prob];
-    
-    params_sim = [grid, R, solve_types(xxx,:),  m, m_temp, lambda, means_test, pi_prob];
-    
+       
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(grid, params, trans_shocks, trans_mat, vguess(xxx));
+    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
     
     %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
@@ -227,7 +227,7 @@ for xxx = 1:n_types
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
         = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
-          params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, move_shocks, sim_panel(:,:,xxx));
+          params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, move_shocks, sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then
     % after a period of time, implements the experirment.     
@@ -460,7 +460,7 @@ disp('')
 disp('Average Rural Population')
 disp(avg_rural)
 disp('Temporary Moving Cost Relative to Mean Consumption')
-disp(m_temp./mean(AVG_C))
+disp(params.m_season./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
 disp('Expr Elasticity: Year One, Two, Four')
@@ -490,14 +490,14 @@ disp(m_income_season(1)/m_income_season(2))
 disp('Consumption Drop')
 disp(cons_drop)
 
-cd('.\Analysis')
+cd('..\Analysis')
 
 m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
 m_rates = 100.*m_rates';
 
 plot_migration
 
-cd('..')
+cd('..\pref_shock')
 
 figure
 

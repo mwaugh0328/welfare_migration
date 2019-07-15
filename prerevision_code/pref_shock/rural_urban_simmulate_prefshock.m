@@ -1,64 +1,31 @@
-function [panel, states] = rural_urban_simmulate_prefshock(assets_policy, move_policy, grid,...
-                    params, N_obs, trans_shocks, shock_states, pref_shock, moveshock)%#codegen
+function [panel, states] = rural_urban_simmulate_prefshock(assets_policy, move_policy, ...
+                    params, perm_types, trans_shocks, shock_states, pref_shock, moveshock)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This simmulates a time series/cross section of variables that we can map
 % to data. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. 
 
-n_asset_states = grid(1);
+grid = params.grid;
 
 asset_space = linspace(grid(2),grid(3),grid(1));
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
-R = params(1); 
-z_rural = params(2); z_urban = params(3); 
+R = params.R; 
+z_rural = perm_types(1); z_urban = perm_types(2); 
 % These are the permanent shocks. 
 
-m = params(4);
-m_seasn = params(5);
-lambda = params(6);
-pi = params(7);
+m = params.m;
+m_seasn = params.m_season;
+lambda = params.lambda;
+pi = params.pi_prob;
 % These control unemployment risk. 
 
 r_shocks = trans_shocks(:,1); 
 u_shocks = trans_shocks(:,2);
 expr_shock = pref_shock;
 
-n_shocks = length(r_shocks);
-
-% move_policy_rural_not = move_policy.rural_not(:,:,:);
-% move_policy_rural_exp = move_policy.rural_exp(:,:,:);
-% move_policy_urban_new = move_policy.urban_new(:,:,:);
-% move_policy_urban_old = move_policy.urban_old(:,:,:);
-
-% policy_assets_rural_nxpr = assets_policy(:,:,1);
-% policy_assets_rural_expr = assets_policy(:,:,2);
-% 
-% policy_assets_seasn_nxpr = assets_policy(:,:,3);
-% policy_assets_seasn_expr = assets_policy(:,:,4);
-% 
-% policy_assets_urban_new = assets_policy(:,:,5);
-% policy_assets_urban_old = assets_policy(:,:,6);
-% 
-% policy_move_rural_nxpr = move_policy(:,:,1);
-% policy_move_rural_expr = move_policy(:,:,2);
-% policy_move_urban_new = move_policy(:,:,3);
-% policy_move_urban_old = move_policy(:,:,4);
-
-% move(5) where the three is no move, season, move perm.
-%     rural_not: [100×30×3 double]
-%     rural_exp: [100×30×3 double]
-%     urban_new: [100×30×2 double]
-%     urban_old: [100×30×2 double]
-
-% Asset stucture...!
-%     rural_not: [100×30×3 uint8]
-%     rural_exp: [100×30×3 uint8]
-%     seasn_not: [100×30 uint8]
-%     seasn_exp: [100×30 uint8]
-%     urban_new: [100×30×2 uint8]
-%     urban_old: [100×30×2 uint8]
+N_obs = params.N_obs;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 time_series = length(shock_states);

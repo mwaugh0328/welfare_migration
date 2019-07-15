@@ -1,33 +1,28 @@
 function [panel_expr] = simmulate_experiment_prefshock...
-    (assets_policy, move_policy, assets_temp, move_temp, cons_eqiv, params,...
+    (assets_policy, move_policy, assets_temp, move_temp, cons_eqiv, params, perm_type,...
     state_at_expr, trans_shocks, shock_states, pref_shock, move_shock)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. 
 
-grid = params(1:3);
-params = params(4:end);
+grid = params.grid;
 
-means_test = params(7);
+means_test = params.means_test;
 asset_space = linspace(grid(2),grid(3),grid(1));
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
-R = params(1); 
-z_rural = params(2); z_urban = params(3); W = params(4);
+R = params.R; 
+z_rural = perm_type(1); z_urban = perm_type(2);
 % These are the permanent shocks. 
 
-m = params(4);
-m_seasn = params(5);
-lambda = params(6);
-pi_prob = params(8);
-
-% These control unemployment risk. 
+m = params.m;
+m_seasn = params.m_season;
+lambda = params.lambda;
+pi_prob = params.pi_prob;
 
 r_shocks = trans_shocks(:,1); 
 u_shocks = trans_shocks(:,2);
 expr_shock = pref_shock;
-
-n_shocks = length(r_shocks);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 time_series = length(shock_states);
