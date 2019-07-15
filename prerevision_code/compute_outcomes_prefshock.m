@@ -199,6 +199,9 @@ sim_cntr_panel = zeros(n_sims,9,11,n_types);
 periods = 1:length(states_panel(:,:,1))-20;
 monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,1);
+move_shocks = move_shocks((N_obs+1):end,1);
+
+tic
 
 for xxx = 1:n_types     
     
@@ -218,19 +221,19 @@ for xxx = 1:n_types
     % provides the asset policy conditional on a temporary move. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 
-   
-%     rng(02071983+xxx)
-%     
-%     monga_index = monga(randi(length(monga),1,n_sims))';
-% 
-%     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-%         = experiment_driver(assets(xxx), move(xxx), ...
-%           assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
-%           params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
+    rng(02071983+xxx)
+    
+    monga_index = monga(randi(length(monga),1,n_sims))';
+
+    [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
+        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
+          params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, move_shocks, sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then
     % after a period of time, implements the experirment.     
 end
+
+toc
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

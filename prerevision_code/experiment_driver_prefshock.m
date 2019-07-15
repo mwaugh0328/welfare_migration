@@ -1,6 +1,6 @@
-function [sim_expr, sim_cntr] = experiment_driver(assets, move, assets_temp,...
+function [sim_expr, sim_cntr] = experiment_driver_prefshock(assets, move, assets_temp,...
     move_temp, cons_eqiv, params, trans_shocks, monga_index,...
-    states, pref_shocks, sim_data)%#codegen
+    states, pref_shocks, move_shocks, sim_data)%#codegen
 
 Nsims = length(monga_index);
 
@@ -19,9 +19,12 @@ for xxx = 1:Nsims
     shock_states = states(index:index+10,4);
     
     p_shocks = pref_shocks(index:index+10,1);
+    
+    m_shocks = move_shocks(index:index+10,1);
+   
        
-    [panel_expr] = simmulate_experiment(assets, move, assets_temp, move_temp, cons_eqiv, params,...
-    state_at_expr, trans_shocks, shock_states, p_shocks);
+    [panel_expr] = simmulate_experiment_prefshock(assets, move, assets_temp, move_temp, cons_eqiv, params,...
+    state_at_expr, trans_shocks, shock_states, p_shocks, m_shocks);
             
     sim_expr(xxx,:,1) = panel_expr(1,:);
     sim_expr(xxx,:,2) = panel_expr(2,:);
