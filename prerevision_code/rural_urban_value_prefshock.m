@@ -598,7 +598,7 @@ for zzz = 1:n_shocks
     
     pi_denom_rural_not = pi_stay_rural_not + pi_move_seasn_not + pi_move_rural_not;
     
-    policy_move_rural_not(:,zzz,:) = [pi_stay_rural_not , pi_move_seasn_not , pi_move_rural_not]./pi_denom_rural_not;
+    policy_move_rural_not(:,zzz,:) = cumsum([pi_stay_rural_not , pi_move_seasn_not , pi_move_rural_not]./pi_denom_rural_not,2);
     
     v_prime_rural_not(:,zzz) = sigma_nu.*log(pi_denom_rural_not);
     
@@ -614,7 +614,7 @@ for zzz = 1:n_shocks
     
     pi_denom_rural_exp = pi_stay_rural_exp + pi_move_seasn_exp + pi_move_rural_exp;
     
-    policy_move_rural_exp(:,zzz,:)  = [pi_stay_rural_exp, pi_move_seasn_exp, pi_move_rural_exp]./pi_denom_rural_exp;
+    policy_move_rural_exp(:,zzz,:)  = cumsum([pi_stay_rural_exp, pi_move_seasn_exp, pi_move_rural_exp]./pi_denom_rural_exp,2);
     
     v_prime_rural_exp(:,zzz) = sigma_nu.*log(pi_denom_rural_exp);
     
@@ -628,7 +628,7 @@ for zzz = 1:n_shocks
    
     pi_denom_urban_new = pi_stay_urban_new + pi_move_urban_new;
     
-    policy_move_urban_new(:,zzz,:) = [pi_stay_urban_new, pi_move_urban_new]./pi_denom_urban_new;
+    policy_move_urban_new(:,zzz,:) = cumsum([pi_stay_urban_new, pi_move_urban_new]./pi_denom_urban_new,2);
     
     v_prime_urban_new(:,zzz) = sigma_nu.*log(pi_denom_urban_new);
     
@@ -642,7 +642,7 @@ for zzz = 1:n_shocks
    
     pi_denom_urban_old = pi_stay_urban_old + pi_move_urban_old;
     
-    policy_move_urban_old(:,zzz,:) = [pi_stay_urban_old, pi_move_urban_old]./pi_denom_urban_old;
+    policy_move_urban_old(:,zzz,:) = cumsum([pi_stay_urban_old, pi_move_urban_old]./pi_denom_urban_old,2);
     
     v_prime_urban_old(:,zzz) = sigma_nu.*log(pi_denom_urban_old);
     

@@ -103,6 +103,7 @@ rng(03281978)
 [~, shock_states_p] = hmmgenerate(time_series,trans_mat,ones(n_shocks));
 
 pref_shocks = rand(time_series,1);
+move_shocks = rand(time_series,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the policy functions and then simmulate the time paths. See the
@@ -137,14 +138,15 @@ toc
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
+tic
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
     
     params = [R, solve_types(xxx,:),  m, m_temp, lambda, pi_prob];
     
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(assets(:,:,:,xxx), move(:,:,:,xxx),...
-        grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks');
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(assets(xxx), move(xxx),...
+        grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',move_shocks);
     
 %     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
@@ -153,6 +155,7 @@ for xxx = 1:n_types
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
 %   
 end 
+toc
 
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their

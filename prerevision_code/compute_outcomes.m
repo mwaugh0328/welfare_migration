@@ -123,12 +123,12 @@ parfor xxx = 1:n_types
     
     params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
 
-%     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
-%         rural_urban_value(params, trans_shocks, trans_mat);
+    [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+        rural_urban_value(params, trans_shocks, trans_mat);
 
     
-    [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
-        rural_urban_value_addit(params, trans_shocks, trans_mat);
+%     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+%         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -137,7 +137,7 @@ end
 
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
-
+tic
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
@@ -154,7 +154,7 @@ for xxx = 1:n_types
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
 %   
 end 
-
+toc
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
 % distributed weights. 
