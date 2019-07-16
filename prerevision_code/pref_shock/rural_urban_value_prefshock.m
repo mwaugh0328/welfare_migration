@@ -32,8 +32,8 @@ tol = 10^-2;
 
 n_shocks = length(shocks);
 
-A = (1-gamma).^-1;
-
+A = params.A;
+%A = sigma_nu.*(1-gamma).^-1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
 n_asset_states = grid(1);
@@ -96,7 +96,7 @@ for zzz = 1:n_shocks
     
     feasible_rural = consumption > 0;
     
-    utility_rural(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
+    utility_rural(:,:,zzz) = A.*(max(consumption,1e-8)).^(1-gamma);
     
     utility_rural(:,:,zzz) = utility_rural(:,:,zzz) + -1e10.*(~feasible_rural);
     
@@ -105,7 +105,7 @@ for zzz = 1:n_shocks
     
     feasible_move_seasn = consumption > 0;
     
-    utility_move_seasn(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
+    utility_move_seasn(:,:,zzz) = A.*(max(consumption,1e-8)).^(1-gamma);
     
     utility_move_seasn(:,:,zzz)= utility_move_seasn(:,:,zzz) + -1e10.*(~feasible_move_seasn);
     
@@ -114,7 +114,7 @@ for zzz = 1:n_shocks
     
     feasible_urban = consumption >  0;
     
-    utility_urban(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
+    utility_urban(:,:,zzz) = A.*(max(consumption,1e-8)).^(1-gamma);
     
     utility_urban(:,:,zzz) = utility_urban(:,:,zzz) + -1e10.*(~feasible_urban); 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,7 +122,7 @@ for zzz = 1:n_shocks
     
     feasible_move_rural = consumption > 0;
     
-    utility_move_rural(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma) ;
+    utility_move_rural(:,:,zzz) = A.*(max(consumption,1e-8)).^(1-gamma) ;
     
     utility_move_rural(:,:,zzz) = utility_move_rural(:,:,zzz) + -1e10.*(~feasible_move_rural); 
     
@@ -131,7 +131,7 @@ for zzz = 1:n_shocks
     
     feasible_move_urban = consumption > 0;
     
-    utility_move_urban(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
+    utility_move_urban(:,:,zzz) = A.*(max(consumption,1e-8)).^(1-gamma);
     
     utility_move_urban(:,:,zzz) = utility_move_urban(:,:,zzz) + -1e10.*(~feasible_move_urban);
     
@@ -142,14 +142,14 @@ for zzz = 1:n_shocks
 end
 
     
-v_old_rural_not = repmat(diag(median(utility_rural,3)),1,n_shocks)./(1-beta);
+v_old_rural_not = 0*ones(size(v_prime_rural_not));
 v_old_rural_exp = v_old_rural_not;
 
 v_old_seasn_not = v_old_rural_not;
 v_old_seasn_exp = v_old_rural_not;
 
-v_old_urban_new = repmat(diag(median(utility_urban,3)),1,n_shocks)./(1-beta);
-v_old_urban_old = v_old_urban_new ;
+v_old_urban_new = v_old_rural_not;
+v_old_urban_old = v_old_rural_not;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Commence value function itteration.
@@ -326,7 +326,10 @@ for iter = 1:n_iterations
     pi_denom_rural_not = pi_stay_rural_not + pi_move_seasn_not + pi_move_rural_not;
     
     v_prime_rural_not(:,zzz) = sigma_nu.*log(pi_denom_rural_not);
+
+    %v_prime_rural_not(isinf(v_prime_rural_not(:,zzz))) = v_stay_rural_not(isinf(v_prime_rural_not(:,zzz)));
     
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                
     %[v_prime_rural_exp(:,zzz), ~] = max([ v_stay_rural_exp , v_move_seasn_exp , v_move_rural_exp ],[],2) ;
@@ -382,11 +385,21 @@ for iter = 1:n_iterations
     v_hat_seasn_exp(:,zzz) = v_seasn_exp;
     
     end
+
+%     rural_not = nansum(nansum(abs(v_old_rural_not-v_prime_rural_not).^2).^(1./2));
+%     rural_exp = nansum(nansum(abs(v_old_rural_exp-v_prime_rural_exp).^2).^(1./2));
+%     urban_new = nansum(nansum(abs(v_old_urban_new-v_prime_urban_new).^2).^(1./2));
+%     urban_old = nansum(nansum(abs(v_old_urban_old-v_prime_urban_old).^2).^(1./2));
     
-    if norm(log(-1.*v_old_rural_not) - log(-1.*v_prime_rural_not),Inf) && ...
-       norm(log(-1.*v_old_rural_exp) - log(-1.*v_prime_rural_exp),Inf) && ...     
-       norm(log(-1.*v_old_urban_new) - log(-1.*v_prime_urban_new),Inf) && ...
-       norm(log(-1.*v_old_urban_old) - log(-1.*v_prime_urban_old),Inf) < tol
+    rural_not = norm(v_old_rural_not-v_prime_rural_not,Inf);
+    rural_exp = norm(v_old_rural_exp-v_prime_rural_exp,Inf);
+    urban_new = norm(v_old_urban_new-v_prime_urban_new,Inf);
+    urban_old = norm(v_old_urban_old-v_prime_urban_old,Inf);
+    
+    if rural_not && ...
+       rural_exp  && ...     
+       urban_new && ...
+       urban_old < tol
 %         disp('value function converged')
 %         disp(toc)
 %         disp(iter)
@@ -407,12 +420,13 @@ for iter = 1:n_iterations
 
     
     end
+
 end
 
-if norm(log(-1.*v_old_rural_not) - log(-1.*v_prime_rural_not),Inf) && ...
-       norm(log(-1.*v_old_rural_exp) - log(-1.*v_prime_rural_exp),Inf) && ...     
-       norm(log(-1.*v_old_urban_new) - log(-1.*v_prime_urban_new),Inf) && ...
-       norm(log(-1.*v_old_urban_old) - log(-1.*v_prime_urban_old),Inf) > tol
+if rural_not && ...
+       rural_exp  && ...     
+       urban_new && ...
+       urban_old > tol
     disp('value function did not converge')
 end
 

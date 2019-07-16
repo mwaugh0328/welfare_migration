@@ -26,7 +26,7 @@ trans_mat = tmat;
 
 n_shocks = length(shocks_rural);
 
-A = (1-gamma).^-1;
+A = params.A;
 
 v_hat_rural_not  = value_funs.rural_not;
 v_hat_rural_exp  = value_funs.rural_exp;

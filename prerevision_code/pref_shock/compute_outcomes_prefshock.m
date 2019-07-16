@@ -4,7 +4,7 @@ function [targets] = compute_outcomes_prefshock(cal_params, flag)
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.25;
+params.sigma_nu = 0.10;
 
 params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
@@ -15,6 +15,8 @@ params.ubar = cal_params(5);   params.lambda = cal_params(6); params.pi_prob = c
 params.rural_options = 3;
 params.urban_options = 2;
 
+gamma = 2;
+params.A = 0.25.*(1-gamma).^-1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Shocks...
@@ -27,13 +29,16 @@ urban_tfp = cal_params(3); rural_tfp = 1./urban_tfp; % Urban TFP
 
 seasonal_factor = 0.55; % The seasonal fluctuation part. 
 
-params.m = 0.16; % This is the moving cost. 
+
 params.m_season = 0.08; % This is the bus ticket
+params.m = 4*params.m_season; % This is the moving cost. 
 
 gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
+
+
  
 n_perm_shocks = 24; %48
 n_tran_shocks = 15; %30
@@ -124,19 +129,18 @@ move_shocks = rand(time_series,1);
 % vguess = zeros(n_types);
 
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
-tic
+
 
 parfor xxx = 1:n_types 
         
     %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
-
     [assets(xxx), move(xxx), vguess(xxx)] = ...
         rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
 
 %     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
 %         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
-toc
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now simulate the model...
@@ -144,11 +148,11 @@ toc
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
-tic
+
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
-        
+       
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
         assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks',move_shocks);
     
@@ -159,7 +163,7 @@ for xxx = 1:n_types
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
 %   
 end 
-toc
+
 
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
@@ -205,7 +209,7 @@ monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,1);
 move_shocks = move_shocks((N_obs+1):end,1);
 
-tic
+
 
 for xxx = 1:n_types     
        
@@ -233,7 +237,7 @@ for xxx = 1:n_types
     % after a period of time, implements the experirment.     
 end
 
-toc
+
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

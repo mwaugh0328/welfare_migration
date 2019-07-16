@@ -9,12 +9,15 @@ must_be_positive = [1,3,5,8];
 must_be_zero_one = [2,4,6,7];
 
 params = zeros(8,1);
-params(must_be_positive) = exp(zzz(must_be_positive));
-params(must_be_zero_one) = 1./(1+exp(-zzz(must_be_zero_one)));
+% params(must_be_positive) = exp(zzz(must_be_positive));
+% params(must_be_zero_one) = 1./(1+exp(-zzz(must_be_zero_one)));
+
+params(must_be_positive) = (zzz(must_be_positive));
+params(must_be_zero_one) = (zzz(must_be_zero_one));
 
 %params(2) = [];
 
-[yyy] = compute_outcomes(params,0);
+[yyy] = compute_outcomes_prefshock(params,0);
 
 % The current moments that we are targeting....
  

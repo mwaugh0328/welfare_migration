@@ -6,15 +6,18 @@ warning('off','stats:regress:RankDefDesignMat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.2220    0.4842    1.4478    0.7088    1.4486    0.6276    0.5188    0.6638
 
-old_cal = [1.3272    0.5000    1.4368    0.7198    1.4854    0.6428    0.6050    0.6303];
-old_cal = old_cal;
+old_cal = [1.3065    0.4961    1.4559    0.7239    1.4440    0.5445    0.4921    0.6590];
 
 must_be_positive = [1,3,5,8];
 must_be_zero_one = [2,4,6,7];
 
+% guess = zeros(1,length(old_cal)+2);
+% guess(must_be_positive) = log(old_cal(must_be_positive));
+% guess(must_be_zero_one) = -log(1./old_cal(must_be_zero_one)-1);
+
 guess = zeros(1,length(old_cal)+2);
-guess(must_be_positive) = log(old_cal(must_be_positive));
-guess(must_be_zero_one) = -log(1./old_cal(must_be_zero_one)-1);
+guess(must_be_positive) = (old_cal(must_be_positive));
+guess(must_be_zero_one) = old_cal(must_be_zero_one);
 
 guess(end-1) = log(2.*10^-1);
 guess(end) = log(2.*10^-1);
@@ -29,7 +32,7 @@ diag_adjust = round(nval-1);
 
 tic
 [new_val, fvec, diag, nfev,~,~,~,~,ifail] = c05qc(@fcn, (guess), int64(diag_adjust),...
-    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-1);
+    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-8);
 toc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,9 +42,9 @@ params(must_be_positive) = exp(new_val(must_be_positive));
 params(must_be_zero_one) = 1./(1+exp(-new_val(must_be_zero_one)));
 
 disp(params)
-compute_outcomes(params,1);
+compute_outcomes_prefshock(params,1);
 
-save calibration_0808_NAG params
+save calibration_test_NAG params
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
