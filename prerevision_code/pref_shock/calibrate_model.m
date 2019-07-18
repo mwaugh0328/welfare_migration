@@ -3,7 +3,7 @@ function theta = calibrate_model(zzz,flag)
 
 params = zzz;
 
-[yyy] = compute_outcomes(params,0);
+[yyy] = compute_outcomes_prefshock(params,0);
 
 % The current moments that we are targeting....
  

@@ -48,11 +48,14 @@ experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 targets = [aggregate_moments, experiment_hybrid];
 
-yyy(3) = yyy(3) + exp(zzz(end-1));
-yyy(end) = yyy(end) + exp(zzz(end));
+% yyy(3) = yyy(3) + exp(zzz(end-1));
+% yyy(end) = yyy(end) + exp(zzz(end));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % g_theta = (targets'-yyy')./targets';
 % g_theta = log(targets'./yyy');
+
+yyy([3,end]) = [];
+targets([3,end]) = [];
 
 g_theta = -(targets') + (yyy');
 

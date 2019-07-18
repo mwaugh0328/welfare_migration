@@ -4,9 +4,9 @@ function [targets] = compute_outcomes_prefshock(cal_params, flag)
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.10;
+params.sigma_nu = 0.40;
 
-params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
+params.R = 0.96; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
 params.beta = 0.95;  params.abar = 0; % Discount factor
 
@@ -16,7 +16,7 @@ params.rural_options = 3;
 params.urban_options = 2;
 
 gamma = 2;
-params.A = 0.25.*(1-gamma).^-1;
+params.A = (1-gamma).^-1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Shocks...
