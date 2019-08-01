@@ -9,7 +9,7 @@ params = zzz;
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....
-aggregate_moments = [1.80, 0.63, 0.68, 0.47];
+aggregate_moments = [1.791, 0.71, 0.55, 0.47];
 
 %%% Description:
 % Wage gap
@@ -21,7 +21,7 @@ aggregate_moments = [1.80, 0.63, 0.68, 0.47];
 % Experiment Moments...
 experiment_moments = [0.22, 0.092, 0.30];
 
-control_moments = [0.36, 0.25, 0.16, 0.10,  0.40];
+control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
 experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 
@@ -50,9 +50,9 @@ targets = [aggregate_moments, experiment_hybrid];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % g_theta = (targets'-yyy')./targets';
-% g_theta = log(targets'./yyy');
+g_theta = log(targets'./yyy');
 
-g_theta = (targets')-(yyy');
+%g_theta = (targets')-(yyy');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

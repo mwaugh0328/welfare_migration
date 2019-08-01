@@ -125,7 +125,6 @@ parfor xxx = 1:n_types
 
     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
         rural_urban_value(params, trans_shocks, trans_mat);
-
     
 %     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
 %         rural_urban_value_addit(params, trans_shocks, trans_mat);
@@ -137,7 +136,7 @@ end
 
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
-tic
+
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
@@ -154,7 +153,7 @@ for xxx = 1:n_types
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
 %   
 end 
-toc
+
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
 % distributed weights. 
@@ -433,7 +432,7 @@ cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
 %                 ones(length(temp_migrate_expr),1)], log(cons_data_r1), log(cons_data_r2)];
             
 cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
-var_cons_growth = std(cons_model_growth);
+var_cons_growth = var(cons_model_growth);
 % Again, no measurment error here, we can add it on expost. Need
 % consistency in language. 
 
