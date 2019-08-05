@@ -28,9 +28,9 @@ A = (1-gamma).^-1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
-n_asset_states = 100;
+n_asset_states = 50;
 
-asset_space = linspace(0,6,n_asset_states);
+asset_space = linspace(0,3,n_asset_states);
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);

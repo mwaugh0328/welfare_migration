@@ -17,24 +17,25 @@ params(must_be_zero_one) = (zzz(must_be_zero_one));
 
 %params(2) = [];
 
-[yyy] = compute_outcomes_prefshock(params,0);
+[yyy] = compute_outcomes(params,0);
 
 % The current moments that we are targeting....
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....
-aggregate_moments = [1.80, 0.63, 0.68, 0.47];
+aggregate_moments = [1.791, 0.71, 0.55, 0.47];
 
-% Wage gap of 2.62
-% 63 percent reside in rural area
-% Aggregate variance of log income (urban)
-% Fraction of rural households with no liquid assets
+%%% Description:
+% Wage gap
+% The rural share
+% The urban variance... note that this is position number 3 (see below)
+% Fraction with no liquid assets
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Experiment Moments...
 experiment_moments = [0.22, 0.092, 0.30];
 
-control_moments = [0.36, 0.25, 0.16, 0.10,  0.40];
+control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
 experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 

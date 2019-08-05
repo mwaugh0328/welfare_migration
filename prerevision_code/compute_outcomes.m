@@ -87,15 +87,15 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-grid = [100, 0, 6];
+grid = [50, 0, 3];
 n_asset_states = grid(1);
 
 asset_space = linspace(grid(2),grid(3),grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
-n_sims = 3000;
-time_series = 50000;
+n_sims = 5000;
+time_series = 200000;
 N_obs = 25000;
 
 rng(03281978)

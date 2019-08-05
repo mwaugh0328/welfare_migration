@@ -9,7 +9,7 @@ params = zzz;
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....
-aggregate_moments = [1.791, 0.71, 0.55, 0.47];
+aggregate_moments = [1.57, 0.71, 0.55, 0.47];
 
 %%% Description:
 % Wage gap
