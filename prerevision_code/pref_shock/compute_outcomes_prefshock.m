@@ -4,9 +4,9 @@ function [targets] = compute_outcomes_prefshock(cal_params, flag)
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.40;
+params.sigma_nu = 0.10;
 
-params.R = 0.96; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
+params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
 params.beta = 0.95;  params.abar = 0; % Discount factor
 
@@ -31,14 +31,12 @@ seasonal_factor = 0.55; % The seasonal fluctuation part.
 
 
 params.m_season = 0.08; % This is the bus ticket
-params.m = 4*params.m_season; % This is the moving cost. 
+params.m = 2*params.m_season; % This is the moving cost. 
 
 gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
-
-
  
 n_perm_shocks = 24; %48
 n_tran_shocks = 15; %30
@@ -96,15 +94,17 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-params.grid = [100, 0, 6];
+params.grid = [50, 0, 3];
 
 asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
-n_sims = 3000;
-time_series = 50000;
+n_sims = 5000;
+time_series = 200000;
 N_obs = 25000;
+
+rng(03281978)
 
 params.N_obs = N_obs;
 

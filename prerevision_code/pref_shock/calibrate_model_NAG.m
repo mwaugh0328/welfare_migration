@@ -17,13 +17,13 @@ params(must_be_zero_one) = (zzz(must_be_zero_one));
 
 %params(2) = [];
 
-[yyy] = compute_outcomes(params,0);
+[yyy] = compute_outcomes_prefshock(params,0);
 
 % The current moments that we are targeting....
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....
-aggregate_moments = [1.791, 0.71, 0.55, 0.47];
+aggregate_moments = [1.57, 0.67, 0.55, 0.47];
 
 %%% Description:
 % Wage gap

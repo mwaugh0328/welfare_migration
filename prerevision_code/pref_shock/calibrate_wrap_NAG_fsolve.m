@@ -6,7 +6,7 @@ warning('off','stats:regress:RankDefDesignMat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.2220    0.4842    1.4478    0.7088    1.4486    0.6276    0.5188    0.6638
 
-guess = [1.3710    0.5350    1.5770    0.7220    1.5416    0.7667    0.3501    0.6190];
+guess = [1.6523    0.4652    1.3913    0.8073    1.5226    0.5389    0.5926    0.6049];
 
 must_be_positive = [1,3,5,8];
 must_be_zero_one = [2,4,6,7];
@@ -32,7 +32,7 @@ diag_adjust = round(nval-1);
 
 tic
 [new_val, fvec, diag, nfev,~,~,~,~,ifail] = c05qc(@fcn, (guess), int64(diag_adjust),...
-    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-4);
+    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-3);
 toc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
