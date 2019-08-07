@@ -22,8 +22,7 @@ params(must_be_zero_one) = (zzz(must_be_zero_one));
 % The current moments that we are targeting....
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Aggregate Moments....
-aggregate_moments = [1.57, 0.67, 0.55, 0.47];
+aggregate_moments = [1.89, 0.61, 0.625, 0.47];
 
 %%% Description:
 % Wage gap
@@ -59,6 +58,8 @@ yyy([3,end]) = [];
 targets([3,end]) = [];
 
 g_theta = -(targets') + (yyy');
+
+%g_theta = log(targets'./yyy');
 
 % const_var = false(length(g_theta),1);
 % %This is just saying if the variances are above targets, pennelize. If

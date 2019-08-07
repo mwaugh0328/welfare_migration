@@ -1,39 +1,32 @@
-function [targets] = compute_outcomes_prefshock(cal_params, flag)
+function [targets] = compute_outcomes(params, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR paper at
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.05;
+gamma = 2; 
 
-params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
+R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
-params.beta = 0.95;  params.abar = 0; % Discount factor
+beta = 0.95;  abar = 0; % Discount factor
 
-params.ubar = cal_params(5);   params.lambda = cal_params(6); params.pi_prob = cal_params(7);
+ubar = params(5);   lambda = params(6); pi_prob = params(7);
 
-params.rural_options = 3;
-params.urban_options = 2;
-
-gamma = 2;
-params.A = (1-gamma).^-1;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Shocks...
-shock_rho = cal_params(4); % Persistance of shocks
-shock_std = cal_params(1).*sqrt((1-shock_rho).^2); % Standard Deviation of shocks
+shock_rho = params(4); % Persistance of shocks
+shock_std = params(1).*sqrt((1-shock_rho).^2); % Standard Deviation of shocks
 
-perm_shock_u_std = cal_params(2); % Permenant ability differs in the urban area.
+perm_shock_u_std = params(2); % Permenant ability differs in the urban area.
 
-urban_tfp = cal_params(3); rural_tfp = 1./urban_tfp; % Urban TFP
+urban_tfp = params(3); rural_tfp = 1./urban_tfp; % Urban TFP
 
 seasonal_factor = 0.55; % The seasonal fluctuation part. 
 
+m = 0.16; % This is the moving cost. 
+m_temp = 0.08; % This is the bus ticket
 
-params.m_season = 0.08; % This is the bus ticket
-params.m = 2*params.m_season; % This is the moving cost. 
-
-gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
+gamma_urban = params(8); % Gamma parameter (set to 1?)
 
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
@@ -94,9 +87,10 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-params.grid = [50, 0, 3];
+grid = [50, 0, 3];
+n_asset_states = grid(1);
 
-asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
+asset_space = linspace(grid(2),grid(3),grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
@@ -106,14 +100,9 @@ N_obs = 25000;
 
 rng(03281978)
 
-params.N_obs = N_obs;
-
-rng(03281978)
-
 [~, shock_states_p] = hmmgenerate(time_series,trans_mat,ones(n_shocks));
 
 pref_shocks = rand(time_series,1);
-move_shocks = rand(time_series,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the policy functions and then simmulate the time paths. See the
@@ -124,19 +113,19 @@ move_shocks = rand(time_series,1);
 % the for loop across different cores. It this case it leads to a big speed
 % up. 
 
-%assets = struct();
-% move = zeros(n_types);
-% vguess = zeros(n_types);
+assets = zeros(n_asset_states,n_shocks,6,n_types);
+move = zeros(n_asset_states,n_shocks,4,n_types);
+vguess = zeros(n_asset_states,n_shocks,6,n_types);
 
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 
-
 parfor xxx = 1:n_types 
-        
-    %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
-    [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
+    
+    params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
 
+    [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+        rural_urban_value(params, trans_shocks, trans_mat);
+    
 %     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
 %         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
@@ -148,13 +137,14 @@ end
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
-
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
-       
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
-        assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks',move_shocks);
+    
+    params = [R, solve_types(xxx,:),  m, m_temp, lambda, pi_prob];
+    
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(assets(:,:,:,xxx), move(:,:,:,xxx),...
+        grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks');
     
 %     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
@@ -163,7 +153,6 @@ for xxx = 1:n_types
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
 %   
 end 
-
 
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
@@ -184,15 +173,15 @@ for xxx = 1:n_types
 end
 
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
-params.means_test = median(data_panel(rural_not_monga,3));
+means_test = median(data_panel(rural_not_monga,3));
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
 
-% assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
-% move_temp = zeros(n_asset_states,n_shocks,2,n_types);
-% cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
+assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
+move_temp = zeros(n_asset_states,n_shocks,2,n_types);
+cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
 
 % assets_surv = zeros(n_asset_states,n_shocks,n_types);
 % move_surv = zeros(n_asset_states,n_shocks,n_types);
@@ -207,37 +196,50 @@ sim_cntr_panel = zeros(n_sims,9,11,n_types);
 periods = 1:length(states_panel(:,:,1))-20;
 monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,1);
-move_shocks = move_shocks((N_obs+1):end,1);
-
-
 
 for xxx = 1:n_types     
-       
+    
+    params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, m_temp, pi_prob];
+    
+    params_sim = [grid, R, solve_types(xxx,:),  m, m_temp, lambda, means_test, pi_prob];
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
+    [assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment_welfare(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
     
     %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
     % provides the asset policy conditional on a temporary move. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-
-    rng(02071983+xxx)
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% perform the survey... tic
+
+%     [assets_surv(:,:,xxx), move_surv(:,:,xxx)] = survey_results(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
+   
+     rng(02071983+xxx)
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
-          params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, move_shocks, sim_panel(:,:,xxx));
+        = experiment_driver(assets(:,:,:,xxx), move(:,:,:,xxx), ...
+          assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx), cons_eqiv(:,:,:,xxx),...
+          params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then
-    % after a period of time, implements the experirment.     
+    % after a period of time, implements the experirment. 
+    
+% if flag == 1
+%     [assets_surv(:,:,xxx), move_surv(:,:,xxx)] = survey_results(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
+%     
+%     [sim_surv_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
+%         = experiment_driver_mex(assets(:,:,:,xxx), move(:,:,:,xxx), ...
+%           assets_surv(:,:,xxx), move_surv(:,:,xxx),...
+%           params_sim, trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, sim_panel(:,:,xxx));
+% end
+    
 end
-
-
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -430,7 +432,7 @@ cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
 %                 ones(length(temp_migrate_expr),1)], log(cons_data_r1), log(cons_data_r2)];
             
 cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
-var_cons_growth = std(cons_model_growth);
+var_cons_growth = var(cons_model_growth);
 % Again, no measurment error here, we can add it on expost. Need
 % consistency in language. 
 
@@ -464,7 +466,7 @@ disp('')
 disp('Average Rural Population')
 disp(avg_rural)
 disp('Temporary Moving Cost Relative to Mean Consumption')
-disp(params.m_season./mean(AVG_C))
+disp(m_temp./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
 disp('Expr Elasticity: Year One, Two, Four')
@@ -501,7 +503,7 @@ m_rates = 100.*m_rates';
 
 plot_migration
 
-cd('..\pref_shock')
+cd('..\revison')
 
 figure
 
