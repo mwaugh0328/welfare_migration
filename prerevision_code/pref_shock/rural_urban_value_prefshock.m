@@ -27,8 +27,8 @@ trans_mat = tmat;
 grid = params.grid;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-n_iterations = 200;
-tol = 10^-2;
+n_iterations = 500;
+tol = 10^-6;
 
 n_shocks = length(shocks);
 

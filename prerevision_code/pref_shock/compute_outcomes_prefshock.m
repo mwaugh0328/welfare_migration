@@ -4,7 +4,7 @@ function [targets] = compute_outcomes_prefshock(cal_params, flag)
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.05;
+params.sigma_nu = 0.12;
 
 params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
