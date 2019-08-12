@@ -31,8 +31,8 @@ gamma_urban = params(8); % Gamma parameter (set to 1?)
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
  
-n_perm_shocks = 24; %48
-n_tran_shocks = 15; %30
+n_perm_shocks = 48; %48
+n_tran_shocks = 30; %30
 % Number of permenant and transitory types. 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

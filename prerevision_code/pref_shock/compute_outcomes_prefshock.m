@@ -4,7 +4,8 @@ function [targets] = compute_outcomes_prefshock(cal_params, flag)
 % Econometrica (late 2017-on)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.sigma_nu = 0.12;
+params.sigma_nu_not = cal_params(end);
+params.sigma_nu_exp = cal_params(end);
 
 params.R = 0.95; % Storage technology that looses value over time. We are thinking currency. Citation for the 0.92 number?
 
@@ -112,8 +113,8 @@ rng(03281978)
 
 [~, shock_states_p] = hmmgenerate(time_series,trans_mat,ones(n_shocks));
 
-pref_shocks = rand(time_series,1);
-move_shocks = rand(time_series,1);
+pref_shocks = rand(time_series,n_perm_shocks);
+move_shocks = rand(time_series,n_perm_shocks);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the policy functions and then simmulate the time paths. See the
@@ -154,7 +155,7 @@ for xxx = 1:n_types
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
-        assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks',move_shocks);
+        assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
     
 %     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
 %         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
@@ -184,8 +185,10 @@ for xxx = 1:n_types
 end
 
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
-params.means_test = median(data_panel(rural_not_monga,3));
+%params.means_test = median(data_panel(rural_not_monga,3));
 
+
+params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
@@ -206,8 +209,8 @@ sim_cntr_panel = zeros(n_sims,9,11,n_types);
 
 periods = 1:length(states_panel(:,:,1))-20;
 monga = periods(rem(periods,2)==0)-1;
-pref_shocks = pref_shocks((N_obs+1):end,1);
-move_shocks = move_shocks((N_obs+1):end,1);
+pref_shocks = pref_shocks((N_obs+1):end,:);
+move_shocks = move_shocks((N_obs+1):end,:);
 
 
 
@@ -231,7 +234,7 @@ for xxx = 1:n_types
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
         = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
-          params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks, move_shocks, sim_panel(:,:,xxx));
+          params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then
     % after a period of time, implements the experirment.     
@@ -451,8 +454,11 @@ control_moments = [temp_migration, control_migration_cont_y2, control_migration_
 
 experiment_hybrid = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, var_cons_growth];
 
+experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
+    control_migration_cont_y2./temp_migration, var_cons_growth];
 
-targets = [aggregate_moments, experiment_hybrid] ;
+
+targets = [aggregate_moments, experiment_hybrid_v2] ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

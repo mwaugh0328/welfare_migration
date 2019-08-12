@@ -38,6 +38,8 @@ control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
 experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 
+experiment_hybrid_v2 = [0.36, 0.22, 0.092, 0.30, 0.10, 0.25,  0.40];
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Survey Moments...
@@ -57,9 +59,9 @@ targets = [aggregate_moments, experiment_hybrid];
 yyy([3,end]) = [];
 targets([3,end]) = [];
 
-g_theta = -(targets') + (yyy');
+%g_theta = -(targets') + (yyy');
 
-%g_theta = log(targets'./yyy');
+g_theta = log(targets'./yyy');
 
 % const_var = false(length(g_theta),1);
 % %This is just saying if the variances are above targets, pennelize. If

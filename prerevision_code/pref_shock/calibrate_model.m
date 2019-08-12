@@ -26,6 +26,8 @@ control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
 experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 
+experiment_hybrid_v2 = [0.36, 0.22, 0.092, 0.30, 0.10, 0.25/0.36, 0.40];
+
 % The experiment hybrid is a combination of conrol and experiment...
 % seasonal migration in control
 % increase in r1 (22 percent)
@@ -47,7 +49,7 @@ experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 % parameters. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-targets = [aggregate_moments, experiment_hybrid];
+targets = [aggregate_moments, experiment_hybrid_v2];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % g_theta = (targets'-yyy')./targets';
@@ -81,6 +83,6 @@ theta = g_theta'*W*g_theta;
 
 elseif flag == 2
     
-theta = yyy;
+theta = g_theta;
 
 end

@@ -4,7 +4,9 @@ function [assets, move, vfinal] = rural_urban_value_prefshock(params,perm_types,
 % described in the extensions of my notes with permanent``Roy'' like
 % shocks. So each period, people can switch locations...
 
-sigma_nu = params.sigma_nu;
+sigma_nu_exp = params.sigma_nu_exp;
+
+sigma_nu_not = params.sigma_nu_not;
 
 n_rural_options = params.rural_options;
 n_urban_options = params.urban_options;
@@ -28,7 +30,7 @@ grid = params.grid;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_iterations = 500;
-tol = 10^-6;
+tol = 10^-2;
 
 n_shocks = length(shocks);
 
@@ -317,11 +319,11 @@ for iter = 1:n_iterations
             
     %[v_prime_rural_not(:,zzz), ~] = max([ v_stay_rural_not, v_move_seasn_not , v_move_rural_not],[],2) ;
     
-    pi_rural_not = [exp(v_stay_rural_not./sigma_nu), exp(v_move_seasn_not./sigma_nu), exp(v_move_rural_not./sigma_nu)];
+    pi_rural_not = exp([v_stay_rural_not, v_move_seasn_not, v_move_rural_not]./sigma_nu_not);
         
     pi_denom_rural_not = sum(pi_rural_not,2);
     
-    v_prime_rural_not(:,zzz) = sigma_nu.*log(pi_denom_rural_not);
+    v_prime_rural_not(:,zzz) = sigma_nu_not.*log(pi_denom_rural_not);
     
     %v_prime_rural_not(:,zzz) = (1./pi_denom_rural_not).*(pi_stay_rural_not.*v_stay_rural_not + pi_move_seasn_not.*v_move_seasn_not + pi_move_rural_not.*v_move_rural_not);
     problem = isinf(v_prime_rural_not(:,zzz));
@@ -335,11 +337,11 @@ for iter = 1:n_iterations
                
     %[v_prime_rural_exp(:,zzz), ~] = max([ v_stay_rural_exp , v_move_seasn_exp , v_move_rural_exp ],[],2) ;
     
-    pi_rural_exp = [exp(v_stay_rural_exp./sigma_nu), exp(v_move_seasn_exp./sigma_nu), exp(v_move_rural_exp./sigma_nu)];
+    pi_rural_exp = exp([v_stay_rural_exp, v_move_seasn_exp, v_move_rural_exp]./sigma_nu_exp);
         
     pi_denom_rural_exp = sum(pi_rural_exp,2);
     
-    v_prime_rural_exp(:,zzz) = sigma_nu.*log(pi_denom_rural_exp);
+    v_prime_rural_exp(:,zzz) = sigma_nu_exp.*log(pi_denom_rural_exp);
     
     problem = isinf(v_prime_rural_exp(:,zzz));
     
@@ -354,11 +356,11 @@ for iter = 1:n_iterations
     
     %[v_prime_urban_new(:,zzz), ~] = max([ v_stay_urban_new , v_move_urban_new ],[],2) ;
     
-    pi_urban_new = [exp(v_stay_urban_new./sigma_nu), exp(v_move_urban_new ./sigma_nu)];
+    pi_urban_new = exp([v_stay_urban_new, v_move_urban_new]./sigma_nu_not);
    
     pi_denom_urban_new = sum(pi_urban_new,2);
     
-    v_prime_urban_new(:,zzz) = sigma_nu.*log(pi_denom_urban_new);
+    v_prime_urban_new(:,zzz) = sigma_nu_not.*log(pi_denom_urban_new);
     
     problem = isinf(v_prime_urban_new(:,zzz));
     
@@ -373,11 +375,11 @@ for iter = 1:n_iterations
     
   %  [v_prime_urban_old(:,zzz), ~] = max([ v_stay_urban_old , v_move_urban_old ],[],2) ;
     
-    pi_urban_old = [exp(v_stay_urban_old./sigma_nu), exp(v_move_urban_old./sigma_nu)];
+    pi_urban_old = exp([v_stay_urban_old, v_move_urban_old]./sigma_nu_exp);
        
     pi_denom_urban_old = sum(pi_urban_old,2);
     
-    v_prime_urban_old(:,zzz) = sigma_nu.*log(pi_denom_urban_old);
+    v_prime_urban_old(:,zzz) = sigma_nu_exp.*log(pi_denom_urban_old);
     
     problem = isinf(v_prime_urban_old(:,zzz));
     
@@ -627,11 +629,11 @@ for zzz = 1:n_shocks
             
     %[v_prime_rural_not(:,zzz), ~] = max([ v_stay_rural_not , v_move_seasn_not , v_move_rural_not],[],2) ;
     
-    pi_rural_not = [exp(v_stay_rural_not./sigma_nu), exp(v_move_seasn_not./sigma_nu), exp(v_move_rural_not./sigma_nu)];
+    pi_rural_not = exp([v_stay_rural_not, v_move_seasn_not, v_move_rural_not]./sigma_nu_not);
         
     pi_denom_rural_not = sum(pi_rural_not,2);
     
-    v_prime_rural_not(:,zzz) = sigma_nu.*log(pi_denom_rural_not);
+    v_prime_rural_not(:,zzz) = sigma_nu_not.*log(pi_denom_rural_not);
     
     problem = isinf(v_prime_rural_not(:,zzz));
     
@@ -654,11 +656,11 @@ for zzz = 1:n_shocks
                
     %[v_prime_rural_exp(:,zzz), ~] = max([ v_stay_rural_exp , v_move_seasn_exp , v_move_rural_exp ],[],2) ;
     
-    pi_rural_exp = [exp(v_stay_rural_exp./sigma_nu), exp(v_move_seasn_exp./sigma_nu), exp(v_move_rural_exp./sigma_nu)];
+    pi_rural_exp = exp([v_stay_rural_exp, v_move_seasn_exp, v_move_rural_exp]./sigma_nu_exp);
         
     pi_denom_rural_exp = sum(pi_rural_exp,2);
     
-    v_prime_rural_exp(:,zzz) = sigma_nu.*log(pi_denom_rural_exp);
+    v_prime_rural_exp(:,zzz) = sigma_nu_exp.*log(pi_denom_rural_exp);
     
     problem = isinf(v_prime_rural_exp(:,zzz));
     
@@ -677,13 +679,13 @@ for zzz = 1:n_shocks
     
     %[v_prime_urban_new(:,zzz), ~] = max([ v_stay_urban_new , v_move_urban_new ],[],2) ;
     
-    pi_urban_new = [exp(v_stay_urban_new./sigma_nu), exp(v_move_urban_new ./sigma_nu)];
+    pi_urban_new = exp([v_stay_urban_new, v_move_urban_new]./sigma_nu_not);
    
     pi_denom_urban_new = sum(pi_urban_new,2);
     
     policy_move_urban_new(:,zzz,:) = cumsum(pi_urban_new./pi_denom_urban_new,2);
     
-    v_prime_urban_new(:,zzz) = sigma_nu.*log(pi_denom_urban_new);
+    v_prime_urban_new(:,zzz) = sigma_nu_not.*log(pi_denom_urban_new);
     
     problem = isinf(v_prime_urban_new(:,zzz));
     
@@ -704,13 +706,13 @@ for zzz = 1:n_shocks
     
     %[v_prime_urban_old(:,zzz), ~] = max([ v_stay_urban_old , v_move_urban_old ],[],2) ;
     
-    pi_urban_old = [exp(v_stay_urban_old./sigma_nu), exp(v_move_urban_old./sigma_nu)];
+    pi_urban_old = exp([v_stay_urban_old, v_move_urban_old]./sigma_nu_exp);
        
     pi_denom_urban_old = sum(pi_urban_old,2);
     
     policy_move_urban_old(:,zzz,:) = cumsum(pi_urban_old./pi_denom_urban_old,2);
     
-    v_prime_urban_old(:,zzz) = sigma_nu.*log(pi_denom_urban_old);
+    v_prime_urban_old(:,zzz) = sigma_nu_exp.*log(pi_denom_urban_old);
     
     problem = isinf(v_prime_urban_old(:,zzz));
     

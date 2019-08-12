@@ -9,7 +9,11 @@ function [assets, move, cons_eqiv] = field_experiment_welfare_prefshock(params, 
 % equivalent and one-time consumption equivalent. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-sigma_nu = params.sigma_nu;
+sigma_nu_exp = params.sigma_nu_exp;
+
+sigma_nu_not = params.sigma_nu_not;
+
+
 n_rural_options = params.rural_options;
 
 R = params.R; 
@@ -169,11 +173,11 @@ for zzz = 1:n_shocks
 
     %policy_assets_rural_not(:,zzz) = diag(p_asset_stay_rural_all_not(:, policy_move_rural_not(:,zzz)));
     
-    pi_rural_not = [exp(v_stay_rural_not./sigma_nu), exp(v_move_seasn_not./sigma_nu), exp(v_move_rural_not./sigma_nu)];
+    pi_rural_not = exp([v_stay_rural_not, v_move_seasn_not, v_move_rural_not]./sigma_nu_not);
         
     pi_denom_rural_not = sum(pi_rural_not,2);
     
-    v_expr_rural_not(:,zzz) = sigma_nu.*log(pi_denom_rural_not);
+    v_expr_rural_not(:,zzz) = sigma_nu_not.*log(pi_denom_rural_not);
     
     problem = isinf(v_expr_rural_not(:,zzz));
     
@@ -264,11 +268,11 @@ for zzz = 1:n_shocks
            
     %[v_expr_rural_exp(:,zzz), policy_move_rural_exp(:,zzz)] = max([ v_stay_rural_exp , v_move_seasn_exp, v_move_rural_exp],[],2) ;
     
-    pi_rural_exp = [exp(v_stay_rural_exp./sigma_nu), exp(v_move_seasn_exp./sigma_nu), exp(v_move_rural_exp./sigma_nu)];
+    pi_rural_exp = exp([v_stay_rural_exp, v_move_seasn_exp, v_move_rural_exp]./sigma_nu_exp);
         
     pi_denom_rural_exp = sum(pi_rural_exp,2);
     
-    v_expr_rural_exp(:,zzz) = sigma_nu.*log(pi_denom_rural_exp);
+    v_expr_rural_exp(:,zzz) = sigma_nu_exp.*log(pi_denom_rural_exp);
     
     problem = isinf(v_expr_rural_exp(:,zzz));
     

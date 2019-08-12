@@ -23,6 +23,7 @@ pi = params.pi_prob;
 
 r_shocks = trans_shocks(:,1); 
 u_shocks = trans_shocks(:,2);
+
 expr_shock = pref_shock;
 
 N_obs = params.N_obs;
