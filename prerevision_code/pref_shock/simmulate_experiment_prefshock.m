@@ -80,8 +80,11 @@ welfare(1) = 0;
 
     season(xxx,1) = mod(shock_states(xxx),2); 
     urban_skill = z_urban.*ones(length(labor_income),1);
-    panel_expr = [labor_income, consumption, assets, live_rural, work_urban,...
-        move, move_seasn, move_cost, season, welfare, experiment_flag];
+%     panel_expr = [labor_income, consumption, assets, live_rural, work_urban,...
+%         move, move_seasn, move_cost, season, welfare, experiment_flag];
+    
+     panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
+     move_seasn, move_cost, season, welfare, urban_skill, experince, experiment_flag];
     return
 end
 
@@ -103,8 +106,11 @@ welfare(1) = 0;
     
     season(xxx,1) = mod(shock_states(xxx),2); 
     urban_skill = z_urban.*ones(length(labor_income),1);
-    panel_expr = [labor_income, consumption, assets, live_rural, work_urban,...
-        move, move_seasn, move_cost, season, welfare, experiment_flag];
+%     panel_expr = [labor_income, consumption, assets, live_rural, work_urban,...
+%         move, move_seasn, move_cost, season, welfare, experiment_flag];
+    
+     panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
+     move_seasn, move_cost, season, welfare, urban_skill, experince, experiment_flag];
     return
 end    
 
@@ -368,8 +374,8 @@ experince = location == 3;
 
 urban_skill = z_urban.*ones(length(labor_income),1);
 
-% panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
-%     move_seasn, move_cost, season, welfare, urban_skill, experince, experiment_flag];
+ panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
+     move_seasn, move_cost, season, welfare, urban_skill, experince, experiment_flag];
 
-panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
-    move_seasn, move_cost, season, welfare, experiment_flag];
+%panel_expr = [labor_income, consumption, assets, live_rural, work_urban, move,...
+ %   move_seasn, move_cost, season, welfare, experiment_flag];

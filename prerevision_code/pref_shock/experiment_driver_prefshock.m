@@ -4,7 +4,7 @@ function [sim_expr, sim_cntr] = experiment_driver_prefshock(assets, move, assets
 
 Nsims = length(monga_index);
 
-sim_expr = zeros(Nsims,11,11);
+sim_expr = zeros(Nsims,13,11);
 % sim_surv = zeros(Nsims,10,2);
 sim_cntr = zeros(Nsims,9,11);
 
