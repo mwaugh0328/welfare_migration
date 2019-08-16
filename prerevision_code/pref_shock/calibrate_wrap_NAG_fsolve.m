@@ -15,8 +15,8 @@ nval = length(guess);
 diag_adjust = round(nval-1);
 
 tic
-[new_val, fvec, diag, nfev,~,~,~,~,ifail] = c05qc(@fcn, (guess), int64(diag_adjust),...
-    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-5);
+[new_val, fvec, diag, nfev,~,~,~,~,ifail] = c05qc(@fcn, log(guess), int64(diag_adjust),...
+    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-6);
 toc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,7 +24,7 @@ toc
 
 
 disp(new_val)
-compute_outcomes_prefshock((new_val),1);
+compute_outcomes_prefshock(exp(new_val),1);
 
 save calibration_NAG new_val
 
@@ -33,7 +33,7 @@ save calibration_NAG new_val
 function [fvec, user, iflag] = fcn(n, x, fvec, user, iflag)
   if iflag ~=0
     fvec = zeros(n, 1);
-    fvec(1:n) = calibrate_model((x),2);
+    fvec(1:n) = calibrate_model(exp(x),2);
   else
     fprintf('objective = %10e\n', mean(abs(fvec)))
   end

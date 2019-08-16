@@ -39,8 +39,8 @@ gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
  
-n_perm_shocks = 24; %48
-n_tran_shocks = 15; %30
+n_perm_shocks = 48; %48
+n_tran_shocks = 30; %30
 % Number of permenant and transitory types. 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,7 +95,7 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-params.grid = [50, 0, 3];
+params.grid = [100, 0, 3];
 
 asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
 
