@@ -12,9 +12,9 @@ load calibration_highgrid
 %[average_rural_labor_units_monga, average_rural_labor_units_not_monga, seasonal_factor, labor_monga, labor_not_monga];
 %    urban_data = [average_urban_labor_units_monga, average_urban_labor_units_not_monga];
 
-[rural, urban, params] = compute_outcomes_prefshock_GE(exp(new_val),[], []);
+[rural, urban, params] = compute_outcomes_prefshock_GE(exp(new_val),[], [], []);
 
-alpha = 0.91;
+alpha = 0.845;
 
 monga_productivity = (rural.seasonal_factor)./(alpha.*(rural.labor_units_monga).^(alpha-1));
 
@@ -32,18 +32,17 @@ wages = [wage_monga; wage_not_monga];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the elasticity of wages w.r.t. labor...
 
-wage_adj_productivity_not_monga = wage_not_monga./not_monga_productivity;
 
-wage_adj_productivity_monga = wage_monga./monga_productivity;
+wage_increase = 100*(log((rural.expr_labor_units).^(alpha-1)) - log((rural.cntr_labor_units).^(alpha-1)))
+% Compare the implied change across the two groups...
 
-change_wage = log(wage_adj_productivity_monga)-log(wage_adj_productivity_not_monga);
+% From ACM: For every extra 10% of the landless population that emigrates, wages increase by 2.2%
+% With a 22 percent increase in emigration between the two...this means that 
+% Agricultural wages are therefore predicted to increase by 2.2 percent *
+% 2.2 = 4.84
 
-change_labor = log(rural.labor_monga)- log(rural.labor_not_monga);
-
-wage_elasticity = change_wage./change_labor;
-
-disp('Wage Elasticity')
-disp(wage_elasticity)
+disp('Wage Change from ACM, Wage Change in Model')
+disp([4.48, wage_increase])
 disp([rural.labor_monga, rural.labor_not_monga])
 
 labor_units_old = [rural.labor_units_monga, rural.labor_units_not_monga];
@@ -59,7 +58,7 @@ relax = 0.25;
 
 for xxx = 1:n_iters
 
-    [ruralnew, ~] = compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test);
+    [ruralnew, ~] = compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test,[]);
     
     labor_units_new = [ruralnew.labor_units_monga, ruralnew.labor_units_not_monga];
     
@@ -84,6 +83,8 @@ for xxx = 1:n_iters
     wages = [wage_monga; wage_not_monga];
     
 end
+
+compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, 1);
 
 rmpath('../calibration')
 
