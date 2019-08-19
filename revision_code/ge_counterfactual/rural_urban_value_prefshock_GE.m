@@ -1,4 +1,4 @@
-function [assets, move, vfinal] = rural_urban_value_prefshock_GE(params,perm_types,shocks,tmat)%#codegen
+function [assets, move, vfinal, cons_eqiv] = rural_urban_value_prefshock_GE(params,perm_types,shocks,tmat,vcft)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This solves for value and policy function for the rural-urban location problem
 % described in the extensions of my notes with permanent``Roy'' like
@@ -774,6 +774,25 @@ vfinal.seasn_not = v_hat_seasn_not;
 vfinal.seasn_exp = v_hat_seasn_exp;
 vfinal.urban_new = v_prime_urban_new;
 vfinal.urban_old = v_prime_urban_old;
+
+
+if isempty(vcft) 
+    
+else
+    % This computes the welfare gain associated with the counter factual
+    % value functions, vcft...
+    cons_eqiv.rural_not = ((vfinal.rural_not./vcft.rural_not)).^(1./(1-gamma)) - 1;
+    cons_eqiv.rural_exp = ((vfinal.rural_exp./vcft.rural_exp)).^(1./(1-gamma)) - 1;
+
+    cons_eqiv.seasn_not = ((vfinal.rural_not./vcft.rural_not)).^(1./(1-gamma)) - 1;
+    cons_eqiv.seasn_exp = ((vfinal.rural_exp./vcft.rural_exp)).^(1./(1-gamma)) - 1;
+
+    cons_eqiv.urban_new = ((vfinal.urban_new./vcft.urban_new)).^(1./(1-gamma)) - 1;
+    cons_eqiv.urban_old = ((vfinal.urban_old./vcft.urban_old)).^(1./(1-gamma)) - 1;
+
+
+end
+
 
 end
 

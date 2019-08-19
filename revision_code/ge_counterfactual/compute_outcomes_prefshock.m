@@ -1,4 +1,4 @@
-function [rural_data, urban_data, vguess, params] = compute_outcomes_prefshock_GE(cal_params, wages, cft_params, vft_fun, flag)
+function [targets] = compute_outcomes_prefshock(cal_params, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR paper at
 % Econometrica (late 2017-on)
@@ -58,12 +58,7 @@ m_adjust_urban = -1./(1-shock_rho.^2).*(shock_std.^2).*(1/2).*(gamma_urban);
 
 seasonal_trans_mat = [0 , 1 ; 1, 0]; 
 
-% This is if the thing is in wages or in productivity terms.
-if isempty(wages) 
-    seasonal_shocks = [log(seasonal_factor); log(1./seasonal_factor)];
-else
-    seasonal_shocks = [log(wages(1)); log(wages(2))];
-end
+seasonal_shocks = [log(seasonal_factor); log(1./seasonal_factor)];
 
 trans_mat = kron(trans_mat, seasonal_trans_mat);
 
@@ -136,72 +131,40 @@ move_shocks = rand(time_series,n_perm_shocks);
 
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 
-% The counterfactual is a means tested moving cost removal. if it's zero,
-% this is the baseline model. Otherwise, it;s the means tested value...
-if isempty(cft_params) 
-    params.means_test = 0;
-else
-    params.means_test = cft_params;
-end
 
-% Then here is the value function stuff, again depends if there is the
-% means test. Also, the final imput can be a value function. This is used
-% to compute welfare...
-
-if isempty(vft_fun) 
-    
-    parfor xxx = 1:n_types 
+parfor xxx = 1:n_types 
         
-    
-        [assets(xxx), move(xxx), vguess(xxx)] = ...
-            rural_urban_value_prefshock_GE(params, solve_types(xxx,:), trans_shocks, trans_mat,[]);
-        
-    end
-else
-    
-    parfor xxx = 1:n_types 
-        [assets(xxx), move(xxx), vguess(xxx), cons_eqiv(xxx)] = ...
-            rural_urban_value_prefshock_GE(params, solve_types(xxx,:), trans_shocks, trans_mat, vft_fun(xxx));
-    end
+    %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
+    [assets(xxx), move(xxx), vguess(xxx)] = ...
+        rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
 
+%     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
+%         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now simulate the model...
 
-sim_panel = zeros(N_obs,10,n_types);
+sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
-if isempty(vft_fun) 
-    for xxx = 1:n_types 
+
+for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
         assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
-    % This is the same one as in baseline model
-
-    end 
     
-else
-    % If we are computing welfare, then do the GE version. Takes in the
-    % cons_eqiv structure and the assigns welfare based on hh's state. 
-    
-     for xxx = 1:n_types 
-       
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock_GE(...
-        assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, ...
-        pref_shocks(:,xxx),move_shocks(:,xxx),cons_eqiv(xxx));
-    
-    %[labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, season];
-    % is what comes out from the pannel. 
+%     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
+%         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
+% 
+%     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_plot(assets(:,:,:,xxx), move(:,:,:,xxx),...
+%         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
+%   
+end 
 
-     end 
-end
-
-% this is how the panel is organized...
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season];
 
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
@@ -224,17 +187,8 @@ end
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
 %params.means_test = median(data_panel(rural_not_monga,3));
 
-if isempty(cft_params) 
-    params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
-    % This is so we can just replicate the old stuff...
-else
-    params.means_test = cft_params;
-    % Here if we are doing the counterfactuall, we want the "same exact
-    % guys", policies may change asset distribtuion, so this holds the
-    % asset threshold at whatever it was chosen to be. 
-end
 
-
+params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
@@ -247,7 +201,7 @@ end
 % move_surv = zeros(n_asset_states,n_shocks,n_types);
  
 sim_expr_panel = zeros(n_sims,13,11,n_types);
-sim_cntr_panel = zeros(n_sims,10,11,n_types);
+sim_cntr_panel = zeros(n_sims,9,11,n_types);
 % sim_surv_panel = zeros(n_sims,10,3,n_types);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -258,16 +212,14 @@ monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,:);
 move_shocks = move_shocks((N_obs+1):end,:);
 
-% Most of this is important for when we compute labor units for the labor
-% elasticity. Otherwise just important for recording the control group
-% values. 
+
 
 for xxx = 1:n_types     
        
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(xxx), move_temp(xxx), cons(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
+    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
     
     %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
@@ -281,9 +233,9 @@ for xxx = 1:n_types
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons(xxx),...
+        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
           params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
-
+         
     % This then takes the policy functions, simmulates the model, then
     % after a period of time, implements the experirment.     
 end
@@ -337,10 +289,22 @@ for xxx = 1:n_types
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% data_panel(:,1) = exp(log(data_panel(:,1)) + m_error_national_survey.*randn(n_obs_panel,1));
+% data_panel(:,2) = exp(log(data_panel(:,2)) + m_error_national_survey.*randn(n_obs_panel,1));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, expected_urban, season];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% First devine some indicator variables...
 
 rural = data_panel(:,4)==1;
 rural_monga = data_panel(:,4)==1 & data_panel(:,end)==1;
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+
+% urban_monga = data_panel(:,4)~=1 & data_panel(:,end)==1;
+% urban_not_monga = data_panel(:,4)~=1 & data_panel(:,end)~=1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part just focuses on the entire sample...
@@ -384,109 +348,186 @@ temp_migration = sum(temp_migrate_cntr)./sum(rural_cntr);
 
 temp_expr_migration = sum(temp_migrate_expr)./sum(rural_cntr);
 
+migration_elasticity = temp_expr_migration - temp_migration;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Migration Elasticity Year 2
+
+temp_migrate_cntr_y2 = control_data(:,7,3) == 1;
+temp_migrate_expr_y2 = expermt_data(:,7,3) == 1;
+
+temp_migration_y2 = sum(temp_migrate_cntr_y2)./sum(rural_cntr);
+
+temp_expr_migration_y2 = sum(temp_migrate_expr_y2)./sum(rural_cntr);
+
+migration_elasticity_y2 = temp_expr_migration_y2 - temp_migration_y2;
+
+cont_y2 = control_data(:,7,1) == 1 & control_data(:,7,3) == 1;
+control_migration_cont_y2 = sum(cont_y2)./sum(rural_cntr);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Migration Elasticity Year 4
+
+temp_migrate_cntr_y3 = control_data(:,7,7) == 1;
+temp_migrate_expr_y3 = expermt_data(:,7,7) == 1;
+
+temp_migration_y3 = sum(temp_migrate_cntr_y3)./sum(rural_cntr);
+
+temp_expr_migration_y3 = sum(temp_migrate_expr_y3)./sum(rural_cntr);
+
+migration_elasticity_y3 = temp_expr_migration_y3 - temp_migration_y3;
+
+cont_y3 = control_data(:,7,1) == 1 & control_data(:,7,3) == 1 & control_data(:,7,7) == 1;
+control_migration_cont_y3 = sum(cont_y3)./sum(rural_cntr);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Migration Elasticity Year 5
+
+temp_migrate_cntr_y5 = control_data(:,7,11) == 1;
+temp_migrate_expr_y5 = expermt_data(:,7,11) == 1;
+
+temp_migration_y5 = sum(temp_migrate_cntr_y5)./sum(rural_cntr);
+
+temp_expr_migration_y5 = sum(temp_migrate_expr_y5)./sum(rural_cntr);
+
+migration_elasticity_y5 = temp_expr_migration_y5 - temp_migration_y5;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Compute the LATE estimate in the model, the same way as in the
+% data...so first stack stuff the way we want it....
+
+all_migration = [temp_migrate_cntr; temp_migrate_expr];
+
+not_control = [zeros(length(temp_migrate_cntr),1); ones(length(temp_migrate_expr),1)];
+
+first_stage_b = regress(all_migration, [ones(length(not_control),1), not_control]);
+
+predic_migration = first_stage_b(1) + first_stage_b(2).*not_control;
+
+consumption_noerror = [control_data(:,2,2); expermt_data(:,2,2)];
+
+c_noerror_no_migrate = control_data(~temp_migrate_cntr,2,2);
+
+AVG_C = mean(consumption_noerror);
+
+OLS_beta = regress(consumption_noerror, [ones(length(predic_migration),1), all_migration]);
+OLS = OLS_beta(2)./AVG_C;
+
+LATE_beta = regress(consumption_noerror, [ones(length(predic_migration),1), predic_migration]);
+LATE = LATE_beta(2)./AVG_C ;
+
+var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
+
+cons_drop = mean(log(control_data(~temp_migrate_cntr,2,1))-log(control_data(~temp_migrate_cntr,2,2)));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cons_data_no_error_r1 = [control_data(:,2,1); expermt_data(:,2,1)];
+cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
+
+% cons_data_r1 = exp(log(cons_data_no_error_r1) + m_error.*randn(length(cons_data_no_error_r1),1)); 
+% cons_data_r2 = exp(log(cons_data_no_error_r2) + m_error.*randn(length(cons_data_no_error_r2),1));
+% 
+% cons_model = [ [temp_migrate_cntr; temp_migrate_expr], [zeros(length(temp_migrate_cntr),1); ...
+%                 ones(length(temp_migrate_expr),1)], log(cons_data_r1), log(cons_data_r2)];
+            
+cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
+var_cons_growth = std(cons_model_growth);
+% Again, no measurment error here, we can add it on expost. Need
+% consistency in language. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Assets...
 frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-avg_welfare = mean(control_data(:,8,1));
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-number_workers_cntr = length(control_data(:,:,1));
-
-number_workers_expr = length(expermt_data(:,:,1));
-
-rural_data.cntr_labor_units = sum((1./rural_tfp).*control_data(~temp_migrate_cntr,1,1))./number_workers_cntr;
-% Number of labor units that remain in the control vilage. Note this is
-% selected on the means test...need to think about this.
-
-rural_data.expr_labor_units = sum((1./rural_tfp).*expermt_data(~temp_migrate_expr,1,1))./number_workers_expr;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This stuff is to figure out the correct scaling parameter.
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season];
 
-labor_units_rural_monga = (data_panel(:,5)~=1 & data_panel(:,end)==1);
-% this says, in monga, I'm working in rural area
+aggregate_moments = [m_income(2)./m_income(1), avg_rural, var_income(2), frac_no_assets];
 
-labor_units_urban_monga = (data_panel(:,5)==1 & data_panel(:,end)==1);
-% this says, in monga, I'm working in urban area
+experiment_moments = [migration_elasticity, migration_elasticity_y2, LATE];
 
-labor_units_rural_not_monga = (data_panel(:,5)~=1 & data_panel(:,end)==0);
-% this says, NOT monga, I'm working in rural area
+control_moments = [temp_migration, control_migration_cont_y2, control_migration_cont_y3, OLS, var_consumption_no_migrate_control];
 
-labor_units_urban_not_monga = (data_panel(:,5)==1 & data_panel(:,end)==0);
-% this says, NOT monga, I'm working in urban area
+experiment_hybrid = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, var_cons_growth];
 
-number_workers_monga = sum(labor_units_rural_monga) + sum(labor_units_urban_monga);
-% In the monga, this is the number of guys in total...
+experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
+    control_migration_cont_y2./temp_migration, var_cons_growth];
 
-number_workers_not_monga = sum(labor_units_rural_not_monga) + sum(labor_units_urban_not_monga);
-% outside of monga, number of guys in total...
+
+targets = [aggregate_moments, experiment_hybrid_v2] ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-rural_data.labor_units_monga = sum((1./rural_tfp).*data_panel(labor_units_rural_monga,1))./number_workers_monga;
-% the want here is how many effective labor units are in the rural area,
-% during the monga. So first sum over all income payments in rural area and
-% then remove TFP term (we will put that back in). 
-% Then divide through by the total mass of works...just a normalization(?)
-
-% Same idea below...
-rural_data.labor_units_not_monga = sum((1./rural_tfp).*data_panel(labor_units_rural_not_monga,1))./number_workers_not_monga;
-
-rural_data.labor_monga = sum(labor_units_rural_monga)./number_workers_monga;
-
-rural_data.labor_not_monga = sum(labor_units_rural_not_monga)./number_workers_not_monga;
-
-rural_data.seasonal_factor = seasonal_factor;
-
-
-rural_data.labor_units_monga = sum((1./rural_tfp).*data_panel(labor_units_rural_monga,1))./number_workers_monga;
-% the want here is how many effective labor units are in the rural area,
-% during the monga. So first sum over all income payments in rural area and
-% then remove TFP term (we will put that back in). 
-% Then divide through by the total mass of works...just a normalization(?)
-
-% Same idea below...
-rural_data.labor_units_not_monga = sum((1./rural_tfp).*data_panel(labor_units_rural_not_monga,1))./number_workers_not_monga;
-
-rural_data.labor_monga = sum(labor_units_rural_monga)./number_workers_monga;
-
-rural_data.labor_not_monga = sum(labor_units_rural_not_monga)./number_workers_not_monga;
-
-rural_data.seasonal_factor = seasonal_factor;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-urban_data.labor_units_monga = sum(data_panel(labor_units_urban_monga,1))./number_workers_monga;
-
-urban_data.labor_units_not_monga = sum(data_panel(labor_units_urban_not_monga,1))./number_workers_not_monga;
-
+       
 if flag == 1
     
-income_assets = [control_data(:,1,1), control_data(:,3,1), control_data(:,8,1), temp_migrate_cntr, control_data(:,9,1)];
-
-report_welfare_quintiles_GE
-
-disp('Welfare by Income Quintile: Unconditional, Conditional, Migration Rate, Income Gain, Consumption Gain, Z, Experience')
-disp(round(100.*[welfare_bin, migration_bin, expr_bin],2))
-
+disp('')
+disp('')
 disp('Average Rural Population')
 disp(avg_rural)
-    
+disp('Temporary Moving Cost Relative to Mean Consumption')
+disp(params.m_season./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
-    
-disp('Fraction of Control Group with No Assets')
+disp('Expr Elasticity: Year One, Two, Four')
+disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3, migration_elasticity_y5])
+disp('Control: Year One, Repeat Two, Four')
+disp([temp_migration, control_migration_cont_y2 , control_migration_cont_y3])
+disp('OLS Estimate')
+disp(OLS)
+disp('LATE Estimate')
+disp(LATE)
+disp('Wage Gap')
+disp(m_income(2)./m_income(1))
+disp('Mean Consumption Rural and Urban')
+disp(m_consumption)
+disp('Variance of Consumption Rural and Urban')
+disp(var_consumption)
+disp('Variance of Consumption Growth')
+disp(var_cons_growth)
+disp('Variance of Log Income Rural and Urban')
+disp(var_income)
+disp('Fraction of Rural with No Assets')
 disp(frac_no_assets)
+disp('Permenant Moves')
+disp(perm_moves)
+disp('Ratio of Income in Monga vs Non-Monga')
+disp(m_income_season(1)/m_income_season(2))
+disp('Consumption Drop')
+disp(cons_drop)
+
+cd('..\Analysis')
+
+m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
+m_rates = 100.*m_rates';
+
+plot_migration
+
+cd('..\calibration')
+
+figure
+
+subplot(3,2,1), hist(log(data_panel(rural,1)),50)
+ 
+subplot(3,2,2), hist(log(data_panel(~rural,1)),50)
+
+subplot(3,2,3), hist(log(data_panel(rural,2)),50)
+ 
+subplot(3,2,4), hist(log(data_panel(~rural,2)),50)
+ 
+subplot(3,2,5), hist((data_panel(rural,3)),50)
+ 
+subplot(3,2,6), hist((data_panel(~rural,3)),50)
     
-disp('Welfare')
-disp(avg_welfare)
-    
+
+
 end
-    
-    
+
+
 
 
 

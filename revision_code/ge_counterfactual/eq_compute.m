@@ -12,7 +12,7 @@ load calibration_highgrid
 %[average_rural_labor_units_monga, average_rural_labor_units_not_monga, seasonal_factor, labor_monga, labor_not_monga];
 %    urban_data = [average_urban_labor_units_monga, average_urban_labor_units_not_monga];
 
-[rural, urban, params] = compute_outcomes_prefshock_GE(exp(new_val),[], [], []);
+[rural, urban, vfun, params] = compute_outcomes_prefshock_GE(exp(new_val),[], [],[], []);
 
 alpha = 0.845;
 
@@ -58,7 +58,7 @@ relax = 0.25;
 
 for xxx = 1:n_iters
 
-    [ruralnew, ~] = compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test,[]);
+    [ruralnew, ~] = compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test,[],[]);
     
     labor_units_new = [ruralnew.labor_units_monga, ruralnew.labor_units_not_monga];
     
@@ -84,7 +84,7 @@ for xxx = 1:n_iters
     
 end
 
-compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, 1);
+compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
 
 rmpath('../calibration')
 

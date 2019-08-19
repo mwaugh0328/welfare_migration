@@ -5,7 +5,7 @@ close all
 warning('off','stats:regress:RankDefDesignMat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-guess = [1.2826    0.5386    1.5549    0.7336    1.5159    0.6749    0.6306    0.5726    0.1062];
+guess = [1.2876    0.5398    1.5543    0.7343    1.5153    0.6702    0.6309    0.5719    0.1066];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 mean(abs(calibrate_model(guess,2)))
@@ -16,7 +16,7 @@ diag_adjust = round(nval-1);
 
 tic
 [new_val, fvec, diag, nfev,~,~,~,~,ifail] = c05qc(@fcn, log(guess), int64(diag_adjust),...
-    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-3);
+    int64(diag_adjust), int64(1), ones(nval,1), int64(5),'epsfcn', 10^-5);
 toc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
