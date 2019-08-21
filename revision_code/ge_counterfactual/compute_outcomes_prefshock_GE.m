@@ -173,6 +173,12 @@ end
 sim_panel = zeros(N_obs,10,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
+
+mtest = asset_space < params.means_test;
+mtest_move = params.m_season.*(~mtest)';
+
+params.m_season = mtest_move;
+
 if isempty(vft_fun) 
     for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it

@@ -1,5 +1,5 @@
 function [panel, states] = rural_urban_simmulate_prefshock_GE(assets_policy, move_policy, ...
-                    params, perm_types, trans_shocks, shock_states, pref_shock, moveshock,cons_eqiv)%#codegen
+                    params, perm_types, trans_shocks, shock_states, pref_shock, moveshock, cons_eqiv)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This simmulates a time series/cross section of variables that we can map
 % to data. 
@@ -109,7 +109,7 @@ for xxx = 1:time_series
                     
         if move_seasn(xxx,1) == 1
             location(xxx+1) = 2;
-            move_cost(xxx,1) = m_seasn;
+            move_cost(xxx,1) = m_seasn(asset_state);
         elseif move(xxx,1) == 1
             location(xxx+1) = 5;
             move_cost(xxx,1) = m;            
@@ -169,7 +169,7 @@ for xxx = 1:time_series
         if expr_shock(xxx) < (1-pi)
             if move_seasn(xxx,1) == 1 
                 location(xxx+1,1) = 2; %Non experinced season (you lost it)
-                move_cost(xxx,1) = m_seasn;
+                move_cost(xxx,1) = m_seasn(asset_state);
             elseif move(xxx,1) == 1
                 location(xxx+1) = 5; % non experinces perm moves (you lost it)
                 move_cost(xxx,1) = m;
@@ -177,7 +177,7 @@ for xxx = 1:time_series
         else 
             if move_seasn(xxx,1) == 1 
                 location(xxx+1,1) = 4; % retain experince, season move
-                move_cost(xxx,1) = m_seasn;
+                move_cost(xxx,1) = m_seasn(asset_state);
             elseif move(xxx,1) == 1
                 location(xxx+1) = 6; % retain experince perm move.
                 move_cost(xxx,1) = m;
