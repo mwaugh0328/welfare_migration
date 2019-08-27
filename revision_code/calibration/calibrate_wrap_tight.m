@@ -5,7 +5,7 @@ warning('off','stats:regress:RankDefDesignMat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %1.3065    0.4961    1.4559    0.7239    1.4440    0.5445    0.4921    0.6590
 %1.3066    0.4961    1.4598    0.7219    1.4479    0.5745    0.5109    0.6590
-guess = [1.2929    0.5370    1.5420    0.7207    1.5111    0.6886    0.6392    0.5759    0.1078];
+guess = [1.2779    0.5376    1.5492    0.7439    1.5131    0.6706    0.6244    0.5661    0.1040];
 
 %guess = [1.0333    0.5488    1.5184    0.6904    0.8454    0.4534    0.6359    0.7371]
 
@@ -27,13 +27,13 @@ lower_bound = [1.00, 0.40, 1.20, 0.50, 1.4, 0.20, 0.35, 0.35, 0.04];
 
 ObjectiveFunction = @(x) calibrate_model(exp(x),1);
 
-options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',2e3);
+options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',5e2);
 
 
-new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],log(lower_bound),log(upper_bound),[],options_pa) 
+new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],[],[],[],options_pa) 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-save calibration_final new_cal
+%save calibration_final new_cal
 
 [results] = compute_outcomes_prefshock(exp(new_cal),1);
 

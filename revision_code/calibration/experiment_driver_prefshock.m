@@ -6,7 +6,10 @@ Nsims = length(monga_index);
 
 sim_expr = zeros(Nsims,13,11);
 % sim_surv = zeros(Nsims,10,2);
-sim_cntr = zeros(Nsims,9,11);
+
+[sr, sc] = size(sim_data);
+
+sim_cntr = zeros(Nsims,sc,11);
 
 % This will implement the experiment in the monga season.
 

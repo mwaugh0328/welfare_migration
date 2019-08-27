@@ -130,18 +130,17 @@ move_shocks = rand(time_series,n_perm_shocks);
 % the for loop across different cores. It this case it leads to a big speed
 % up. 
 
-%assets = struct();
-% move = zeros(n_types);
-% vguess = zeros(n_types);
-
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 
 % The counterfactual is a means tested moving cost removal. if it's zero,
 % this is the baseline model. Otherwise, it;s the means tested value...
 if isempty(cft_params) 
+    
     params.means_test = 0;
 else
+    
     params.means_test = cft_params;
+
 end
 
 % Then here is the value function stuff, again depends if there is the
@@ -156,12 +155,17 @@ if isempty(vft_fun)
         [assets(xxx), move(xxx), vguess(xxx)] = ...
             rural_urban_value_prefshock_GE(params, solve_types(xxx,:), trans_shocks, trans_mat,[]);
         
+%         [assets(xxx), move(xxx), vguess(xxx)] = ...
+%         rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
+        
     end
 else
     
     parfor xxx = 1:n_types 
+        
         [assets(xxx), move(xxx), vguess(xxx), cons_eqiv(xxx)] = ...
             rural_urban_value_prefshock_GE(params, solve_types(xxx,:), trans_shocks, trans_mat, vft_fun(xxx));
+        
     end
 
 end
@@ -170,17 +174,21 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now simulate the model...
 
-sim_panel = zeros(N_obs,10,n_types);
+
 states_panel = zeros(N_obs,4,n_types);
 
 
 mtest = asset_space < params.means_test;
 mtest_move = params.m_season.*(~mtest)';
 
-params.m_season = mtest_move;
+%params.m_season = mtest_move;
 
 if isempty(vft_fun) 
+    
+    sim_panel = zeros(N_obs,9,n_types);   
+    
     for xxx = 1:n_types 
+
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
        
@@ -193,6 +201,10 @@ if isempty(vft_fun)
 else
     % If we are computing welfare, then do the GE version. Takes in the
     % cons_eqiv structure and the assigns welfare based on hh's state. 
+    
+    sim_panel = zeros(N_obs,10,n_types);
+    
+    params.m_season = mtest_move;
     
      for xxx = 1:n_types 
        
@@ -230,7 +242,8 @@ end
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
 %params.means_test = median(data_panel(rural_not_monga,3));
 
-if isempty(cft_params) 
+if isempty(cft_params)
+    
     params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
     % This is so we can just replicate the old stuff...
 else
@@ -253,7 +266,10 @@ end
 % move_surv = zeros(n_asset_states,n_shocks,n_types);
  
 sim_expr_panel = zeros(n_sims,13,11,n_types);
-sim_cntr_panel = zeros(n_sims,10,11,n_types);
+
+[sr, sc] = size(sim_panel(:,:,1));
+
+sim_cntr_panel = zeros(n_sims,sc,11,n_types);
 % sim_surv_panel = zeros(n_sims,10,3,n_types);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,6 +283,9 @@ move_shocks = move_shocks((N_obs+1):end,:);
 % Most of this is important for when we compute labor units for the labor
 % elasticity. Otherwise just important for recording the control group
 % values. 
+
+params.m_season = 0.08; % This is the bus ticket
+% need to reset this because of how the simmulation of expriment works. 
 
 for xxx = 1:n_types     
        
