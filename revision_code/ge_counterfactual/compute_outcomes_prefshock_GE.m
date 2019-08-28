@@ -202,7 +202,7 @@ else
     % If we are computing welfare, then do the GE version. Takes in the
     % cons_eqiv structure and the assigns welfare based on hh's state. 
     
-    sim_panel = zeros(N_obs,10,n_types);
+    sim_panel = zeros(N_obs,11,n_types);
     
     params.m_season = mtest_move;
     
@@ -242,7 +242,9 @@ end
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
 %params.means_test = median(data_panel(rural_not_monga,3));
 
-if isempty(cft_params)
+if ( isempty(cft_params) || cft_params == 0)
+    % if we have not specify, do this. Or if it's zero, then we are again 
+    % just trying to replicate the original economy.
     
     params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
     % This is so we can just replicate the old stuff...
@@ -395,6 +397,7 @@ perm_moves = sum(data_panel(rural,6)==1)./length(data_panel);
 
 % First drop people that did not have the experiment performed on them....
 rural_cntr = data_panel_cntr(:,4,1)==1 & data_panel_expr(:,end,1)==1;
+% need to think about this last condition if it's selecting who I want...
 
 control_data = data_panel_cntr(rural_cntr,:,:);
 expermt_data = data_panel_expr(rural_cntr,:,:);
@@ -409,7 +412,7 @@ temp_migration = sum(temp_migrate_cntr)./sum(rural_cntr);
 
 temp_expr_migration = sum(temp_migrate_expr)./sum(rural_cntr);
 
-frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
+frac_no_assets = 0.90*(sum(control_data(:,3,1) == asset_space(1)))/sum(rural_cntr) + 0.10*(sum(control_data(:,3,1) == asset_space(2)))/sum(rural_cntr);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 avg_welfare = mean(control_data(:,8,1));
@@ -490,24 +493,43 @@ urban_data.labor_units_not_monga = sum(data_panel(labor_units_urban_not_monga,1)
 
 if flag == 1
     
-income_assets = [control_data(:,1,1), control_data(:,3,1), control_data(:,8,1), temp_migrate_cntr, control_data(:,9,1)];
+%panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, experince, move_cost, season];
+    
+income_assets = [control_data(:,1,1), control_data(:,3,1), control_data(:,8,1), control_data(:,7,1), control_data(:,9,1), control_data(:,10,1)];
 
 report_welfare_quintiles_GE
 
-disp('Welfare by Income Quintile: Unconditional, Conditional, Migration Rate, Income Gain, Consumption Gain, Z, Experience')
-disp(round(100.*[welfare_bin, migration_bin, expr_bin],2))
+disp('Control Group, Welfare by Income Quintile: Welfare, Migration Rate, Experience, Moving Cost')
+disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
 
 disp('Average Rural Population')
 disp(avg_rural)
     
-disp('Fraction of Rural Who are Migrants')
+disp('Control Group, Fraction of Rural Who are Migrants')
 disp(temp_migration)
-    
+
 disp('Fraction of Control Group with No Assets')
 disp(frac_no_assets)
     
 disp('Welfare')
 disp(avg_welfare)
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+income_assets = [data_panel(labor_units_rural_not_monga,1), data_panel(labor_units_rural_not_monga,3), data_panel(labor_units_rural_not_monga,8),...
+    data_panel(labor_units_rural_not_monga,7), data_panel(labor_units_rural_not_monga,9), data_panel(labor_units_rural_not_monga,10)];
+
+
+report_welfare_quintiles_GE
+
+disp('All Rural, Welfare by Income Quintile: Welfare, Migration Rate, Experience, Moving Cost')
+disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
+
+disp('Aggregate, Fraction of Rural Who are Migrants')
+disp((rural_data.labor_not_monga - rural_data.labor_monga)./rural_data.labor_not_monga)
+
+disp('Permanent Migration')
+disp(perm_moves)
     
 end
     

@@ -47,7 +47,17 @@ disp([rural.labor_monga, rural.labor_not_monga])
 
 labor_units_old = [rural.labor_units_monga, rural.labor_units_not_monga];
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This computes eq. gives us some baseline statistics....
 
+compute_outcomes_prefshock_GE(exp(new_val), wages, 0, vfun,1);
+
+wages_old = wages;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is where the counter-factual eq would be...
@@ -83,6 +93,9 @@ for xxx = 1:n_iters
     wages = [wage_monga; wage_not_monga];
     
 end
+
+disp('Change in Wages')
+disp(wages./wages_old)
 
 compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
 

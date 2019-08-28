@@ -309,7 +309,7 @@ live_rural = location == 1 | location == 2 | location == 3 | location == 4;
 work_urban = location == 2 | location == 4 | location == 5 | location == 6;
 experince  = location == 3;
 
-panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, experince, season];
+panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, experince, move_cost, season];
 
 states = [rec_asset_states, location, season, shock_states'];
 
