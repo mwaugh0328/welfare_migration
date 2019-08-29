@@ -7,6 +7,7 @@ warning('off','stats:regress:RankDefDesignMat');
 %1.3066    0.4961    1.4598    0.7219    1.4479    0.5745    0.5109    0.6590
 guess = [1.2763    0.5376    1.5492    0.7439    1.5131    0.6702    0.6268    0.5668    0.1073];
 
+
 %guess = [1.0333    0.5488    1.5184    0.6904    0.8454    0.4534    0.6359    0.7371]
 
 upper_bound = [1.75, 0.60, 1.70, 0.90, 1.7, 0.85, 0.85, 0.85, 0.20]; 
@@ -27,7 +28,7 @@ lower_bound = [1.00, 0.40, 1.20, 0.50, 1.4, 0.20, 0.35, 0.35, 0.04];
 
 ObjectiveFunction = @(x) calibrate_model(exp(x),1);
 
-options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',5e2);
+options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',1e3);
 
 
 new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],[],[],[],options_pa) 
