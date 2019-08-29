@@ -513,6 +513,9 @@ disp(frac_no_assets)
     
 disp('Welfare')
 disp(avg_welfare)
+
+disp('Average Experince')
+disp(mean(control_data(:,9,1)))
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -527,6 +530,9 @@ disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
 
 disp('Aggregate, Fraction of Rural Who are Migrants')
 disp((rural_data.labor_not_monga - rural_data.labor_monga)./rural_data.labor_not_monga)
+
+disp('Average Experince')
+disp(mean(data_panel(labor_units_rural_not_monga,9)))
 
 disp('Permanent Migration')
 disp(perm_moves)
