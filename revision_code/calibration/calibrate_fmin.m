@@ -35,4 +35,4 @@ disp(new_val)
 disp(new_val)
 %compute_outcomes_prefshock(exp(new_val),1);
 
-%save calibration_highgrid new_val fval
+%save calibration_high_a_grid new_val fval
