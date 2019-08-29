@@ -95,7 +95,7 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-params.grid = [50, 0, 3];
+params.grid = [100, 0, 3];
 
 asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
 

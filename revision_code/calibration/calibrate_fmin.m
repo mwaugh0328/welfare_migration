@@ -3,9 +3,9 @@ close all
 
 warning('off','stats:regress:RankDefDesignMat');
 
-options = optimset('Display','iter','MaxFunEvals',200,'MaxIter',1e6,'TolFun',1e-3,'TolX',1e-10);
+options = optimset('Display','iter','MaxFunEvals',50,'MaxIter',1e6,'TolFun',1e-3,'TolX',1e-10);
 
-guess = [1.2763    0.5376    1.5492    0.7439    1.5131    0.6702    0.6268    0.5668    0.1073];
+guess = [1.2906    0.5508    1.5654    0.7403    1.5519    0.5964    0.6312    0.5375    0.1198];
 
 [new_val,fval]= fminsearch(@(xxx)calibrate_model(exp(xxx),1),log(guess),options);
 
