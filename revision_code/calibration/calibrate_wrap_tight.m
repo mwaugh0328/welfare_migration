@@ -5,7 +5,7 @@ warning('off','stats:regress:RankDefDesignMat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %1.3065    0.4961    1.4559    0.7239    1.4440    0.5445    0.4921    0.6590
 %1.3066    0.4961    1.4598    0.7219    1.4479    0.5745    0.5109    0.6590
-guess = [1.2763    0.5376    1.5492    0.7439    1.5131    0.6702    0.6268    0.5668    0.1073];
+guess = [1.2893    0.5511    1.5691    0.7426    1.5548    0.5939    0.6258    0.5327    0.1161];
 
 
 %guess = [1.0333    0.5488    1.5184    0.6904    0.8454    0.4534    0.6359    0.7371]
@@ -28,7 +28,7 @@ lower_bound = [1.00, 0.40, 1.20, 0.50, 1.4, 0.20, 0.35, 0.35, 0.04];
 
 ObjectiveFunction = @(x) calibrate_model(exp(x),1);
 
-options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',1e3);
+options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',1e2,'InitialMeshSize',0.05);
 
 
 new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],[],[],[],options_pa) 
@@ -38,23 +38,3 @@ new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],[],[],[],option
 
 [results] = compute_outcomes_prefshock(exp(new_cal),1);
 
-% Just Control...
-% 1.1075    0.5033    1.3988    0.6742    1.5932    0.6849    0.3735
-% Control and Experiment
-% 1.2639    0.5179    1.4820    0.7380    1.4825    0.4578    0.5423
-%
-% Hybrid
-% 1.0703    0.4909    1.4755    0.6660    1.4657    0.4700    0.5964
-% 0.9870    0.4961    1.4717    0.6283    1.5053    0.5114    0.4879
-% 1.0734    0.5010    1.5054    0.6682    1.4772    0.4723    0.5582
-
-% 
-
-% options = optimoptions('fsolve', 'Display','iter','MaxFunEvals',1e3,'MaxIter',1e1,...
-%     'Algorithm','trust-region-reflective','FinDiffRelStep',10^-3);
-% 
-% guess = cal;
-% 
-% tic
-% new_cal = fsolve(@(xxx) calibrate_model(xxx,0),guess,options);
-% toc
