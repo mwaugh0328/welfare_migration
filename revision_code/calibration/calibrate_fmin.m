@@ -3,19 +3,19 @@ close all
 
 warning('off','stats:regress:RankDefDesignMat');
 
-options = optimset('Display','iter','MaxFunEvals',100,'MaxIter',1e6,'TolFun',1e-3,'TolX',1e-10);
+options = optimset('Display','iter','MaxFunEvals',500,'MaxIter',1e6,'TolFun',1e-3,'TolX',1e-10);
 
-guess = [1.2893    0.5512    1.5696    0.7427    1.5545    0.5938    0.6254    0.5338    0.1162];
+guess = [1.2893    0.5511    1.5691    0.7426    1.5548    0.5939    0.6258    0.5327    0.1161];
 
 [new_val,fval]= fminsearch(@(xxx)calibrate_model(exp(xxx),1),log(guess),options);
 
 disp(new_val)
 
-%save calibration_highgrid new_val fval
-% 
-% [new_val,fval]= fminsearch(@(xxx)calibrate_model(exp(xxx),1),new_val,options);
+save calibration_high_a_grid new_val fval
 
-%save calibration_highgrid new_val fval
+[new_val,fval]= fminsearch(@(xxx)calibrate_model(exp(xxx),1),new_val,options);
+
+save calibration_high_a_grid new_val fval
 
 %[new_val,fval]= fminsearch(@(xxx)calibrate_model(exp(xxx),1),new_val,options);
 
@@ -33,6 +33,6 @@ disp(new_val)
 % end
 
 disp(new_val)
-%compute_outcomes_prefshock(exp(new_val),1);
+compute_outcomes_prefshock(exp(new_val),1);
 
-save calibration_high_a_grid new_val fval
+%save calibration_high_a_grid new_val fval
