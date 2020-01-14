@@ -20,11 +20,11 @@ aggregate_moments = [1.89, 0.61, 0.625, 0.47];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Experiment Moments...
-experiment_moments = [0.22, 0.092, 0.30];
+%experiment_moments = [0.22, 0.092, 0.30];
 
-control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
+%control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
-experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
+%experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10,  0.40];
 
 experiment_hybrid_v2 = [0.36, 0.22, 0.092, 0.30, 0.10, 0.25/0.36, 0.40];
 
@@ -83,6 +83,6 @@ theta = g_theta'*W*g_theta;
 
 elseif flag == 2
     
-theta = g_theta;
+theta = yyy;
 
 end

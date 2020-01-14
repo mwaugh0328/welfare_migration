@@ -13,17 +13,17 @@
 
 clear
 
-load('calibration_allmoments_new.mat')
+load('calibration_highgrid.mat')
 
-params = new_cal;
+params = exp(new_val);
 
 n_params = length(params); % how many paramters we need to do...
 
-eps = 1+0.01; % This is the change. One issue is that some of this stuff was
+eps = 1+0.005; % This is the change. One issue is that some of this stuff was
 % not changing that much, this is a question of how accuratly we are
 % solving it, here is an area of investigation.
 
-els_moments = zeros(10,10);
+els_moments = zeros(9,9);
 
 for xxx = 1:n_params
     
@@ -35,14 +35,14 @@ for xxx = 1:n_params
     cal_eps_for(xxx) = params(xxx).*eps; % forward
     cal_eps_bak(xxx) = params(xxx)./eps; % backward
         
-    change_cal = (cal_eps_for(xxx))-(cal_eps_bak(xxx));
+    change_cal = log(cal_eps_for(xxx))-log(cal_eps_bak(xxx));
     
     moments_for = calibrate_model(cal_eps_for,2); % moments forward
     moments_bak = calibrate_model(cal_eps_bak,2); % moments backward
     
-    change_moments = (moments_for) - (moments_bak);
+    change_moments = log(moments_for) - log(moments_bak);
     
-    els_moments(xxx,:) = change_moments'./change_cal; % compute change.
+    els_moments(xxx,:) = change_moments'./change_cal % compute change.
     
 % So each row is a parameter, the each column is the moment
     

@@ -30,7 +30,6 @@ urban_tfp = cal_params(3); rural_tfp = 1./urban_tfp; % Urban TFP
 
 seasonal_factor = 0.55; % The seasonal fluctuation part. 
 
-
 params.m_season = 0.08; % This is the bus ticket
 params.m = 2*params.m_season; % This is the moving cost. 
 
@@ -39,8 +38,8 @@ gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
  
-n_perm_shocks = 24; %48
-n_tran_shocks = 15; %30
+n_perm_shocks = 48; %48
+n_tran_shocks = 30; %30
 % Number of permenant and transitory types. 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +81,7 @@ n_shocks = length(shocks_trans_u);
 % normal distribution and then the transition matrix will determine the
 % relative weights of the guys in the population. 
 
-[zurban , zurban_prob] = pareto_approx_alt_v2(n_perm_shocks, 1./perm_shock_u_std);
+[zurban , zurban_prob] = pareto_approx(n_perm_shocks, 1./perm_shock_u_std);
 
 types = [ones(n_perm_shocks,1), zurban];
 
@@ -94,18 +93,15 @@ type_weights = zurban_prob;
 % Set up asset space and parameters to pass to the value function
 % itteration.
     
-params.grid = [50, 0, 3];
+params.grid = [100, 0, 3];
 
 asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
-% Pre generate the shocks
 n_sims = 5000;
 time_series = 100000;
 N_obs = 25000;
-
-rng(03281978)
 
 params.N_obs = N_obs;
 
@@ -191,10 +187,6 @@ params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_pa
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % This section of the code now performs the expirements. 
-
 sim_expr_panel = zeros(n_sims,13,11,n_types);
 sim_cntr_panel = zeros(n_sims,9,11,n_types);
 % sim_surv_panel = zeros(n_sims,10,3,n_types);
@@ -227,24 +219,8 @@ for xxx = 1:n_types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % perform the survey... tic
 
-%     [assets_surv(:,:,xxx), move_surv(:,:,xxx)] = survey_results(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
-   
     rng(02071983+xxx)
     monga_index = monga(randi(length(monga),1,n_sims))';
-
-%     This is about put the high z guys into the urban area.
-%     in_urban = (states_panel(monga_index,2,xxx) == (5) | states_panel(monga_index,2,xxx) == (6));
-%     sum(in_urban)/length(in_urban)
-%     
-%     if sum(in_urban)/length(in_urban) > 0.35
-%     states_panel(:,:,xxx) = states_panel(:,:,2);
-%     sim_panel(:,:,xxx) = sim_panel(:,:,2);
-%     end
-%     
-%     states_panel(:,2,xxx) = ones(length(states_panel(:,2,xxx)),1); % this
-%     %does not work, urban guys are rich, don't move...
-%     states_panel(:,1,xxx) = randi(3,length(states_panel(:,1,xxx)),1);
-    
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
         = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx),...
@@ -445,16 +421,7 @@ LATE = LATE_beta(2)./AVG_C ;
 
 var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
 
-cons_drop = mean(log(control_data(~temp_migrate_cntr,2,1))-log(control_data(~temp_migrate_cntr,2,2)));
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 income_noerror = [control_data(:,1,2); expermt_data(:,1,2)];
-
-OLS_beta_income = regress(income_noerror, [ones(length(predic_migration),1), all_migration]);
-OLS_income = OLS_beta_income(2)./mean(income_noerror);
-
-LATE_beta_income = regress(income_noerror, [ones(length(predic_migration),1), predic_migration]);
-LATE_income = LATE_beta_income(2)./mean(income_noerror);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Welfare gains
@@ -464,14 +431,9 @@ all_stay = (~temp_migrate_expr) & (~temp_migrate_cntr);
 
 induced_cash = cash_data(:,7,1) ~= temp_migrate_cntr;
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 welfare_expr = expermt_data(:,10,1);
 welfare_all = 100.*[zeros(length(temp_migrate_cntr),1); welfare_expr];
-
-welfare_LATE_beta = regress(welfare_all, [ones(length(predic_migration),1), predic_migration]);
-
-welfare_ITT = regress(welfare_all, [ones(length(not_control),1), not_control]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % To remember the ordering of the 
@@ -489,8 +451,8 @@ expr_prd = expermt_data(:,12,1);
 
 report_welfare_quintiles
 
-disp('Welfare and Migration by Income Quintile Cash Transfer: Uncondtional, Migration, Income Gain, Consumption Gain')
-disp(round(100.*[welfare_bin, migration_bin, income_gain_bin, cons_gain_bin],2))
+disp('Welfare and Migration by Income Quintile ')
+disp(round(100.*[welfare_bin, migration_bin],2))
 disp('Average Welfare Gain, Migration Rate')
 disp(round(100.*[mean(cash_data(:,10,1)),mean(cash_data(:,7,1))],2))
 
@@ -506,26 +468,10 @@ expr_prd = expermt_data(:,12,1);
 
 report_welfare_quintiles
 
-disp('Welfare by Income Quintile: Unconditional, Conditional, Migration Rate, Income Gain, Consumption Gain, Z, Experience')
-disp(round(100.*[welfare_bin, welfare_bin_cond, migration_bin, income_gain_bin, cons_gain_bin, urban_bin./100, expr_bin],2))
-disp('Averages: Unconditional Welfare, Unconditional Migration Rate, Conditional on Migrating Welfare, Income Gain, Consumption Gain, Experince')
-disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expermt_data(temp_migrate_expr,10,1)),...
-    mean(income_gain(temp_migrate_expr)),mean(cons_gain(temp_migrate_expr)),mean(expr_prd(temp_migrate_expr))],2))
-
-
-% welfare_migrate_data = [expermt_data(:,10,1), temp_migrate_expr, income_gain, cons_gain];
-% urban_prd = expermt_data(:,11,2);
-% 
-% report_welfare_by_zurban
-% 
-% disp('Welfare by Z: Unconditional, Conditional, Migration Rate')
-% disp(round(100.*[welfare_bin, welfare_bin_cond, migration_bin],2))
-% 
-% income_assets = [control_data(:,1,1), control_data(:,3,1), expermt_data(:,10,1), temp_migrate_expr];
-% 
-% % I think this is for the urban z guys...
-% report_welfare_income_zurban
-
+disp('Welfare by Income Quintile: Welfare, Migration Rate, Z, Experience')
+disp(round(100.*[welfare_bin, migration_bin, urban_bin./100, expr_bin],2))
+disp('Averages: Unconditional Welfare, Migration Rate, Experince')
+disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expr_prd(temp_migrate_expr))],2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -602,10 +548,6 @@ disp('Fraction of Rural with No Assets')
 disp(frac_no_assets)
 disp('Permenant Moves')
 disp(perm_moves)
-disp('Ratio of Income in Monga vs Non-Monga')
-disp(m_income_season(1)/m_income_season(2))
-disp('Consumption Drop')
-disp(cons_drop)
 
 cd('..\Analysis')
 
@@ -618,8 +560,6 @@ cd('..\calibration')
 
 
 figure
-
-
 subplot(3,2,1), hist(log(data_panel(rural,1)),50)
  
 subplot(3,2,2), hist(log(data_panel(~rural,1)),50)
