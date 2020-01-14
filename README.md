@@ -1,9 +1,10 @@
-### The Welfare Effects of Encouraging Rural-Urban Migration
+### [The Welfare Effects of Encouraging Rural-Urban Migration](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf)
 
 ---
-This repository contains code to reproduce aspects of the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"]((http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf)).
+This repository contains code to reproduce aspects of the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). It also includes replication files (empirical and quantitative results) for the paper ["Underinvestment in a Profitable
+Technology: The Case of Seasonal Migration in Bangladesh"](https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA10489)
 
-Complete explanations of the repository are currently under construction.
+**Complete explanations of the repository are currently under construction.**
 
 ##### Basic Calls
 The most basic call to start inside the ``\revision_code\calibration`` folder. From there to generate outcomes from the model and the partial equilibrium welfare numbers is here:
