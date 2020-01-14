@@ -1,0 +1,88 @@
+\documentclass[pdftex,11pt]{article}
+\usepackage[pdftex]{graphicx,color}
+\usepackage{setspace,multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{titlesec}
+\usepackage{subfigure}
+\usepackage{fancyhdr}
+\usepackage[longnamesfirst]{natbib}
+\usepackage{cite}
+\usepackage[paperwidth=8.5in,
+left=0.5in,right=0.5in,paperheight=11.0in,textheight=9.5in,centering]{geometry}
+\usepackage{booktabs}
+\usepackage{rotating}
+
+\bibliographystyle{ecta}
+\definecolor{nblue}{RGB}{0,0,128}
+
+\usepackage[colorlinks=true, linkcolor=nblue,
+citecolor=black, urlcolor=nblue, bookmarks=false,
+pdfstartview={XYZ null null 0.90},
+pdftitle={Redistributing the Gains From Trade Through Progressive Taxation},
+pdfauthor={Spencer G. Lyon, Michael E. Waugh},
+pdfkeywords={economics, trade, dynamics, quant econ, lyon, waugh, incomplete markets, taxes, redistribution, progressivity, inequality, Ricardo, julia, migration, taxation, social insurance}
+]{hyperref}
+
+\usepackage{setspace}
+
+\onehalfspace
+
+\renewcommand{\baselinestretch}{1.1}
+\renewcommand{\arraystretch}{.7}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{.1in}
+\renewcommand\familydefault{\sfdefault}
+
+\titleformat{\section}{\large\bf}{\thesection.}{.5em}{}
+\titleformat{\subsection}{\normalsize\bf}{\thesubsection.}{.5em}{}
+\titleformat{\subsubsection}{\normalsize\bf}{\thesubsubsection.}{.5em}{}
+
+\def\thesection{\arabic{section}}
+\def\thesubsection{\Alph{subsection}}
+\def\thesubsubsection{\Roman{subsubsection}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+
+\pagestyle{fancy}
+\rhead{}
+\lhead{}
+\cfoot{\thepage}
+\lfoot{}
+\lfoot{Revised: \today}
+\renewcommand{\headrulewidth}{0pt}
+
+
+\begin{document}
+
+\subsection{Labor Earnings in the Rural Area}
+
+The model is \textbf{solved} in the following way. This discussion below is simply about code, not to be in the paper. Labor earnings in the rural area are
+\begin{align}
+w_{r}(s, i, N_r) = A_{i} s
+\end{align}
+where $A_i$ is mechanically the seasonal productivity shock. But it is a convolution of the wage per efficiency unit of labor AND the seasonal shock. Then given the production function we can invert what the actual wage per efficiency unit is given the number of efficiency units that are working in the rural area. The number of efficiency units working in a rural area in season $i$ is:
+\begin{align}
+N_{r,i} = \int_{r,i} s \ ds
+\end{align}
+so this is simply adding up the efficiency units of those working in the rural area. Then since wages equal the marginal product of labor we have:
+\begin{align}
+w_{r}(s, i, N_r) = \alpha \tilde{A}_{i} \left( N_{r,i} \right)^{\alpha - 1} s \label{eq:wage_mpl}
+\end{align}
+and then given an $\alpha$ we can invert (\ref{eq:wage_mpl}) to find the ``fundamental'' seasonal productivity, $\tilde{A}_{i}$, i.e. given $A_i$ and equilibrium $N_{r,i}$, we can figure out what $\tilde{A}_{i}$. This is important as it allows us to feed in the value $\alpha \tilde{A}_{i} \left( N_{r,i} \right)^{\alpha - 1}$ into the code and the resulting output will exactly replicated our calibrated economy.
+
+\textbf{Calibrating the wage elasticity.} This is how I did it\ldots take the control village with $N_{r,m}$ efficiency units of labor; take $N^{ex}_{r,m}$ efficiency units of labor from the experiment. Then compute the log difference in wages using (\ref{eq:wage_mpl}):
+\begin{align}
+\log w^{ex}_{r}(s, m, N_r) - \log w_{r}(s, m, N_r) \label{eq:wage_log_diff}
+\end{align}
+and given that we know the change in \textbf{bodies}, we can compute a wage elasticity. In particular, we phrase it interms of the change in migration flows as in ACM. So for every 10 percent increase in migration, we should see a 2.2 percent increase in wages. In our calibrated economy, there is a 22 percent increase in migration rates between the experiment and control, so we want to find an $\alpha$ such that \ref{eq:wage_log_diff} takes on the value of 4.4 percent.
+
+\subsection{GE Counterfactual}
+
+This is the way we will implement the counterfactual. First, in the calibrated economy, we will record the level of assets that satisfies the ACM sampling criteria, call this $a^{acm}$. Recall that this is found so that only the bottom 50th percentile of the rural asset distribution are offered the travel subsidy. In the GE counterfactual, we will provide a permanent travel subsidy to those who fall below $a^{acm}$. This is done for several reasons, but most important it makes sure the we are looking at ``similar guys'' as in the PE experiment. The other thing is that in our model there is a strong tendency if the cost goes away for many people to relocate back to the rural area; this will modulate this. Second, given the change in costs, we find wages that which are consistent with \ref{eq:wage_mpl}.
+
+So note that there are two important aspects of this policy. First, is the permanence of it. This will change extensive margin movements, i.e. location choice, migration choice, and the accumulation of experience. Second, through these changes it will affect wages. For example, if seasonal migration rates increase, then this will benefit those who stay as wages will increase. Note that this can also cut the other way as if more people decide to locate in the rural area, non-monga wage rates will \emph{decrease} hurting most households.
+
+
+
+\end{document}  
