@@ -1,4 +1,4 @@
-function [targets] = analyze_outcomes_prefshock(cal_params, flag)
+function [targets] = compute_outcomes_prefshock_addit(cal_params, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR paper at
 % Econometrica (late 2017-on)
@@ -30,6 +30,7 @@ urban_tfp = cal_params(3); rural_tfp = 1./urban_tfp; % Urban TFP
 
 seasonal_factor = 0.55; % The seasonal fluctuation part. 
 
+
 params.m_season = 0.08; % This is the bus ticket
 params.m = 2*params.m_season; % This is the moving cost. 
 
@@ -38,8 +39,8 @@ gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 % m_error_national_survey = 0; % Mesurment error. Set to zero, then expost pick to high variances. 
 % m_error_expr = 0;
  
-n_perm_shocks = 48; %48
-n_tran_shocks = 30; %30
+n_perm_shocks = 24; %48
+n_tran_shocks = 15; %30
 % Number of permenant and transitory types. 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,6 +53,7 @@ m_adjust_urban = -1./(1-shock_rho.^2).*(shock_std.^2).*(1/2).*(gamma_urban);
 % thus changes in std or gamma only affect variances. 
 
 % [shocks_trans,trans_mat] = tauchen(n_tran_shocks,0,shock_rho,shock_std,2.5);
+
 [shocks_trans,trans_mat] = rouwenhorst(n_tran_shocks,shock_rho,shock_std);
 
 seasonal_trans_mat = [0 , 1 ; 1, 0]; 
@@ -81,7 +83,7 @@ n_shocks = length(shocks_trans_u);
 % normal distribution and then the transition matrix will determine the
 % relative weights of the guys in the population. 
 
-[zurban , zurban_prob] = pareto_approx(n_perm_shocks, 1./perm_shock_u_std);
+[zurban , zurban_prob] = pareto_approx_alt_v2(n_perm_shocks, 1./perm_shock_u_std);
 
 types = [ones(n_perm_shocks,1), zurban];
 
@@ -103,6 +105,8 @@ n_sims = 5000;
 time_series = 100000;
 N_obs = 25000;
 
+rng(03281978)
+
 params.N_obs = N_obs;
 
 rng(03281978)
@@ -121,22 +125,22 @@ move_shocks = rand(time_series,n_perm_shocks);
 % the for loop across different cores. It this case it leads to a big speed
 % up. 
 
+%assets = struct();
+% move = zeros(n_types);
+% vguess = zeros(n_types);
+
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
+
 
 parfor xxx = 1:n_types 
         
     %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
     [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
+        rural_urban_value_prefshock_addit(params, solve_types(xxx,:), trans_shocks, trans_mat);
 
 %     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
 %         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%plot_policy_function
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -161,6 +165,7 @@ for xxx = 1:n_types
 %   
 end 
 
+
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
 % distributed weights. 
@@ -180,13 +185,21 @@ for xxx = 1:n_types
 end
 
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+%params.means_test = median(data_panel(rural_not_monga,3));
+
 
 params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
 
+% assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
+% move_temp = zeros(n_asset_states,n_shocks,2,n_types);
+% cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
+
+% assets_surv = zeros(n_asset_states,n_shocks,n_types);
+% move_surv = zeros(n_asset_states,n_shocks,n_types);
+ 
 sim_expr_panel = zeros(n_sims,13,11,n_types);
 sim_cntr_panel = zeros(n_sims,9,11,n_types);
 % sim_surv_panel = zeros(n_sims,10,3,n_types);
@@ -199,43 +212,38 @@ monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,:);
 move_shocks = move_shocks((N_obs+1):end,:);
 
+
+
 for xxx = 1:n_types     
-        
+       
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
     [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
-
-    [assets_temp_cash(xxx), move_temp_cash(xxx),... 
-       cons_eqiv_cash(xxx)] = cash_experiment_welfare_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat, vguess(xxx));
-%     
-%     [assets_temp_cash(:,:,:,xxx), move_temp_cash(:,:,:,xxx),... 
-%         cons_eqiv_cash(:,:,:,xxx)] = work_fare(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
+    
+    %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
     % provides the asset policy conditional on a temporary move. 
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% perform the survey... tic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 
     rng(02071983+xxx)
+    
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx),...
-        move_temp(xxx), cons_eqiv(xxx), params, solve_types(xxx,:), trans_shocks,...
-        monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
-      
-    [sim_cash_panel(:,:,:,xxx), ~]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp_cash(xxx),...
-        move_temp_cash(xxx), cons_eqiv_cash(xxx), params, solve_types(xxx,:), trans_shocks,...
-        monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
-        
+        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
+          params, solve_types(xxx,:), trans_shocks, monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
+         
+    % This then takes the policy functions, simmulates the model, then
+    % after a period of time, implements the experirment.     
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Now the code below constructs a panel so the approriate types are where
 % % they should be....
 
@@ -251,15 +259,12 @@ for xxx = 1:n_types
 
     data_panel_cntr(s_expr_count:e_expr_count,:,1) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,1,xxx);
     
-    data_panel_cash(s_expr_count:e_expr_count,:,1) = sim_cash_panel(n_sims-(sample_expr(xxx)-1):end,:,1,xxx);
-    
     data_panel_expr(s_expr_count:e_expr_count,:,2) = sim_expr_panel(n_sims-(sample_expr(xxx)-1):end,:,2,xxx);
 
     data_panel_cntr(s_expr_count:e_expr_count,:,2) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,2,xxx);
         
     data_panel_expr(s_expr_count:e_expr_count,:,3) = sim_expr_panel(n_sims-(sample_expr(xxx)-1):end,:,3,xxx);
     data_panel_cntr(s_expr_count:e_expr_count,:,3) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,3,xxx);
-    data_panel_cash(s_expr_count:e_expr_count,:,3) = sim_cash_panel(n_sims-(sample_expr(xxx)-1):end,:,3,xxx);
     
     data_panel_expr(s_expr_count:e_expr_count,:,4) = sim_expr_panel(n_sims-(sample_expr(xxx)-1):end,:,4,xxx);
     data_panel_cntr(s_expr_count:e_expr_count,:,4) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,4,xxx);
@@ -272,6 +277,12 @@ for xxx = 1:n_types
     
     data_panel_expr(s_expr_count:e_expr_count,:,11) = sim_expr_panel(n_sims-(sample_expr(xxx)-1):end,:,11,xxx);
     data_panel_cntr(s_expr_count:e_expr_count,:,11) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,11,xxx);
+        
+% if flag == 1
+%     
+%         data_panel_surv(s_expr_count:e_expr_count,:,1) = sim_surv_panel(n_sims-(sample_expr(xxx)-1):end,:,1,xxx);
+%         data_panel_surv(s_expr_count:e_expr_count,:,2) = sim_surv_panel(n_sims-(sample_expr(xxx)-1):end,:,2,xxx);
+% end
                     
     s_expr_count = e_expr_count + 1;
                 
@@ -284,7 +295,7 @@ end
 % data_panel(:,2) = exp(log(data_panel(:,2)) + m_error_national_survey.*randn(n_obs_panel,1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];
+% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, expected_urban, season];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First devine some indicator variables...
 
@@ -311,6 +322,7 @@ m_consumption = [mean((data_panel(rural,2))), mean((data_panel(~rural,2)))];
 avg_rural = sum(rural)./length(data_panel);
 
 var_income = [var(log(data_panel(rural,1))), var(log(data_panel(~rural,1)))];
+% No emasurment error here, we add it on expost. 
 
 var_consumption = [var(log(data_panel(rural,2))), var(log(data_panel(~rural,2)))];
 
@@ -325,7 +337,6 @@ rural_cntr = data_panel_cntr(:,4,1)==1 & data_panel_expr(:,end,1)==1;
 
 control_data = data_panel_cntr(rural_cntr,:,:);
 expermt_data = data_panel_expr(rural_cntr,:,:);
-cash_data = data_panel_cash(rural_cntr,:,:);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Migration Elasticity
@@ -381,19 +392,6 @@ temp_expr_migration_y5 = sum(temp_migrate_expr_y5)./sum(rural_cntr);
 
 migration_elasticity_y5 = temp_expr_migration_y5 - temp_migration_y5;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity, Cash
-temp_migrate_cash = cash_data(:,7,1) == 1;
-
-temp_migrate_cash = sum(temp_migrate_cash)./sum(rural_cntr);
-
-cash_elasticity = temp_migrate_cash - temp_migration;
-
-temp_migrate_cash_y2 = cash_data(:,7,3) == 1;
-
-temp_migrate_cash_y2 = sum(temp_migrate_cash_y2)./sum(rural_cntr);
-
-cash_elasticity_y2 = temp_migrate_cash_y2 - temp_migration_y2;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the LATE estimate in the model, the same way as in the
@@ -421,105 +419,33 @@ LATE = LATE_beta(2)./AVG_C ;
 
 var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
 
-income_noerror = [control_data(:,1,2); expermt_data(:,1,2)];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Welfare gains
-induced = temp_migrate_expr ~= temp_migrate_cntr;
-
-all_stay = (~temp_migrate_expr) & (~temp_migrate_cntr);
-
-induced_cash = cash_data(:,7,1) ~= temp_migrate_cntr;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-welfare_expr = expermt_data(:,10,1);
-welfare_all = 100.*[zeros(length(temp_migrate_cntr),1); welfare_expr];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% To remember the ordering of the 
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];
-% This whole section reports the welfare numbers... 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The expieriment...
-
-income_assets = [control_data(:,1,1), control_data(:,3,1), expermt_data(:,10,1), temp_migrate_expr];
-
-income_gain = log(expermt_data(:,1,2)) - log(control_data(:,1,2));
-cons_gain = log(expermt_data(:,2,2)) - log(control_data(:,2,2));
-urban_prd = expermt_data(:,11,2);
-expr_prd = expermt_data(:,12,1);
-
-report_welfare_quintiles
-
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('')
-disp('PE Conditional Migration Transfer: Welfare by Income Quintile: Welfare, Migration Rate, Z, Experience')
-disp(round(100.*[welfare_bin, migration_bin, urban_bin./100, expr_bin],2))
-disp('Averages: Welfare, Migration Rate, Experince')
-disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expr_prd(temp_migrate_expr))],2))
-
+cons_drop = mean(log(control_data(~temp_migrate_cntr,2,1))-log(control_data(~temp_migrate_cntr,2,2)));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The unconditional cash transfer
-income_assets = [control_data(:,1,1), control_data(:,3,1), cash_data(:,10,1), cash_data(:,7,1)];
-
-income_gain = log(control_data(:,1,2)) - log(control_data(:,1,1));
-cons_gain = log(control_data(:,2,2)) - log(control_data(:,2,1));
-urban_prd = expermt_data(:,11,2);
-expr_prd = expermt_data(:,12,1);
-
-report_welfare_quintiles
-
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('')
-disp('PE Unconditional Cash Transfer: Welfare and Migration by Income Quintile ')
-disp(round(100.*[welfare_bin, migration_bin],2))
-disp('PE Unconditional Cash Transfer: Average Welfare Gain, Migration Rate')
-disp(round(100.*[mean(cash_data(:,10,1)),mean(cash_data(:,7,1))],2))
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 cons_data_no_error_r1 = [control_data(:,2,1); expermt_data(:,2,1)];
 cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
 
 % cons_data_r1 = exp(log(cons_data_no_error_r1) + m_error.*randn(length(cons_data_no_error_r1),1)); 
 % cons_data_r2 = exp(log(cons_data_no_error_r2) + m_error.*randn(length(cons_data_no_error_r2),1));
-      
+% 
+% cons_model = [ [temp_migrate_cntr; temp_migrate_expr], [zeros(length(temp_migrate_cntr),1); ...
+%                 ones(length(temp_migrate_expr),1)], log(cons_data_r1), log(cons_data_r2)];
+            
 cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
 var_cons_growth = std(cons_model_growth);
+% Again, no measurment error here, we can add it on expost. Need
+% consistency in language. 
 
-m_error = (0.1783 - var(cons_model_growth)).^.5;
-
-cons_model_growth = cons_model_growth + m_error.*randn(length(cons_model_growth),1);
-
-cons_model = [ [temp_migrate_cntr; temp_migrate_expr], [zeros(length(temp_migrate_cntr),1); ...
-                ones(length(temp_migrate_expr),1)], cons_model_growth];
-            
-cd('..\Analysis')
-
-save cons_model_set cons_model 
-
-cd('..\calibration')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Assets...
 %frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
 
 frac_no_assets = 0.90*(sum(control_data(:,3,1) == asset_space(1)))/sum(rural_cntr) + 0.10*(sum(control_data(:,3,1) == asset_space(2)))/sum(rural_cntr);
-% Trying to smmoth this thing out
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% aggregate_moments = [m_income(2)./m_income(1), avg_rural, var_income(2), frac_no_assets];
-% 
-% experiment_moments = [migration_elasticity, migration_elasticity_y2, LATE];
-% 
-% control_moments = [temp_migration, control_migration_cont_y2, control_migration_cont_y3, OLS, var_consumption_no_migrate_control];
-%     
-% targets = [aggregate_moments, experiment_moments, control_moments] ;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 aggregate_moments = [m_income(2)./m_income(1), avg_rural, var_income(2), frac_no_assets];
 
@@ -539,9 +465,7 @@ targets = [aggregate_moments, experiment_hybrid_v2] ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        
 if flag == 1
-
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('Statistics From Model')
+    
 disp('')
 disp('')
 disp('Average Rural Population')
@@ -551,11 +475,9 @@ disp(params.m_season./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
 disp('Expr Elasticity: Year One, Two, Four')
-disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3])
+disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3, migration_elasticity_y5])
 disp('Control: Year One, Repeat Two, Four')
 disp([temp_migration, control_migration_cont_y2 , control_migration_cont_y3])
-disp('Cash: Year One, Two')
-disp([cash_elasticity , cash_elasticity_y2])
 disp('OLS Estimate')
 disp(OLS)
 disp('LATE Estimate')
@@ -566,12 +488,18 @@ disp('Mean Consumption Rural and Urban')
 disp(m_consumption)
 disp('Variance of Consumption Rural and Urban')
 disp(var_consumption)
+disp('Variance of Consumption Growth')
+disp(var_cons_growth)
 disp('Variance of Log Income Rural and Urban')
 disp(var_income)
 disp('Fraction of Rural with No Assets')
 disp(frac_no_assets)
 disp('Permenant Moves')
 disp(perm_moves)
+disp('Ratio of Income in Monga vs Non-Monga')
+disp(m_income_season(1)/m_income_season(2))
+disp('Consumption Drop')
+disp(cons_drop)
 
 cd('..\Analysis')
 
@@ -582,8 +510,8 @@ plot_migration
 
 cd('..\calibration')
 
-
 figure
+
 subplot(3,2,1), hist(log(data_panel(rural,1)),50)
  
 subplot(3,2,2), hist(log(data_panel(~rural,1)),50)
@@ -596,6 +524,8 @@ subplot(3,2,5), hist((data_panel(rural,3)),50)
  
 subplot(3,2,6), hist((data_panel(~rural,3)),50)
     
+
+
 end
 
 

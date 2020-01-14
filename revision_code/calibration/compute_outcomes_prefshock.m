@@ -399,6 +399,7 @@ var_cons_growth = std(cons_model_growth);
 %frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
 
 frac_no_assets = 0.90*(sum(control_data(:,3,1) == asset_space(1)))/sum(rural_cntr) + 0.10*(sum(control_data(:,3,1) == asset_space(2)))/sum(rural_cntr);
+% Trying to smmoth this thing out
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
