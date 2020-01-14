@@ -83,7 +83,7 @@ n_shocks = length(shocks_trans_u);
 % normal distribution and then the transition matrix will determine the
 % relative weights of the guys in the population. 
 
-[zurban , zurban_prob] = pareto_approx_alt_v2(n_perm_shocks, 1./perm_shock_u_std);
+[zurban , zurban_prob] = pareto_approx(n_perm_shocks, 1./perm_shock_u_std);
 
 types = [ones(n_perm_shocks,1), zurban];
 
@@ -105,8 +105,6 @@ n_sims = 5000;
 time_series = 100000;
 N_obs = 25000;
 
-rng(03281978)
-
 params.N_obs = N_obs;
 
 rng(03281978)
@@ -125,21 +123,13 @@ move_shocks = rand(time_series,n_perm_shocks);
 % the for loop across different cores. It this case it leads to a big speed
 % up. 
 
-%assets = struct();
-% move = zeros(n_types);
-% vguess = zeros(n_types);
-
 solve_types = [rural_tfp.*types(:,1), types(:,2)];
 
-
 parfor xxx = 1:n_types 
-        
-    %params = [R, solve_types(xxx,:), beta, m, gamma, abar, ubar, lambda, pi_prob, m_temp];
+
     [assets(xxx), move(xxx), vguess(xxx)] = ...
         rural_urban_value_prefshock(params, solve_types(xxx,:), trans_shocks, trans_mat);
 
-%     [assets(:,:,:,xxx), move(:,:,:,xxx), vguess(:,:,:,xxx)] = ...
-%         rural_urban_value_addit(params, trans_shocks, trans_mat);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,22 +139,14 @@ end
 sim_panel = zeros(N_obs,9,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
-
 for xxx = 1:n_types 
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
         assets(xxx), move(xxx),params, solve_types(xxx,:), trans_shocks, shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
-    
-%     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_mex_p(assets(:,:,:,xxx), move(:,:,:,xxx),...
-%         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks',trans_mat);
-% 
-%     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_plot(assets(:,:,:,xxx), move(:,:,:,xxx),...
-%         grid, params, N_obs, trans_shocks, shock_states_p, pref_shocks, trans_mat);
-%   
-end 
 
+end 
 
 % Now record the data. What we are doing here is creating a
 % cross-section/pannel of guys that are taken in porportion to their
@@ -192,17 +174,9 @@ params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_pa
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This section of the code now performs the expirements. 
-
-% assets_temp = zeros(n_asset_states,n_shocks,2,n_types);
-% move_temp = zeros(n_asset_states,n_shocks,2,n_types);
-% cons_eqiv = zeros(n_asset_states,n_shocks,2,n_types);
-
-% assets_surv = zeros(n_asset_states,n_shocks,n_types);
-% move_surv = zeros(n_asset_states,n_shocks,n_types);
  
 sim_expr_panel = zeros(n_sims,13,11,n_types);
 sim_cntr_panel = zeros(n_sims,9,11,n_types);
-% sim_surv_panel = zeros(n_sims,10,3,n_types);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -211,8 +185,6 @@ periods = 1:length(states_panel(:,:,1))-20;
 monga = periods(rem(periods,2)==0)-1;
 pref_shocks = pref_shocks((N_obs+1):end,:);
 move_shocks = move_shocks((N_obs+1):end,:);
-
-
 
 for xxx = 1:n_types     
        
@@ -277,23 +249,12 @@ for xxx = 1:n_types
     
     data_panel_expr(s_expr_count:e_expr_count,:,11) = sim_expr_panel(n_sims-(sample_expr(xxx)-1):end,:,11,xxx);
     data_panel_cntr(s_expr_count:e_expr_count,:,11) = sim_cntr_panel(n_sims-(sample_expr(xxx)-1):end,:,11,xxx);
-        
-% if flag == 1
-%     
-%         data_panel_surv(s_expr_count:e_expr_count,:,1) = sim_surv_panel(n_sims-(sample_expr(xxx)-1):end,:,1,xxx);
-%         data_panel_surv(s_expr_count:e_expr_count,:,2) = sim_surv_panel(n_sims-(sample_expr(xxx)-1):end,:,2,xxx);
-% end
-                    
+                            
     s_expr_count = e_expr_count + 1;
                 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% data_panel(:,1) = exp(log(data_panel(:,1)) + m_error_national_survey.*randn(n_obs_panel,1));
-% data_panel(:,2) = exp(log(data_panel(:,2)) + m_error_national_survey.*randn(n_obs_panel,1));
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, expected_urban, season];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -311,9 +272,6 @@ rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
 
 % Income earned by rural residents relative to urban...
 m_income = [mean((data_panel(rural,1))), mean((data_panel(~rural,1)))];
-
-% Income in monga relative to non-monga...
-m_income_season = [mean((data_panel(rural_monga,1))), mean((data_panel(rural_not_monga,1)))];
 
 % Consumption...
 m_consumption = [mean((data_panel(rural,2))), mean((data_panel(~rural,2)))];
@@ -392,7 +350,6 @@ temp_expr_migration_y5 = sum(temp_migrate_expr_y5)./sum(rural_cntr);
 
 migration_elasticity_y5 = temp_expr_migration_y5 - temp_migration_y5;
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the LATE estimate in the model, the same way as in the
 % data...so first stack stuff the way we want it....
@@ -418,8 +375,6 @@ LATE_beta = regress(consumption_noerror, [ones(length(predic_migration),1), pred
 LATE = LATE_beta(2)./AVG_C ;
 
 var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
-
-cons_drop = mean(log(control_data(~temp_migrate_cntr,2,1))-log(control_data(~temp_migrate_cntr,2,2)));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -496,10 +451,6 @@ disp('Fraction of Rural with No Assets')
 disp(frac_no_assets)
 disp('Permenant Moves')
 disp(perm_moves)
-disp('Ratio of Income in Monga vs Non-Monga')
-disp(m_income_season(1)/m_income_season(2))
-disp('Consumption Drop')
-disp(cons_drop)
 
 cd('..\Analysis')
 
