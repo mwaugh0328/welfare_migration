@@ -32,6 +32,6 @@ for xxx = 1:length(edges_income)-1
 
 end
 
-disp(sum(counts(:)))
+%disp(sum(counts(:)))
 %disp('Welfare by Income Quintile')
 %disp(100.*welfare_bin)
