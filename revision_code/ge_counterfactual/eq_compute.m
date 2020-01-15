@@ -3,7 +3,7 @@ warning('off','stats:regress:RankDefDesignMat');
 
 addpath('../calibration')
 
-load calibration_highgrid
+load calibration_final
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First compute the competitive equillibrium and infer seasonal
@@ -11,8 +11,9 @@ load calibration_highgrid
 
 %[average_rural_labor_units_monga, average_rural_labor_units_not_monga, seasonal_factor, labor_monga, labor_not_monga];
 %    urban_data = [average_urban_labor_units_monga, average_urban_labor_units_not_monga];
-
+tic
 [rural, urban, vfun, params] = compute_outcomes_prefshock_GE(exp(new_val),[], [],[], []);
+toc
 
 alpha = 0.845;
 
@@ -33,31 +34,40 @@ wages = [wage_monga; wage_not_monga];
 % Compute the elasticity of wages w.r.t. labor...
 
 
-wage_increase = 100*(log((rural.expr_labor_units).^(alpha-1)) - log((rural.cntr_labor_units).^(alpha-1)))
+wage_increase = 100*(log((rural.expr_labor_units).^(alpha-1)) - log((rural.cntr_labor_units).^(alpha-1)));
 % Compare the implied change across the two groups...
 
 % From ACM: For every extra 10% of the landless population that emigrates, wages increase by 2.2%
 % With a 22 percent increase in emigration between the two...this means that 
 % Agricultural wages are therefore predicted to increase by 2.2 percent *
 % 2.2 = 4.84
-
+disp('')
+disp('')
 disp('Wage Change from ACM, Wage Change in Model')
 disp([4.48, wage_increase])
-disp([rural.labor_monga, rural.labor_not_monga])
+%disp([rural.labor_monga, rural.labor_not_monga])
 
 labor_units_old = [rural.labor_units_monga, rural.labor_units_not_monga];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This computes eq. gives us some baseline statistics....
-
+disp('')
+disp('')
+disp('First Compute the Baseline: Note welfare here should be 0 as nothing happend')
 compute_outcomes_prefshock_GE(exp(new_val), wages, 0, vfun,1);
 
 wages_old = wages;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+disp('')
+disp('')
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+disp('Now compute counterfactual holding wages fixed...')
 
 compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
+
+disp('')
+disp('')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is where the counter-factual eq would be...
@@ -94,8 +104,14 @@ for xxx = 1:n_iters
     
 end
 
+disp('')
+disp('')
+
 disp('Change in Wages')
 disp(wages./wages_old)
+
+disp('Now compute counterfactual welfare with wages changing...')
+disp('')
 
 compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
 

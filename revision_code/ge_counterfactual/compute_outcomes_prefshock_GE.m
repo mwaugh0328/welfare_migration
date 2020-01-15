@@ -88,7 +88,7 @@ n_shocks = length(shocks_trans_u);
 % normal distribution and then the transition matrix will determine the
 % relative weights of the guys in the population. 
 
-[zurban , zurban_prob] = pareto_approx_alt_v2(n_perm_shocks, 1./perm_shock_u_std);
+[zurban , zurban_prob] = pareto_approx(n_perm_shocks, 1./perm_shock_u_std);
 
 types = [ones(n_perm_shocks,1), zurban];
 
@@ -494,6 +494,9 @@ urban_data.labor_units_not_monga = sum(data_panel(labor_units_urban_not_monga,1)
 if flag == 1
     
 %panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, experince, move_cost, season];
+
+disp('Average Rural Population')
+disp(avg_rural)
     
 income_assets = [control_data(:,1,1), control_data(:,3,1), control_data(:,8,1), control_data(:,7,1), control_data(:,9,1), control_data(:,10,1)];
 
@@ -502,40 +505,37 @@ report_welfare_quintiles_GE
 disp('Control Group, Welfare by Income Quintile: Welfare, Migration Rate, Experience, Moving Cost')
 disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
 
-disp('Average Rural Population')
-disp(avg_rural)
-    
 disp('Control Group, Fraction of Rural Who are Migrants')
 disp(temp_migration)
 
-disp('Fraction of Control Group with No Assets')
+disp('Control Group Fraction with No Assets')
 disp(frac_no_assets)
     
-disp('Welfare')
+disp('Control Group, Average Welfare')
 disp(avg_welfare)
 
-disp('Average Experince')
+disp('Control Group, Average Experince')
 disp(mean(control_data(:,9,1)))
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-income_assets = [data_panel(labor_units_rural_not_monga,1), data_panel(labor_units_rural_not_monga,3), data_panel(labor_units_rural_not_monga,8),...
-    data_panel(labor_units_rural_not_monga,7), data_panel(labor_units_rural_not_monga,9), data_panel(labor_units_rural_not_monga,10)];
-
-
-report_welfare_quintiles_GE
-
-disp('All Rural, Welfare by Income Quintile: Welfare, Migration Rate, Experience, Moving Cost')
-disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
-
-disp('Aggregate, Fraction of Rural Who are Migrants')
-disp((rural_data.labor_not_monga - rural_data.labor_monga)./rural_data.labor_not_monga)
-
-disp('Average Experince')
-disp(mean(data_panel(labor_units_rural_not_monga,9)))
-
-disp('Permanent Migration')
-disp(perm_moves)
+% income_assets = [data_panel(labor_units_rural_not_monga,1), data_panel(labor_units_rural_not_monga,3), data_panel(labor_units_rural_not_monga,8),...
+%     data_panel(labor_units_rural_not_monga,7), data_panel(labor_units_rural_not_monga,9), data_panel(labor_units_rural_not_monga,10)];
+% 
+% 
+% report_welfare_quintiles_GE
+% 
+% disp('All Rural, Welfare by Income Quintile: Welfare, Migration Rate, Experience, Moving Cost')
+% disp(round(100.*[welfare_bin, migration_bin, expr_bin, moving_cost_bin],2))
+% 
+% disp('Aggregate, Fraction of Rural Who are Migrants')
+% disp((rural_data.labor_not_monga - rural_data.labor_monga)./rural_data.labor_not_monga)
+% 
+% disp('Average Experince')
+% disp(mean(data_panel(labor_units_rural_not_monga,9)))
+% 
+% disp('Permanent Migration')
+% disp(perm_moves)
     
 end
     
