@@ -51,6 +51,7 @@ labor_units_old = [rural.labor_units_monga, rural.labor_units_not_monga];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This computes eq. gives us some baseline statistics....
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('')
 disp('First Compute the Baseline: Note welfare here should be 0 as nothing happend')
@@ -62,6 +63,9 @@ disp('')
 disp('')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('')
+disp('')
 disp('Now compute counterfactual holding wages fixed...')
 
 compute_outcomes_prefshock_GE(exp(new_val), wages, params.means_test, vfun,1);
@@ -71,7 +75,9 @@ disp('')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is where the counter-factual eq would be...
-
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('')
+disp('')
 disp('Calculating the Equillibrium')
 n_iters = 10;
 relax = 0.25;
@@ -104,12 +110,12 @@ for xxx = 1:n_iters
     
 end
 
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('')
-
 disp('Change in Wages')
 disp(wages./wages_old)
-
+disp('')
 disp('Now compute counterfactual welfare with wages changing...')
 disp('')
 

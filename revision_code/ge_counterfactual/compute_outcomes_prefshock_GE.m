@@ -494,7 +494,7 @@ urban_data.labor_units_not_monga = sum(data_panel(labor_units_urban_not_monga,1)
 if flag == 1
     
 %panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, welfare, experince, move_cost, season];
-
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Average Rural Population')
 disp(avg_rural)
     
@@ -516,7 +516,7 @@ disp(avg_welfare)
 
 disp('Control Group, Average Experince')
 disp(mean(control_data(:,9,1)))
-    
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % income_assets = [data_panel(labor_units_rural_not_monga,1), data_panel(labor_units_rural_not_monga,3), data_panel(labor_units_rural_not_monga,8),...

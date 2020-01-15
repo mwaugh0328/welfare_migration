@@ -2,13 +2,13 @@
 
 ---
 This repository contains code to reproduce results from the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). It also includes replication files (empirical and quantitative results) for the paper ["Underinvestment in a Profitable
-Technology: The Case of Seasonal Migration in Bangladesh"](https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA10489) that were downloaded from Econometrica's code repository and obtained from the authors. I will provide support for the former, but not for the later. 
+Technology: The Case of Seasonal Migration in Bangladesh"](https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA10489) that were downloaded from Econometrica's code repository and obtained from the authors. I will provide support for the former, but not for the later.
 
 **Complete explanations of the repository are currently under construction.**
 
 **Software Requirements:** Outside of plotting (and the data analysis of the field experiment) all of this code is in MATLAB with the Parallel Computing Toolbox (for computation of the model) and the Global Optimization Toolbox (for calibration).
 
-With access to 12 cores processors on a Xeon E5-2690 the model (with a dense productivity and asset grid) is solved in about one minute. Simple modifications to speed up computation are to reduce the productivity grid, which out loosing much in terms computing equilibrium outcomes.
+With access to 12 cores processors (Xeon E5-2690) the model (with a dense productivity and asset grid) is solved in about 100 seconds. Simple modifications to speed up computation are to reduce the productivity grid, which out loosing much in terms computing equilibrium outcomes.
 
 #### Basic Calls
 ---
