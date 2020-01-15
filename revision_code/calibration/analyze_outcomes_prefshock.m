@@ -576,7 +576,9 @@ disp(perm_moves)
 cd('..\Analysis')
 
 m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
-m_rates = 100.*m_rates';
+m_rates_model = 100.*m_rates';
+
+save migration_model m_rates_model
 
 plot_migration
 
