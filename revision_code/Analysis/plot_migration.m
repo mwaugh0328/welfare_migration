@@ -15,7 +15,7 @@ data_isnan = isnan(data);
 H = shadedErrorBar(years(~data_isnan), data(~data_isnan),[error_two(~data_isnan)],'b');
 hold
 
-D = plot(years(~data_isnan), m_rates(~data_isnan),'r-' );
+D = plot(years(~data_isnan), m_rates_model(~data_isnan),'r-' );
 xlim([2008 2013])
 set(gca,'XTick',[2008:2013])
 box off
