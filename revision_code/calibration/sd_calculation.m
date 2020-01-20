@@ -179,21 +179,24 @@ GAM=eye(11).*g;
 sd_all=zeros(T+1,11);
 for j=0:T
 M=Matrix_M_new(:,j*11+1:j*11+11);
-SD_mat= inv(M'*W*M) * M' * W * GAM * V * GAM * W * M * inv(M'*W*M)
+SD_mat= inv(M'*W*M) * M' * W * GAM * V * GAM * W * M * inv(M'*W*M);
 SD=diag(SD_mat)';
 sd_all(j+1,:)=SD;
 end
 mean_sd_all=[params(order_table) me_mom1_var me_mom11_var; sd_all];
 
+disp('Parameter Estimate and S.E.')
+disp(mean_sd_all([1,2],:))
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Sensitivity of parameters with respect to moments (Andrews et al 2017):
 % for the 1%
 M=Matrix_M_new(:,23:33);
-sensitivity = - inv(M'*W*M) * M' * W  
+sensitivity = - inv(M'*W*M) * M' * W ; 
 
 % for the mean
 M=Matrix_M_new(:,1:11);
-sensitivity= - inv(M'*W*M) * M' * W  
+sensitivity = - inv(M'*W*M) * M' * W  ;
 
 
 
