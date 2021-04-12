@@ -142,7 +142,7 @@ solve_types = [rural_tfp.*types(:,1), types(:,2)];
 parfor xxx = 1:n_types 
 
     [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value_prefshock(params, solve_types(xxx,:));
+        rural_urban_value(params, solve_types(xxx,:));
 
 end
 
@@ -152,13 +152,13 @@ end
 seasont = repmat([0,1],1,n_tran_shocks);
 
 lowz = flipud(move(8).rural_not(:,seasont==1,1));
-medz = flipud(move(10).rural_not(:,seasont==1,1));
-medz_exp = flipud(move(8).rural_exp(:,seasont==1,1));
+medz = flipud(move(11).rural_not(:,seasont==1,1));
+lowz_exp = flipud(move(8).rural_exp(:,seasont==1,1));
 % visually, it's better to run this on the equally spaced grid.
 
 cd('..\Analysis')
 
-save movepolicy.mat lowz medz medz_exp
+save movepolicy.mat lowz medz lowz_exp
 
 cd('..\calibration')
 
@@ -175,7 +175,7 @@ parfor xxx = 1:n_types
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
        
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(...
         assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
     
 end 
@@ -224,10 +224,10 @@ parfor xxx = 1:n_types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:),  vguess(xxx));
+    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare(params, solve_types(xxx,:),  vguess(xxx));
 
     [assets_temp_cash(xxx), move_temp_cash(xxx),... 
-       cons_eqiv_cash(xxx)] = cash_experiment_welfare_prefshock(params, solve_types(xxx,:), vguess(xxx));
+       cons_eqiv_cash(xxx)] = cash_experiment_welfare(params, solve_types(xxx,:), vguess(xxx));
 %     
 %     [assets_temp_cash(:,:,:,xxx), move_temp_cash(:,:,:,xxx),... 
 %         cons_eqiv_cash(:,:,:,xxx)] = work_fare(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
@@ -243,11 +243,11 @@ parfor xxx = 1:n_types
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
+        = experiment_driver(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
           params, solve_types(xxx,:), monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
       
     [sim_cash_panel(:,:,:,xxx), ~]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp_cash(xxx),move_temp_cash(xxx), cons_eqiv_cash(xxx),...
+        = experiment_driver(assets(xxx), move(xxx), assets_temp_cash(xxx),move_temp_cash(xxx), cons_eqiv_cash(xxx),...
         params, solve_types(xxx,:), monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
         
 end
@@ -581,23 +581,21 @@ m_rates_model = 100.*m_rates';
 
 save migration_model m_rates_model
 
-plot_migration
-
 cd('..\calibration')
 
 
-figure
-subplot(3,2,1), hist(log(data_panel(rural,1)),50)
- 
-subplot(3,2,2), hist(log(data_panel(~rural,1)),50)
-
-subplot(3,2,3), hist(log(data_panel(rural,2)),50)
- 
-subplot(3,2,4), hist(log(data_panel(~rural,2)),50)
- 
-subplot(3,2,5), hist((data_panel(rural,3)),50)
- 
-subplot(3,2,6), hist((data_panel(~rural,3)),50)
+% figure
+% subplot(3,2,1), hist(log(data_panel(rural,1)),50)
+%  
+% subplot(3,2,2), hist(log(data_panel(~rural,1)),50)
+% 
+% subplot(3,2,3), hist(log(data_panel(rural,2)),50)
+%  
+% subplot(3,2,4), hist(log(data_panel(~rural,2)),50)
+%  
+% subplot(3,2,5), hist((data_panel(rural,3)),50)
+%  
+% subplot(3,2,6), hist((data_panel(~rural,3)),50)
     
 end
 

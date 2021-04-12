@@ -141,7 +141,7 @@ solve_types = [rural_tfp.*types(:,1), types(:,2)];
 parfor xxx = 1:n_types 
 
     [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value_prefshock(params, solve_types(xxx,:));
+        rural_urban_value(params, solve_types(xxx,:));
 
 end
 
@@ -156,7 +156,7 @@ parfor xxx = 1:n_types
 % Interestingly, this is not a good part of the code to use parfor... it
 % runs much faster with just a for loop.
        
-    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate_prefshock(...
+    [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(...
         assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
 
 end 
@@ -211,7 +211,7 @@ parfor xxx = 1:n_types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First, perform the field experiment...
 
-    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare_prefshock(params, solve_types(xxx,:), vguess(xxx));
+    [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare(params, solve_types(xxx,:), vguess(xxx));
     
     %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
 
@@ -225,7 +225,7 @@ parfor xxx = 1:n_types
     monga_index = monga(randi(length(monga),1,n_sims))';
 
     [sim_expr_panel(:,:,:,xxx), sim_cntr_panel(:,:,:,xxx)]...
-        = experiment_driver_prefshock(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
+        = experiment_driver(assets(xxx), move(xxx), assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx),...
           params, solve_types(xxx,:), monga_index, states_panel(:,:,xxx), pref_shocks(:,xxx), move_shocks(:,xxx), sim_panel(:,:,xxx));
          
     % This then takes the policy functions, simmulates the model, then

@@ -1,4 +1,4 @@
-function [assets, move, vfinal] = rural_urban_value_prefshock(params,perm_types)
+function [assets, move, vfinal] = rural_urban_value(params,perm_types)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This solves for value and policy function for the rural-urban location problem
 % described in the Paper

@@ -1,31 +1,34 @@
-function [panel, states] = simmulate_prefshock(assets_policy, move_policy, ...
-                    params, perm_types, trans_shocks, shock_states, pref_shock, moveshock)%#codegen
+function [panel, states] = rural_urban_simmulate(assets_policy, move_policy, ...
+                    params, perm_types, shock_states, pref_shock, moveshock)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This simmulates a time series/cross section of variables that we can map
 % to data. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Set up grid for asset holdings. 
+% Unpack parameters
 
 asset_space = params.asset_space;
 
-% asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
-
 R = params.R; 
-z_rural = perm_types(1); z_urban = perm_types(2); 
-% These are the permanent shocks. 
 
 m = params.m;
-m_seasn = params.m_season;
-lambda = params.lambda;
-pi = params.pi_prob;
-% These control unemployment risk. 
 
-r_shocks = trans_shocks(:,1); 
-u_shocks = trans_shocks(:,2);
+m_seasn = params.m_season;
+
+lambda = params.lambda;
+
+pi = params.pi_prob;
+
+r_shocks = params.trans_shocks(:,1);
+u_shocks = params.trans_shocks(:,2);
+
+N_obs = params.N_obs;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 expr_shock = pref_shock;
 
-N_obs = params.N_obs;
+z_rural = perm_types(1); z_urban = perm_types(2); 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 time_series = length(shock_states);
@@ -51,7 +54,6 @@ labor_income = zeros(time_series,1);
 compr_advntg = zeros(time_series,1);
 
 consumption = zeros(time_series,1);
-net_asset = zeros(time_series,1);
 assets = zeros(time_series+1,1);
 season = zeros(time_series,1);
 
@@ -77,18 +79,9 @@ for xxx = 1:time_series
 
     if location(xxx) == 1 % rural area
         
-        % first figure out where they are going
-        %prob_options = cumsum(move_policy.rural_not(asset_state,shock_states(xxx),:));
-        % this does a lot...so for the move policy, grab the matrix for
-        % location rural, not experinced, then asset state, shock state.
-        % this will return a 1 by 3 matrix with the choice probabilities.
-        % Then we take cummulative sum. So the interpertation is
-        % a cummulative probability distribution over the shocks.
-        
-        %choice = find((move_policy.rural_not(asset_state,shock_states(xxx),:)) > logit_shock,1);
+        % first figure out where they are going        
         choice = hard_rural_choice(move_policy.rural_not(asset_state,shock_states(xxx),:) > logit_shock);
         choice = choice(1);
-        %choice = -(sum((move_policy_rural_not(asset_state,shock_states(xxx),:)) > logit_shock)-4);
         % given the logit shock above, we just find which choice this guy
         % will make. 
         
@@ -132,21 +125,10 @@ for xxx = 1:time_series
 % RURAL EXPERIENCE
 
     elseif location(xxx) == 3
-        
-        %prob_options = cumsum((reshape(move_policy.rural_exp(asset_state,shock_states(xxx),:),1,3)));
-        % this does a lot...so for the move policy, grab the matrix for
-        % location rural, EXPERINCED, then asset state, shock state.
-        % this will return a 1 by 3 matrix with the choice probabilities.
-        % Then we  take cummulative sum. So the interpertation is
-        % a cummulative probability distribution over the shocks.
-        
+
         choice = hard_rural_choice(move_policy.rural_exp(asset_state,shock_states(xxx),:) > logit_shock);
         choice = choice(1);
-        
-        %choice = find((move_policy.rural_exp(asset_state,shock_states(xxx),:)) > logit_shock,1);
-        %choice = -(sum((move_policy_rural_exp(asset_state,shock_states(xxx),:)) > logit_shock)-4);
-        % given the logit shock above, we just find which choice this guy
-        % will make. 
+
         
         move(xxx,1) = (choice == 3); % move if choice above is 3
         move_seasn(xxx,1) = (choice == 2); % seasonal move if choice above is 2.
@@ -193,21 +175,9 @@ for xxx = 1:time_series
 % URBAN GUYS...
 
     elseif location(xxx) == 5
-        
-        %prob_options = cumsum((reshape(move_policy.urban_new(asset_state,shock_states(xxx),:),1,2)));
-        % this does a lot...so for the move policy, grab the matrix for
-        % location URBAN,No Experince, then asset state, shock state.
-        % this will return a 1 by 2 matrix with the choice probabilities.
-        % Then we take cummulative sum. So the interpertation is
-        % a cummulative probability distribution over the shocks.
-        
+
         choice = hard_urban_choice(move_policy.urban_new(asset_state,shock_states(xxx),:) > logit_shock);
         choice = choice(1);
-        
-        %choice = find((move_policy.urban_new(asset_state,shock_states(xxx),:)) > logit_shock,1);
-        %choice = -(sum((move_policy_urban_new(asset_state,shock_states(xxx),:)) > logit_shock)-3);
-        % given the logit shock above, we just find which choice this guy
-        % will make. 
         
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
@@ -231,21 +201,9 @@ for xxx = 1:time_series
 % URBAN Experince GUYS....
 
     elseif location(xxx) == 6
-        
-        %prob_options = cumsum((reshape(move_policy.urban_old(asset_state,shock_states(xxx),:),1,2)));
-        % this does a lot...so for the move policy, grab the matrix for
-        % location URBAN, Experince, then asset state, shock state.
-        % this will return a 1 by 2 matrix with the choice probabilities.
-        % Then we take cummulative sum. So the interpertation is
-        % a cummulative probability distribution over the shocks.
-        
+
         choice = hard_urban_choice(move_policy.urban_old(asset_state,shock_states(xxx),:) > logit_shock);
         choice = choice(1);        
-        
-        %choice = find((move_policy.urban_old(asset_state,shock_states(xxx),:)) > logit_shock,1);
-        %choice = -(sum((move_policy_urban_old(asset_state,shock_states(xxx),:)) > logit_shock)-3);
-        % given the logit shock above, we just find which choice this guy
-        % will make. 
         
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
@@ -275,8 +233,6 @@ for xxx = 1:time_series
         
     consumption(xxx,1) = labor_income(xxx,1) + R.*assets(xxx,1) - assets(xxx+1,1) - move_cost(xxx,1);
     
-    net_asset(xxx,1) = R.*assets(xxx,1) - assets(xxx+1,1);
-    
     compr_advntg(xxx,1) = (z_urban.*u_shocks(shock_states(xxx)))./(z_rural.*r_shocks(shock_states(xxx)));
         
     season(xxx,1) = mod(shock_states(xxx),2);   
@@ -303,7 +259,7 @@ work_urban = location == 2 | location == 4 | location == 5 | location == 6;
 % in the urban area. Note location 2 and 4, these are rural guys on
 % seasonal moves. 
 
-panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, net_asset];
+panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season];
 
 states = [rec_asset_states, location, season, shock_states'];
 

@@ -1,4 +1,4 @@
-function [assets, move, cons_eqiv] = field_experiment_welfare_prefshock(params, perm_types, value_funs)
+function [assets, move, cons_eqiv] = field_experiment_welfare(params, perm_types, value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This solves for the policy functions for the field experiment. The idea

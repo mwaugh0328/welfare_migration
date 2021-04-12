@@ -37,22 +37,20 @@ if isempty(specs)
                              % moving cost.
     grid2 = [70, 0.30, 2];
 
-    %specs.asset_space = [linspace(grid1(2),grid1(3),grid1(1)), linspace(grid2(2),grid2(3),grid2(1))];
-    specs.asset_space = linspace(0,2,100); % this is the equally spaced grid
+    specs.asset_space = [linspace(grid1(2),grid1(3),grid1(1)), linspace(grid2(2),grid2(3),grid2(1))];
+    %specs.asset_space = linspace(0,2,100); % this is the equally spaced grid
 
-    specs.n_perm_shocks = 48;
-    specs.n_trans_shocks = 30;
+    specs.n_perm_shocks = 24;
+    specs.n_trans_shocks = 15;
 
     specs.time_series = 100000; % length of the time series for each perm type
     specs.N_obs = 25000; % grab last number of observations
     specs.n_sims = 10000; % given the pannel above how many times to sample for experiment
 end
 
-[yyy] = analyze_outcomes(cal_params, specs,1);
-
-
 %[yyy] = compute_outcomes(cal_params, specs,1);
 
+[yyy] = analyze_outcomes(cal_params, specs,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....
