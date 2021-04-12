@@ -1,9 +1,9 @@
-function [assets, move, cons_eqiv] = cash_experiment_welfare_prefshock(params, perm_types, shocks, tmat, value_funs)
+function [assets, move, cons_eqiv] = cash_experiment_welfare_prefshock(params, perm_types, value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This solves for the policy functions for the field experiment. The idea
+% This solves for the policy functions for the UNCONDITIONA CASH experiment. The idea
 % is to take the optimal value functions, then solve for the optimal policy
-% functions given the one time move. See the notes for more description.
+% functions given the CASH. See the notes for more description.
 %
 % Update, now will dompute welfare gains in units of lifetime consumption
 % equivalent and one-time consumption equivalent. 
@@ -13,24 +13,26 @@ sigma_nu_exp = params.sigma_nu_exp;
 
 sigma_nu_not = params.sigma_nu_not;
 
+n_rural_options = params.rural_options; n_urban_options = params.urban_options;
 
-n_rural_options = params.rural_options;
+R = params.R;
 
-R = params.R; 
-z_rural = perm_types(1); z_urban = perm_types(2); 
+z_rural = perm_types(1);
+z_urban = perm_types(2);
+% These are the permanent shocks. 
 
-beta = params.beta; m = params.m; gamma = 2; abar = params.abar;
+beta = params.beta; m = params.m; gamma = params.pref_gamma; abar = params.abar;
+A = params.A;
 
 ubar = params.ubar; lambda = params.lambda; pi_prob = params.pi_prob;
 
 m_seasn = params.m_season;
 
-shocks_rural = shocks(:,1); shocks_urban = shocks(:,2);
-trans_mat = tmat;
+shocks_rural = params.trans_shocks(:,1);
+shocks_urban = params.trans_shocks(:,2);
+trans_mat = params.trans_mat;
 
 n_shocks = length(shocks_rural);
-
-A = params.A;
 
 v_hat_rural_not  = value_funs.rural_not;
 v_hat_rural_exp  = value_funs.rural_exp;
@@ -45,11 +47,10 @@ v_hat_urban_old  = value_funs.urban_old;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
 
-grid = params.grid;
+asset_space = params.asset_space;
+n_asset_states = length(params.asset_space);
 
-n_asset_states = grid(1);
-
-asset_space = linspace(grid(2),grid(3),grid(1));
+%asset_space = linspace(grid(2),grid(3),grid(1));
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);
@@ -84,9 +85,10 @@ feasible_move_seasn = false(n_asset_states,n_asset_states,n_shocks);
 
 net_assets = R.*asset_grid' - asset_grid;
 
-cash_transfer = 0.56.*m_seasn;
+cash_transfer = m_seasn;
 % This is where we would want to adjust to make the comparision to the
-% unconditional cash transfer
+% unconditional cash transfer. How did I come up with that number? I think
+% it's the budget neutral. But in compastion, need to make sure its full
 
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -157,9 +159,7 @@ for zzz = 1:n_shocks
     value_fun(~feasible_move_seasn(:,:,zzz)) = -1e10;
     
     [v_move_seasn_not, p_asset_move_seasn_not] = max(value_fun,[],2);
-    
 
-  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute value of moving...here I get the expected value of being in the
 % urban area because I'm moving out the rural area and I become a new guy.
