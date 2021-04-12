@@ -76,10 +76,7 @@ n_shocks = length(shocks_trans_u);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This sets up the permenant type of shocks...for now, I'm just going to
-% use this tauchen method which with no persistance will correspond with a
-% normal distribution and then the transition matrix will determine the
-% relative weights of the guys in the population. 
+% This sets up the permenant type of shocks...
 
 [zurban , zurban_prob] = pareto_approx(n_perm_shocks, 1./perm_shock_u_std);
 
@@ -135,7 +132,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%seasont = repmat([0,1],1,30)
+% move(12).rural_not(:,seasont==1,1)
 %plot_policy_function
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
