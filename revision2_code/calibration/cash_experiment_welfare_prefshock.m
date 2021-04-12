@@ -1,4 +1,4 @@
-function [assets, move, cons_eqiv] = field_experiment_welfare_prefshock(params, perm_types, value_funs)
+function [assets, move, cons_eqiv] = cash_experiment_welfare_prefshock(params, perm_types, shocks, tmat, value_funs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This solves for the policy functions for the field experiment. The idea
@@ -13,28 +13,24 @@ sigma_nu_exp = params.sigma_nu_exp;
 
 sigma_nu_not = params.sigma_nu_not;
 
-n_rural_options = params.rural_options; n_urban_options = params.urban_options;
 
-R = params.R;
+n_rural_options = params.rural_options;
 
-z_rural = perm_types(1);
-z_urban = perm_types(2);
-% These are the permanent shocks. 
+R = params.R; 
+z_rural = perm_types(1); z_urban = perm_types(2); 
 
-beta = params.beta; m = params.m; gamma = params.pref_gamma; abar = params.abar;
-A = params.A;
+beta = params.beta; m = params.m; gamma = 2; abar = params.abar;
 
 ubar = params.ubar; lambda = params.lambda; pi_prob = params.pi_prob;
 
 m_seasn = params.m_season;
 
-shocks_rural = params.trans_shocks(:,1);
-shocks_urban = params.trans_shocks(:,2);
-trans_mat = params.trans_mat;
+shocks_rural = shocks(:,1); shocks_urban = shocks(:,2);
+trans_mat = tmat;
 
 n_shocks = length(shocks_rural);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+A = params.A;
 
 v_hat_rural_not  = value_funs.rural_not;
 v_hat_rural_exp  = value_funs.rural_exp;
@@ -49,10 +45,11 @@ v_hat_urban_old  = value_funs.urban_old;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. This is the same across locations.
 
-asset_space = params.asset_space;
-n_asset_states = length(params.asset_space);
+grid = params.grid;
 
-%asset_space = linspace(grid(2),grid(3),grid(1));
+n_asset_states = grid(1);
+
+asset_space = linspace(grid(2),grid(3),grid(1));
 % asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
 
 asset_grid  = meshgrid(asset_space,asset_space);
@@ -87,24 +84,30 @@ feasible_move_seasn = false(n_asset_states,n_asset_states,n_shocks);
 
 net_assets = R.*asset_grid' - asset_grid;
 
+cash_transfer = 0.56.*m_seasn;
+% This is where we would want to adjust to make the comparision to the
+% unconditional cash transfer
+
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - abar;
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - abar;
+    % Providing Cash (Unconditionally)
     
     feasible_rural(:,:,zzz) = consumption > 0;
     
     utility_rural(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - abar;
-    % NO MOVING COST HERE!!!!!!!!!!!
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - abar - m_seasn;
+    % Providing Cash (Unconditionally)
     
     feasible_move_seasn(:,:,zzz) = consumption > 0;
     
     utility_move_seasn(:,:,zzz) = A.*(max(consumption,1e-10)).^(1-gamma);
   
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - m - abar;
+    consumption = (net_assets + cash_transfer) + z_rural.*shocks_rural(zzz) - m - abar;
+    % Providing Cash (Unconditionally)
     
     feasible_move_rural(:,:,zzz) = consumption > 0;
     
@@ -155,6 +158,8 @@ for zzz = 1:n_shocks
     
     [v_move_seasn_not, p_asset_move_seasn_not] = max(value_fun,[],2);
     
+
+  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute value of moving...here I get the expected value of being in the
 % urban area because I'm moving out the rural area and I become a new guy.
@@ -192,6 +197,11 @@ for zzz = 1:n_shocks
     end
     
     policy_move_rural_not(:,zzz,:) = cumsum(pi_rural_not./pi_denom_rural_not,2);
+    
+    
+    %v_expr_rural_not(:,zzz) = (1./pi_denom_rural_not).*(pi_stay_rural_not.*v_stay_rural_not + pi_move_seasn_not.*v_move_seasn_not + pi_move_rural_not.*v_move_rural_not);
+    
+    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

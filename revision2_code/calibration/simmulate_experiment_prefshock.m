@@ -1,6 +1,6 @@
 function [panel_expr] = simmulate_experiment_prefshock...
     (assets_policy, move_policy, assets_temp, move_temp, cons_eqiv, params, perm_type,...
-    state_at_expr, trans_shocks, shock_states, pref_shock, move_shock)%#codegen
+    state_at_expr, shock_states, pref_shock, move_shock)%#codegen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set up grid for asset holdings. 
@@ -22,8 +22,8 @@ m_seasn = params.m_season;
 lambda = params.lambda;
 pi_prob = params.pi_prob;
 
-r_shocks = trans_shocks(:,1); 
-u_shocks = trans_shocks(:,2);
+r_shocks = params.trans_shocks(:,1);
+u_shocks = params.trans_shocks(:,2);
 expr_shock = pref_shock;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,6 +107,7 @@ experiment_flag(1) = 0;
 welfare(1) = 0;
     
     season(xxx,1) = mod(shock_states(xxx),2); 
+    
     urban_skill = z_urban.*ones(length(labor_income),1);
 %     panel_expr = [labor_income, consumption, assets, live_rural, work_urban,...
 %         move, move_seasn, move_cost, season, welfare, experiment_flag];

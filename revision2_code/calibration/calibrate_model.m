@@ -31,7 +31,7 @@ cal_params(13) = 0.95; % This is the discount factor. Would be something worth
 cal_params(14) = 0.0; % This is the abar...it's set to zero. We are able to 
 % to have it be positive. 
 
-[yyy] = compute_outcomes_prefshock(cal_params,0);
+[yyy] = compute_outcomes_prefshock(cal_params,1);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
