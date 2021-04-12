@@ -1,4 +1,4 @@
-function theta = calibrate_model(cal_params,flag)
+function theta = calibrate_model(cal_params,specs,flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cal_params should have the following order
 % 1: standard Deviation of shocks (todo, veryfy its stand dev or variance)
@@ -30,8 +30,25 @@ cal_params(13) = 0.95; % This is the discount factor. Would be something worth
 
 cal_params(14) = 0.0; % This is the abar...it's set to zero. We are able to 
 % to have it be positive. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[yyy] = compute_outcomes_prefshock(cal_params,1);
+if isempty(specs)
+    grid1 = [30, 0.0, 0.29]; % this is done to overwieght grid at constraint and
+                             % moving cost.
+    grid2 = [70, 0.30, 2];
+
+    specs.asset_space = [linspace(grid1(2),grid1(3),grid1(1)), linspace(grid2(2),grid2(3),grid2(1))];
+
+    specs.n_perm_shocks = 36;
+    specs.n_trans_shocks = 15;
+
+    specs.time_series = 100000; % length of the time series for each perm type
+    specs.N_obs = 25000; % grab last number of observations
+    specs.n_sims = 10000; % given the pannel above how many times to sample for experiment
+end
+
+
+[yyy] = compute_outcomes_prefshock(cal_params, specs,1);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,9 +67,9 @@ aggregate_moments = [1.89, 0.61, 0.625, 0.47];
 
 %control_moments = [0.36, 0.25, 0.16, 0.10,  0.19];
 
-experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10, 0.10, 0.40];
-
 %experiment_hybrid_v2 = [0.36, 0.22, 0.092, 0.30, 0.10, 0.25/0.36, 0.40];
+
+experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10, 0.40];
 
 % The experiment hybrid is a combination of conrol and experiment...
 % seasonal migration in control
@@ -60,7 +77,7 @@ experiment_hybrid = [0.36, 0.22, 0.092, 0.30, 0.10, 0.10, 0.40];
 % increase in r2 (9.2 percent)
 % LATE estiamte
 % OLS estimate
-% Standard deviation of consumption growth. See line 433 in
+% Standard deviation of consumption growth. See line 400 in
 % ``compute_outcomes.``
 
 % Note there is currently an inconsistency between the numbers in the table

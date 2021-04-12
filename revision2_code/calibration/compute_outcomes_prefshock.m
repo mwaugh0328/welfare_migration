@@ -1,4 +1,4 @@
-function [targets] = compute_outcomes_prefshock(cal_params, flag)
+function [targets] = compute_outcomes_prefshock(cal_params, specs, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR2 paper at
 % Econometrica (late 2020-on)
@@ -48,9 +48,8 @@ params.m = 2*params.m_season; % This is the moving cost.
 gamma_urban = cal_params(8); % Gamma parameter (set to 1?)
 
 % Number of permenant and transitory types. 
-n_perm_shocks = 36; %48
-n_tran_shocks = 15; %30
-
+n_perm_shocks = specs.n_perm_shocks; %36; %48
+n_tran_shocks = specs.n_trans_shocks; %15; %30
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % This first sets up the transitory shocks. 
@@ -105,20 +104,16 @@ type_weights = zurban_prob;
 % This is the new grid setup. It places a finer grid near the constraint
 % and moving cost...
 
-%params.grid = [100, 0, 2];
+params.asset_space = specs.asset_space;
 
-grid1 = [30, 0.0, 0.29];
-grid2 = [70, 0.30, 2];
-
-params.asset_space = [linspace(grid1(2),grid1(3),grid1(1)), linspace(grid2(2),grid2(3),grid2(1))];
 
 %params.asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
-asset_space = params.asset_space;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
-n_sims = 10000;
-time_series = 100000;
-N_obs = 25000;
+n_sims = specs.n_sims; %10000;
+time_series = specs.time_series; %100000;
+N_obs = specs.N_obs; %25000;
 
 params.N_obs = N_obs;
 
@@ -397,7 +392,7 @@ cons_data_no_error_r2 = [control_data(:,2,2); expermt_data(:,2,2)];
 %                 ones(length(temp_migrate_expr),1)], log(cons_data_r1), log(cons_data_r2)];
             
 cons_model_growth = log(cons_data_no_error_r1) - log(cons_data_no_error_r2);
-var_cons_growth = std(cons_model_growth);
+std_cons_growth = std(cons_model_growth);
 % Again, no measurment error here, we can add it on expost. Need
 % consistency in language. 
 
@@ -405,26 +400,27 @@ var_cons_growth = std(cons_model_growth);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Assets...
-%frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
+%frac_no_assets = sum(control_data(:,3,1) < params.asset_space(2))./sum(rural_cntr);
 
-frac_no_assets = 0.95*(sum(control_data(:,3,1) == asset_space(1)))/sum(rural_cntr) + 0.05*(sum(control_data(:,3,1) == asset_space(2)))/sum(rural_cntr);
+frac_no_assets = 0.95*(sum(control_data(:,3,1) == params.asset_space(1)))/sum(rural_cntr) + 0.05*(sum(control_data(:,3,1) == params.asset_space(2)))/sum(rural_cntr);
 % Trying to smmoth this thing out
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 aggregate_moments = [m_income(2)./m_income(1), avg_rural, var_income(2), frac_no_assets];
 
-experiment_moments = [migration_elasticity, migration_elasticity_y2, LATE];
-
-control_moments = [temp_migration, control_migration_cont_y2, control_migration_cont_y3, OLS, var_consumption_no_migrate_control];
-
-experiment_hybrid = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, params.m_season./mean(AVG_C), var_cons_growth];
-
-experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
-    control_migration_cont_y2./temp_migration, var_cons_growth];
-
+experiment_hybrid = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, std_cons_growth];
 
 targets = [aggregate_moments, experiment_hybrid] ;
+
+% experiment_moments = [migration_elasticity, migration_elasticity_y2, LATE];
+% 
+% control_moments = [temp_migration, control_migration_cont_y2, control_migration_cont_y3, OLS, var_consumption_no_migrate_control];
+% 
+% experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
+%     control_migration_cont_y2./temp_migration, var_cons_growth];
+%
+% experiment_hybrid_v3 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, params.m_season./mean(AVG_C), var_cons_growth];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -453,8 +449,8 @@ disp('Mean Consumption Rural and Urban')
 disp(m_consumption)
 disp('Variance of Consumption Rural and Urban')
 disp(var_consumption)
-disp('Variance of Consumption Growth')
-disp(var_cons_growth)
+disp('Standard Deviation of Consumption Growth')
+disp(std_cons_growth)
 disp('Variance of Log Income Rural and Urban')
 disp(var_income)
 disp('Fraction of Rural with No Assets')
