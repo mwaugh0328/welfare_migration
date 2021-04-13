@@ -5,7 +5,7 @@
 </p>
 
 ---
-This repository contains code to reproduce results from the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). The [``\revision2_code"](https://github.com/mwaugh0328/welfare_migration/tree/master/revision2_code) is associated with changes/clean up for the SECOND REVISON. **It is in progress.**
+This repository contains code to reproduce results from the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). The [``\revision2_code``](https://github.com/mwaugh0328/welfare_migration/tree/master/revision2_code) is associated with changes/clean up for the SECOND REVISON. **IN PROGRESS.**
 
 **Complete explanations of the repository are currently under construction.**
 
