@@ -14,7 +14,7 @@ This repository contains code to reproduce results from the paper ["The Welfare 
 specs.n_perm_shocks = 24;
 specs.n_trans_shocks = 15;
 ```
-and things will run in about half the time
+and things will run in about 36 seconds on my laptop.
 
 #### Basic Calls
 ---
@@ -43,17 +43,15 @@ tells us that in the third position of ``new_val`` is urban TFP.
 
 ---
 
----
 **Compute Effecient Allocation:** NEED TO CLEAN UP
 
 ---
 
-
-**Calibrate the Model:** The calibration routine is implemented by starting inside the [``\revision_code\calibration``](https://github.com/mwaugh0328/welfare_migration/tree/master/revision_code/calibration)
+**Calibrate the Model:** The calibration routine is implemented by starting inside the [``\revision2_code\calibration``](https://github.com/mwaugh0328/welfare_migration/tree/master/revision_code/calibration)
 ```
 >> calibrate_wrap_tight
 ```
-And then within it you can see how it works. It calls ``compute_outcomes_prefshock.m`` which is similar to the ``analyze...`` file above but is optimized for the calibration routine.  The key to get this thing to fit was using the ``ga`` solver which is essentially a search of the entire parameter space in a smart way. The current settins have a tight bounds on the parameter space. The original calibration routine had very loose bounds. Alternative approaches with different minimizers (``patternsearch`` ``fminsearch`` (with and without random start) and some ``NAG`` routines) are in the ``graveyard`` folder.
+And then within it you can see how it works. It calls ``compute_outcomes.m`` which is similar to the ``analyze...`` file above but is optimized for the calibration routine.  The key to get this thing to fit was using the ``ga`` solver which is essentially a search of the entire parameter space in a smart way. The current settins have a tight bounds on the parameter space. The original calibration routine had very loose bounds. Alternative approaches with different minimizers (``patternsearch`` ``fminsearch`` (with and without random start) and some ``NAG`` routines) are in the ``graveyard`` folder.
 
 ---
 
