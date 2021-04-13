@@ -6,6 +6,12 @@ function [targets] = analyze_outcomes(cal_params, specs, flag)
 % set of code, compute_outcomes is for calibration purposes (faster, more
 % striped down)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if isempty(specs)
+    [cal_params, specs] = preamble(cal_params, []);
+else
+    [cal_params, ~] = preamble(cal_params, []);
+end
+
 params.rural_options = 3;
 params.urban_options = 2;
 

@@ -52,9 +52,6 @@ v_hat_urban_old  = value_funs.urban_old;
 asset_space = params.asset_space;
 n_asset_states = length(params.asset_space);
 
-%asset_space = linspace(grid(2),grid(3),grid(1));
-% asset_space = [0, logspace(log10(grid(2)),log10(grid(3)),n_asset_states-1)];
-
 asset_grid  = meshgrid(asset_space,asset_space);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

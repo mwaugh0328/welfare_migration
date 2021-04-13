@@ -6,6 +6,13 @@ function [targets] = compute_outcomes(cal_params, specs, flag)
 % set of code, analyze_outcomes is for used for plotting and welfare analysis
 % (does more stuff)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if isempty(specs)
+    [cal_params, specs] = preamble(cal_params, []);
+else
+    [cal_params, ~] = preamble(cal_params, []);
+end
+
+
 params.rural_options = 3;
 params.urban_options = 2;
 
@@ -439,7 +446,7 @@ disp(params.m_season./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
 disp('Expr Elasticity: Year One, Two, Four')
-disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3, migration_elasticity_y5])
+disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3])
 disp('Control: Year One, Repeat Two, Four')
 disp([temp_migration, control_migration_cont_y2 , control_migration_cont_y3])
 disp('OLS Estimate')
@@ -460,9 +467,6 @@ disp('Fraction of Rural with No Assets')
 disp(frac_no_assets)
 disp('Permenant Moves')
 disp(perm_moves)
-disp('Ratio of Income in Monga vs Non-Monga')
-disp([mean((data_panel(rural_not_monga,1))),mean((data_panel(rural_monga,1)))])
-
 % cd('..\Analysis')
 % 
 % m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];

@@ -1,5 +1,5 @@
 
-income_assets(:,[1,2]) = income_assets(:,[1,2]) + .01.*randn(size(income_assets(:,[1,2])));
+income_assets(:,[1,2]) = income_assets(:,[1,2]) + .001.*randn(size(income_assets(:,[1,2])));
 % Add just a bit of noise to smooth stuf out...
 
 income_prct = 20:20:80;
