@@ -167,7 +167,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now simulate the model...
 
-sim_panel = zeros(N_obs,9,n_types);
+sim_panel = zeros(N_obs,15,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
 parfor xxx = 1:n_types 
@@ -175,7 +175,7 @@ parfor xxx = 1:n_types
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(...
-        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
+        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx),vguess(xxx));
 
 end 
 
@@ -206,7 +206,7 @@ end
 % Here is the means test for Mushfiq's expr...the latter is to smooth
 % things
 
-rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+rural_not_monga = data_panel(:,4)==1 & data_panel(:,9)~=1;
 %params.means_test = median(data_panel(rural_not_monga,3));
 
 
@@ -216,7 +216,7 @@ params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_pa
 % % This section of the code now performs the expirements. 
  
 sim_expr_panel = zeros(n_sims,13,11,n_types);
-sim_cntr_panel = zeros(n_sims,9,11,n_types);
+sim_cntr_panel = zeros(n_sims,15,11,n_types);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -284,8 +284,8 @@ end
 % First devine some indicator variables...
 
 rural = data_panel(:,4)==1;
-rural_monga = data_panel(:,4)==1 & data_panel(:,end)==1;
-rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+rural_monga = data_panel(:,4)==1 & data_panel(:,9)==1;
+rural_not_monga = data_panel(:,4)==1 & data_panel(:,9)~=1;
 
 % urban_monga = data_panel(:,4)~=1 & data_panel(:,end)==1;
 % urban_not_monga = data_panel(:,4)~=1 & data_panel(:,end)~=1;

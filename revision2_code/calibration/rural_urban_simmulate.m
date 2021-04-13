@@ -1,5 +1,5 @@
 function [panel, states] = rural_urban_simmulate(assets_policy, move_policy, ...
-                    params, perm_types, shock_states, pref_shock, moveshock)%#codegen
+                    params, perm_types, shock_states, pref_shock, moveshock, vfun)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This simmulates a time series/cross section of variables that we can map
 % to data. 
@@ -13,6 +13,11 @@ R = params.R;
 m = params.m;
 
 m_seasn = params.m_season;
+
+mtest = asset_space < params.means_test;
+% this is the mass of people that don't have to pay
+mtest_move_cost = m_seasn.*(~mtest)';
+move_fiscal_cost = m_seasn - mtest_move_cost;
 
 lambda = params.lambda;
 
@@ -49,6 +54,7 @@ location(1) = 1;
 move = zeros(time_series,1);
 move_seasn = zeros(time_series,1);
 move_cost = zeros(time_series,1);
+fiscal_cost = zeros(time_series,1);
 
 labor_income = zeros(time_series,1);
 production = zeros(time_series,1);
@@ -59,6 +65,8 @@ consumption = zeros(time_series,1);
 net_asset = zeros(time_series,1);
 assets = zeros(time_series+1,1);
 season = zeros(time_series,1);
+
+welfare = zeros(time_series,1);
 
 assets(1,1) = asset_space(asset_state);
 
@@ -96,7 +104,7 @@ for xxx = 1:time_series
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
             labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax);
         
-        %welfare(xxx,1) = vfun.rural_not(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.rural_not(asset_state,shock_states(xxx));
         
         asset_state_p = assets_policy.rural_not(asset_state,shock_states(xxx),choice);
         % asset state is policy, location (rural, not experinced), asset
@@ -106,7 +114,8 @@ for xxx = 1:time_series
                     
         if move_seasn(xxx,1) == 1
             location(xxx+1) = 2;
-            move_cost(xxx,1) = m_seasn;
+            move_cost(xxx,1) = mtest_move_cost(asset_state);
+            fiscal_cost(xxx,1) = move_fiscal_cost(asset_state);
         elseif move(xxx,1) == 1
             location(xxx+1) = 5;
             move_cost(xxx,1) = m;            
@@ -118,7 +127,7 @@ for xxx = 1:time_series
         
     elseif location(xxx) == 2 % seasonal movers....
        
-        %welfare(xxx,1) = vfun.seasn_not(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.seasn_not(asset_state,shock_states(xxx));
        
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] ...
             = labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
@@ -143,21 +152,20 @@ for xxx = 1:time_series
         move(xxx,1) = (choice == 3); % move if choice above is 3
         move_seasn(xxx,1) = (choice == 2); % seasonal move if choice above is 2.
         
-        %welfare(xxx,1) = vfun.rural_exp(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.rural_exp(asset_state,shock_states(xxx));
                 
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
             labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax);
         
         asset_state_p = assets_policy.rural_exp(asset_state,shock_states(xxx),choice);
-        % asset state is policy, location (rural, EXPERINCED), asset
-        % state, shock state, then the choice from above. 
         
         location(xxx+1) = location(xxx);
         
         if expr_shock(xxx) < (1-pi)
             if move_seasn(xxx,1) == 1 
                 location(xxx+1,1) = 2; %Non experinced season (you lost it)
-                move_cost(xxx,1) = m_seasn;
+                move_cost(xxx,1) = mtest_move_cost(asset_state);
+                fiscal_cost(xxx,1) = move_fiscal_cost(asset_state);
             elseif move(xxx,1) == 1
                 location(xxx+1) = 5; % non experinces perm moves (you lost it)
                 move_cost(xxx,1) = m;
@@ -165,7 +173,8 @@ for xxx = 1:time_series
         else 
             if move_seasn(xxx,1) == 1 
                 location(xxx+1,1) = 4; % retain experince, season move
-                move_cost(xxx,1) = m_seasn;
+                move_cost(xxx,1) = mtest_move_cost(asset_state);
+                fiscal_cost(xxx,1) = move_fiscal_cost(asset_state);
             elseif move(xxx,1) == 1
                 location(xxx+1) = 6; % retain experince perm move.
                 move_cost(xxx,1) = m;
@@ -178,7 +187,7 @@ for xxx = 1:time_series
 
     elseif location(xxx) == 4
         
-        %welfare(xxx,1) = vfun.seasn_exp(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.seasn_exp(asset_state,shock_states(xxx));
         
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
             labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
@@ -199,7 +208,7 @@ for xxx = 1:time_series
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
         
-        %welfare(xxx,1) = vfun.urban_new(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.urban_new(asset_state,shock_states(xxx));
 
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
             labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
@@ -226,7 +235,7 @@ for xxx = 1:time_series
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
         
-        %welfare(xxx,1) = vfun.urban_old(asset_state,shock_states(xxx));
+        welfare(xxx,1) = vfun.urban_old(asset_state,shock_states(xxx));
    
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
             labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
@@ -274,6 +283,7 @@ rec_asset_states = rec_asset_states(1:end-1,1);
 
 live_rural = location == 1 | location == 2 | location == 3 | location == 4;
 work_urban = location == 2 | location == 4 | location == 5 | location == 6;
+experince  = location == 3;
 % live_rural asksi, if anyof these situations are true, then you live in
 % the rural area, note 1-4 are rural guys who litterally are their or are
 % out on a seaonsal move. 
@@ -282,7 +292,8 @@ work_urban = location == 2 | location == 4 | location == 5 | location == 6;
 % in the urban area. Note location 2 and 4, these are rural guys on
 % seasonal moves. 
 
-panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season];
+panel = [labor_income, consumption, assets, live_rural, work_urban, move,...
+    move_seasn, move_cost, season, net_asset, welfare, experince, fiscal_cost, tax, production];
 
 states = [rec_asset_states, location, season, shock_states'];
 
