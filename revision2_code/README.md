@@ -5,13 +5,11 @@
 </p>
 
 ---
-This repository contains code to reproduce results from the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). The [``\revision2_code"]((https://github.com/mwaugh0328/welfare_migration/tree/master/revision2_code) is associated with changes/clean up for the SECOND REVISON. **It is in progress.**
+This repository contains code to reproduce results from the paper ["The Welfare Effects of Encouraging Rural-Urban Migration"](http://www.waugheconomics.com/uploads/2/2/5/6/22563786/LMW.pdf). The [``\revision2_code"](https://github.com/mwaugh0328/welfare_migration/tree/master/revision2_code) is associated with changes/clean up for the SECOND REVISON. **It is in progress.**
 
 **Complete explanations of the repository are currently under construction.**
 
-**Software Requirements:** Outside of plotting (and the data analysis of the field experiment) all of this code is in MATLAB and requires the Parallel Computing Toolbox (for computation of the model) and the Global Optimization Toolbox (for calibration).
-
-With access to 4cores (Intel(R) Core(TM) i7-8650U CPU) the model is solved in about 120 seconds. Simple modifications to speed up computation are to reduce the productivity grid(s) without loosing much in terms of equilibrium outcomes. For example, in ``preamble.m`` set
+**Software Requirements:** Outside of plotting (and the data analysis of the field experiment) all of this code is in MATLAB and requires the Parallel Computing Toolbox (for computation of the model) and the Global Optimization Toolbox (for calibration). With access to 4cores (Intel(R) Core(TM) i7-8650U CPU) the model is solved in about 120 seconds. Simple modifications to speed up computation are to reduce the productivity grid(s) without loosing much in terms of equilibrium outcomes. For example, in ``preamble.m`` set
 ```
 specs.n_perm_shocks = 24;
 specs.n_trans_shocks = 15;
