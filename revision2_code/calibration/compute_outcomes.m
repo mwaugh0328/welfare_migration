@@ -175,7 +175,8 @@ parfor xxx = 1:n_types
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(...
-        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx),vguess(xxx));
+        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p,...
+        pref_shocks(:,xxx), move_shocks(:,xxx),vguess(xxx));
 
 end 
 

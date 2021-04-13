@@ -204,7 +204,7 @@ cd('..\calibration')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now simulate the model...
 
-sim_panel = zeros(N_obs,9,n_types);
+sim_panel = zeros(N_obs,15,n_types);
 states_panel = zeros(N_obs,4,n_types);
 
 
@@ -213,7 +213,8 @@ parfor xxx = 1:n_types
 % runs much faster with just a for loop.
        
     [sim_panel(:,:,xxx), states_panel(:,:,xxx)] = rural_urban_simmulate(...
-        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p, pref_shocks(:,xxx),move_shocks(:,xxx));
+        assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p,...
+        pref_shocks(:,xxx),move_shocks(:,xxx),vguess(xxx));
     
 end 
 
@@ -235,7 +236,7 @@ for xxx = 1:n_types
    
 end
 
-rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+rural_not_monga = data_panel(:,4)==1 & data_panel(:,9)~=1;
 
 params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_panel(rural_not_monga,3),45))./2;
 
@@ -245,7 +246,7 @@ params.means_test = (prctile(data_panel(rural_not_monga,3),55) + prctile(data_pa
 
 sim_expr_panel = zeros(n_sims,13,11,n_types);
 sim_cash_panel = zeros(n_sims,13,11,n_types);
-sim_cntr_panel = zeros(n_sims,9,11,n_types);
+sim_cntr_panel = zeros(n_sims,15,11,n_types);
 % sim_surv_panel = zeros(n_sims,10,3,n_types);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -327,8 +328,8 @@ end
 % First devine some indicator variables...
 
 rural = data_panel(:,4)==1;
-rural_monga = data_panel(:,4)==1 & data_panel(:,end)==1;
-rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
+rural_monga = data_panel(:,4)==1 & data_panel(:,9)==1;
+rural_not_monga = data_panel(:,4)==1 & data_panel(:,9)~=1;
 
 % urban_monga = data_panel(:,4)~=1 & data_panel(:,end)==1;
 % urban_not_monga = data_panel(:,4)~=1 & data_panel(:,end)~=1;
@@ -359,7 +360,7 @@ perm_moves = sum(data_panel(rural,6)==1)./length(data_panel);
 % [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, experiment_flag];
 
 % First drop people that did not have the experiment performed on them....
-rural_cntr = data_panel_cntr(:,4,1)==1 & data_panel_expr(:,end,1)==1;
+rural_cntr = data_panel_cntr(:,4,1)==1 & data_panel_expr(:,13,1)==1;
 
 control_data = data_panel_cntr(rural_cntr,:,:);
 expermt_data = data_panel_expr(rural_cntr,:,:);
