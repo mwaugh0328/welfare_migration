@@ -46,6 +46,17 @@ tells us that in the third position of ``new_val`` is urban TFP.
 **Compute Effecient Allocation:** NEED TO CLEAN UP
 
 ---
+**TODO LIST**
+
+Should probably use git to describe this...
+
+- Structure accounting consistnent with new stuff in taxation, effecient allocation part
+- Paramaterize the cash transfer part regarding how much is given for the welfare component
+- Create policy funciton change plot with the experiment
+- Alternative calibrations(?)
+- In readme describe standard error calculations, re-run
+
+---
 
 **Calibrate the Model:** The calibration routine is implemented by starting inside the [``\revision2_code\calibration``](https://github.com/mwaugh0328/welfare_migration/tree/master/revision_code/calibration)
 ```
