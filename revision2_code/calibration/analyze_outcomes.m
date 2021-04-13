@@ -6,12 +6,19 @@ function [targets] = analyze_outcomes(cal_params, specs, flag)
 % set of code, compute_outcomes is for calibration purposes (faster, more
 % striped down)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The flie preable loads any fixed parameters (eg discount rate) and the
+% specs on the computation, grid, number of simmulations. It's intended to
+% be common to all code. So one place is changed all other code will
+% inherti the change...
+
 if isempty(specs)
     [cal_params, specs] = preamble(cal_params, []);
 else
     [cal_params, ~] = preamble(cal_params, []);
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Now everything below is just organization till around like 150 or so...
 params.rural_options = 3;
 params.urban_options = 2;
 
@@ -234,13 +241,14 @@ parfor xxx = 1:n_types
 
     [assets_temp_cash(xxx), move_temp_cash(xxx),... 
        cons_eqiv_cash(xxx)] = cash_experiment_welfare(params, solve_types(xxx,:), vguess(xxx));
-%     
-%     [assets_temp_cash(:,:,:,xxx), move_temp_cash(:,:,:,xxx),... 
-%         cons_eqiv_cash(:,:,:,xxx)] = work_fare(grid, params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
-
+   
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
     % provides the asset policy conditional on a temporary move. 
+    %
+    % The second one is the cash experiment. TODO: there is a magic number
+    % floating in the cash one depending upon how much is given. Need to
+    % fix.
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % perform the survey... tic
@@ -285,12 +293,9 @@ for xxx = 1:n_types
     s_expr_count = e_expr_count + 1;
                 
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% data_panel(:,1) = exp(log(data_panel(:,1)) + m_error_national_survey.*randn(n_obs_panel,1));
-% data_panel(:,2) = exp(log(data_panel(:,2)) + m_error_national_survey.*randn(n_obs_panel,1));
+% Now we are done. Everything else below is accounting and measurment. 
+% TODO: setup simmilar to GE, TAX, Effecient, accounting framework.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];

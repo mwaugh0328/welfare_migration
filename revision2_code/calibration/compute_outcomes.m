@@ -6,12 +6,19 @@ function [targets] = compute_outcomes(cal_params, specs, flag)
 % set of code, analyze_outcomes is for used for plotting and welfare analysis
 % (does more stuff)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The flie preable loads any fixed parameters (eg discount rate) and the
+% specs on the computation, grid, number of simmulations. It's intended to
+% be common to all code. So one place is changed all other code will
+% inherti the change...
+
 if isempty(specs)
     [cal_params, specs] = preamble(cal_params, []);
 else
     [cal_params, ~] = preamble(cal_params, []);
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Now everything below is just organization till around like 150 or so...
 
 params.rural_options = 3;
 params.urban_options = 2;
@@ -178,7 +185,9 @@ s_count = 1;
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This then pulls from the pannel
+% This then pulls from the simmulation to construct the correct pannel, why
+% bc we need the appropriate number of high type relative to low type guys
+% in there. 
 for xxx = 1:n_types 
 
     e_count = s_count + sample(xxx)-1;
@@ -190,7 +199,7 @@ for xxx = 1:n_types
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% HEre is the means test for Mushfiq's expr...the latter is to smooth
+% Here is the means test for Mushfiq's expr...the latter is to smooth
 % things
 
 rural_not_monga = data_panel(:,4)==1 & data_panel(:,end)~=1;
@@ -219,9 +228,6 @@ parfor xxx = 1:n_types
 % First, perform the field experiment...
 
     [assets_temp(xxx), move_temp(xxx), cons_eqiv(xxx)] = field_experiment_welfare(params, solve_types(xxx,:), vguess(xxx));
-    
-    %[assets_temp(:,:,:,xxx), move_temp(:,:,:,xxx)] = field_experiment(params, trans_shocks, trans_mat, vguess(:,:,:,xxx));
-
     % This generates an alternative policy function for rural households associated with a
     % the field experiment of paying for a temporary move. The asset_temp
     % provides the asset policy conditional on a temporary move. 
@@ -238,8 +244,6 @@ parfor xxx = 1:n_types
     % This then takes the policy functions, simmulates the model, then
     % after a period of time, implements the experirment.     
 end
-
-
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,9 +271,10 @@ for xxx = 1:n_types
     s_expr_count = e_expr_count + 1;
                 
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Now we are done. Everything else below is accounting and measurment. 
+% TODO: setup simmilar to GE, TAX, Effecient, accounting framework.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, expected_urban, season];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % First devine some indicator variables...
