@@ -1,4 +1,4 @@
-function [targets] = analyze_outcomes(cal_params, specs, flag)
+function [targets] = analyze_outcomes(cal_params, specs, wages, meanstest, vft_fun, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR2 paper at
 % Econometrica (late 2020-on).
@@ -21,6 +21,10 @@ end
 % Now everything below is just organization till around like 150 or so...
 params.rural_options = 3;
 params.urban_options = 2;
+
+params.tax.rate = cal_params(15);
+params.tax.prog = cal_params(16);
+
 
 %Preferences
 params.sigma_nu_not = cal_params(9); %These are the logit shocks
@@ -82,7 +86,11 @@ m_adjust_urban = -1./(1-shock_rho.^2).*(shock_std.^2).*(1/2).*(gamma_urban);
 
 seasonal_trans_mat = [0 , 1 ; 1, 0]; 
 
-seasonal_shocks = [log(params.seasonal_factor); log(1./params.seasonal_factor)];
+if isempty(wages) 
+    seasonal_shocks = [log(params.seasonal_factor); log(1./params.seasonal_factor)];
+else
+    seasonal_shocks = [log(wages(1)); log(wages(2))];
+end
 
 params.trans_mat = kron(trans_mat_temp, seasonal_trans_mat);
 
@@ -122,9 +130,6 @@ type_weights = zurban_prob;
 
 params.asset_space = specs.asset_space;
 
-
-%params.asset_space = linspace(params.grid(2),params.grid(3),params.grid(1));
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Pre generate the shocks
 n_sims = specs.n_sims; %10000;
@@ -147,18 +152,37 @@ move_shocks = rand(time_series,n_perm_shocks);
 % Note depending on the computer you have (and toolboxes with Matlab) using
 % the parfor command here does help. It distributes the instructions within
 % the for loop across different cores. It this case it leads to a big speed
-% up. 
+% up.
 
-
-solve_types = [rural_tfp.*types(:,1), types(:,2)];
-
-parfor xxx = 1:n_types 
-
-    [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value(params, solve_types(xxx,:));
+if isempty(meanstest) 
+    
+    params.means_test = 0;
+else
+    
+    params.means_test = meanstest;
 
 end
 
+solve_types = [rural_tfp.*types(:,1), types(:,2)];
+
+if isempty(vft_fun) 
+    
+    parfor xxx = 1:n_types 
+        
+        [assets(xxx), move(xxx), vguess(xxx)] = ...
+            rural_urban_value(params, solve_types(xxx,:),[]);
+    
+    end
+else
+    
+    parfor xxx = 1:n_types 
+        
+        [assets(xxx), move(xxx), vguess(xxx),~] = ...
+            rural_urban_value(params, solve_types(xxx,:), vft_fun(xxx));
+        
+    end
+
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -169,7 +193,7 @@ medz = flipud(move(11).rural_not(:,seasont==1,1));
 lowz_exp = flipud(move(8).rural_exp(:,seasont==1,1));
 % visually, it's better to run this on the equally spaced grid.
 
-cd('..\Analysis')
+cd('..\plotting')
 
 save movepolicy.mat lowz medz lowz_exp
 
@@ -512,7 +536,7 @@ cons_model_growth = cons_model_growth + m_error.*randn(length(cons_model_growth)
 cons_model = [ [temp_migrate_cntr; temp_migrate_expr], [zeros(length(temp_migrate_cntr),1); ...
                 ones(length(temp_migrate_expr),1)], cons_model_growth];
             
-cd('..\Analysis')
+cd('..\plotting')
 
 save cons_model_set cons_model 
 
@@ -585,7 +609,7 @@ disp(frac_no_assets)
 disp('Permenant Moves')
 disp(perm_moves)
 
-cd('..\Analysis')
+cd('..\plotting')
 
 m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
 m_rates_model = 100.*m_rates';

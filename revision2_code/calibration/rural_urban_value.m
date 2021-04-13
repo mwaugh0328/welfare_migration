@@ -1,4 +1,4 @@
-function [assets, move, vfinal] = rural_urban_value(params,perm_types)
+function [assets, move, vfinal, cons_eqiv] = rural_urban_value(params,perm_types,vcft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This solves for value and policy function for the rural-urban location problem
 % described in the Paper
@@ -20,12 +20,12 @@ A = params.A;
 
 ubar = params.ubar; lambda = params.lambda; pi_prob = params.pi_prob;
 
-m_seasn = params.m_season;
-
 shocks_rural = params.trans_shocks(:,1);
 shocks_urban = params.trans_shocks(:,2);
 trans_mat = params.trans_mat;
 %grid = params.grid;
+
+m_seasn = params.m_season;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_iterations = 500;
@@ -91,9 +91,18 @@ utility_move_seasn = zeros(n_asset_states,n_asset_states,n_shocks);
 
 net_assets = R.*asset_grid' - asset_grid;
 
+mtest = asset_space < params.means_test;
+% this is the mass of people that don't have to pay
+
+
+mtest_move = m_seasn.*(~mtest)';
+% This is the ``means tested moving cost'' so you only get it if you are
+% poor enough. This shows up in the consumption set below, then this is the
+% moving cost
+
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - abar;
     
     feasible_rural = consumption > 0;
     
@@ -102,7 +111,7 @@ for zzz = 1:n_shocks
     utility_rural(:,:,zzz) = utility_rural(:,:,zzz) + -1e10.*(~feasible_rural);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - m_seasn - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - mtest_move - abar;
     
     feasible_move_seasn = consumption > 0;
     
@@ -111,7 +120,7 @@ for zzz = 1:n_shocks
     utility_move_seasn(:,:,zzz)= utility_move_seasn(:,:,zzz) + -1e10.*(~feasible_move_seasn);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + z_urban.*shocks_urban(zzz) - abar;
+    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax) - abar;
     
     feasible_urban = consumption >  0;
     
@@ -119,7 +128,7 @@ for zzz = 1:n_shocks
     
     utility_urban(:,:,zzz) = utility_urban(:,:,zzz) + -1e10.*(~feasible_urban); 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + z_rural.*shocks_rural(zzz) - m - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - m - abar;
     
     feasible_move_rural = consumption > 0;
     
@@ -128,7 +137,7 @@ for zzz = 1:n_shocks
     utility_move_rural(:,:,zzz) = utility_move_rural(:,:,zzz) + -1e10.*(~feasible_move_rural); 
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + z_urban.*shocks_urban(zzz) - m - abar;
+    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax) - m - abar;
     
     feasible_move_urban = consumption > 0;
     
@@ -718,6 +727,32 @@ vfinal.seasn_not = v_hat_seasn_not;
 vfinal.seasn_exp = v_hat_seasn_exp;
 vfinal.urban_new = v_prime_urban_new;
 vfinal.urban_old = v_prime_urban_old;
+
+if isempty(vcft) 
+    
+    cons_eqiv.rural_not = 0.*vfinal.rural_not;
+    cons_eqiv.rural_exp = 0.*vfinal.rural_exp;
+
+    cons_eqiv.seasn_not = 0.*vfinal.rural_not;
+    cons_eqiv.seasn_exp = 0.*vfinal.rural_exp;
+
+    cons_eqiv.urban_new = 0.*vfinal.urban_new;
+    cons_eqiv.urban_old = 0.*vfinal.urban_old;
+    
+else
+    % This computes the welfare gain associated with the counter factual
+    % value functions, vcft...
+    cons_eqiv.rural_not = ((vfinal.rural_not./vcft.rural_not)).^(1./(1-gamma)) - 1;
+    cons_eqiv.rural_exp = ((vfinal.rural_exp./vcft.rural_exp)).^(1./(1-gamma)) - 1;
+
+    cons_eqiv.seasn_not = ((vfinal.rural_not./vcft.rural_not)).^(1./(1-gamma)) - 1;
+    cons_eqiv.seasn_exp = ((vfinal.rural_exp./vcft.rural_exp)).^(1./(1-gamma)) - 1;
+
+    cons_eqiv.urban_new = ((vfinal.urban_new./vcft.urban_new)).^(1./(1-gamma)) - 1;
+    cons_eqiv.urban_old = ((vfinal.urban_old./vcft.urban_old)).^(1./(1-gamma)) - 1;
+
+
+end
 
 end
 

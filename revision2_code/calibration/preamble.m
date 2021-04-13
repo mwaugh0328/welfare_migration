@@ -30,6 +30,10 @@ cal_params(13) = 0.95; % This is the discount factor. Would be something worth
 
 cal_params(14) = 0.0; % This is the abar...it's set to zero. We are able to 
 % to have it be positive. 
+
+cal_params(15) = 1.0; % this value is 1 - the average tax rate
+
+cal_params(16) = 0.0; % this is the tax progresivity
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if isempty(specs)

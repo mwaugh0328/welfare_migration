@@ -23,6 +23,10 @@ end
 params.rural_options = 3;
 params.urban_options = 2;
 
+params.tax.rate = cal_params(15);
+params.tax.prog = cal_params(16);
+
+params.means_test = 0;
 %Preferences
 params.sigma_nu_not = cal_params(9); %These are the logit shocks
 params.sigma_nu_exp = cal_params(9);
@@ -155,7 +159,7 @@ solve_types = [rural_tfp.*types(:,1), types(:,2)];
 parfor xxx = 1:n_types 
 
     [assets(xxx), move(xxx), vguess(xxx)] = ...
-        rural_urban_value(params, solve_types(xxx,:));
+        rural_urban_value(params, solve_types(xxx,:),[]);
 
 end
 
