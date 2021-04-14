@@ -325,124 +325,30 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part just focuses on the entire sample...
 
-[~, ~, tfp, wages, aggstats] = just_aggregate(params,data_panel,[],[],flag);
+[~, ~, ~, wages, aggstats] = just_aggregate(params,data_panel,[],[],flag);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now use the control and expirement stuff...
-% [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, experiment_flag];
+% First drop people that did not have the experiment performed on them...
 
-% First drop people that did not have the experiment performed on them....
 rural_cntr = data_panel_cntr(:,4,1)==1 & data_panel_expr(:,13,1)==1;
 
 control_data = data_panel_cntr(rural_cntr,:,:);
 expermt_data = data_panel_expr(rural_cntr,:,:);
 cash_data = data_panel_cash(rural_cntr,:,:);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity
+% The function report_experiemtn loops through stuff and creates the
+% structure that has migration rates, elasticities, LATE, and ols...
+[migration] = report_experiment(control_data, expermt_data, 'bus');
 
-temp_migrate_cntr = control_data(:,7,1) == 1;
-temp_migrate_expr = expermt_data(:,7,1) == 1;
+% And it works for the cash part too. 
 
-temp_migration = sum(temp_migrate_cntr)./sum(rural_cntr);
-
-temp_expr_migration = sum(temp_migrate_expr)./sum(rural_cntr);
-
-migration_elasticity = temp_expr_migration - temp_migration;
+[cash] = report_experiment(control_data, cash_data, 'cash');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity Year 2
 
-temp_migrate_cntr_y2 = control_data(:,7,3) == 1;
-temp_migrate_expr_y2 = expermt_data(:,7,3) == 1;
-
-temp_migration_y2 = sum(temp_migrate_cntr_y2)./sum(rural_cntr);
-
-temp_expr_migration_y2 = sum(temp_migrate_expr_y2)./sum(rural_cntr);
-
-migration_elasticity_y2 = temp_expr_migration_y2 - temp_migration_y2;
-
-cont_y2 = control_data(:,7,1) == 1 & control_data(:,7,3) == 1;
-control_migration_cont_y2 = sum(cont_y2)./sum(rural_cntr);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity Year 4
-
-temp_migrate_cntr_y3 = control_data(:,7,7) == 1;
-temp_migrate_expr_y3 = expermt_data(:,7,7) == 1;
-
-temp_migration_y3 = sum(temp_migrate_cntr_y3)./sum(rural_cntr);
-
-temp_expr_migration_y3 = sum(temp_migrate_expr_y3)./sum(rural_cntr);
-
-migration_elasticity_y3 = temp_expr_migration_y3 - temp_migration_y3;
-
-cont_y3 = control_data(:,7,1) == 1 & control_data(:,7,3) == 1 & control_data(:,7,7) == 1;
-control_migration_cont_y3 = sum(cont_y3)./sum(rural_cntr);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity Year 5
-
-temp_migrate_cntr_y5 = control_data(:,7,11) == 1;
-temp_migrate_expr_y5 = expermt_data(:,7,11) == 1;
-
-temp_migration_y5 = sum(temp_migrate_cntr_y5)./sum(rural_cntr);
-
-temp_expr_migration_y5 = sum(temp_migrate_expr_y5)./sum(rural_cntr);
-
-migration_elasticity_y5 = temp_expr_migration_y5 - temp_migration_y5;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Migration Elasticity, Cash
-temp_migrate_cash = cash_data(:,7,1) == 1;
-
-temp_migrate_cash = sum(temp_migrate_cash)./sum(rural_cntr);
-
-cash_elasticity = temp_migrate_cash - temp_migration;
-
-temp_migrate_cash_y2 = cash_data(:,7,3) == 1;
-
-temp_migrate_cash_y2 = sum(temp_migrate_cash_y2)./sum(rural_cntr);
-
-cash_elasticity_y2 = temp_migrate_cash_y2 - temp_migration_y2;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute the LATE estimate in the model, the same way as in the
-% data...so first stack stuff the way we want it....
-
-all_migration = [temp_migrate_cntr; temp_migrate_expr];
-
-not_control = [zeros(length(temp_migrate_cntr),1); ones(length(temp_migrate_expr),1)];
-
-first_stage_b = regress(all_migration, [ones(length(not_control),1), not_control]);
-
-predic_migration = first_stage_b(1) + first_stage_b(2).*not_control;
-
-consumption_noerror = [control_data(:,2,2); expermt_data(:,2,2)];
-
-c_noerror_no_migrate = control_data(~temp_migrate_cntr,2,2);
-
-AVG_C = mean(consumption_noerror);
-
-OLS_beta = regress(consumption_noerror, [ones(length(predic_migration),1), all_migration]);
-OLS = OLS_beta(2)./AVG_C;
-
-LATE_beta = regress(consumption_noerror, [ones(length(predic_migration),1), predic_migration]);
-LATE = LATE_beta(2)./AVG_C ;
-
-var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
-
-income_noerror = [control_data(:,1,2); expermt_data(:,1,2)];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% To remember the ordering of the 
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];
-% This whole section reports the welfare numbers... 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The expieriment...
-
-income_assets = [control_data(:,1,1), control_data(:,3,1), expermt_data(:,10,1), temp_migrate_expr];
+income_assets = [control_data(:,1,1), control_data(:,3,1), expermt_data(:,10,1), migration.experiment_indicator.y1];
 
 urban_prd = expermt_data(:,11,2);
 expr_prd = expermt_data(:,12,1);
@@ -454,7 +360,7 @@ disp('')
 disp('PE Conditional Migration Transfer: Welfare by Income Quintile: Welfare, Migration Rate, Z, Experience')
 disp(round(100.*[bin.welfare, bin.migration, bin.urban./100, bin.expr],2))
 disp('Averages: Welfare, Migration Rate, Experince')
-disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expr_prd(temp_migrate_expr))],2))
+disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expr_prd(migration.experiment_indicator.y1))],2))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -488,8 +394,9 @@ m_error = (0.1783 - var(cons_model_growth)).^.5;
 
 cons_model_growth = cons_model_growth + m_error.*randn(length(cons_model_growth),1);
 
-cons_model = [ [temp_migrate_cntr; temp_migrate_expr], [zeros(length(temp_migrate_cntr),1); ...
-                ones(length(temp_migrate_expr),1)], cons_model_growth];
+cons_model = [ [migration.control_indicator.y1; migration.experiment_indicator.y1],...
+                [zeros(length(migration.control_indicator.y1),1); ...
+                ones(length(migration.experiment_indicator.y1),1)], cons_model_growth];
             
 cd('..\plotting')
 
@@ -523,8 +430,9 @@ frac_no_assets = 0.95*(sum(control_data(:,3,1) == params.asset_space(1)))/sum(ru
 
 aggregate_moments = [aggstats.income.urban./aggstats.income.rural, aggstats.avg_rural, aggstats.var_income.urban, frac_no_assets];
 
-experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
-    control_migration_cont_y2./temp_migration, var_cons_growth];
+experiment_hybrid_v2 = [migration.control.y1, migration.elasticity.y1, migration.elasticity.y2,...
+    migration.LATE, migration.OLS,...
+    migration.control_cont.y2./migration.control.y1, var_cons_growth];
 
 targets = [aggregate_moments, experiment_hybrid_v2] ;
 
@@ -538,27 +446,27 @@ disp('Control and Experiment Statistics From Model')
 disp('')
 disp('')
 disp('Temporary Moving Cost Relative to Mean Consumption')
-disp(params.m_season./mean(AVG_C))
-disp('Fraction of Rural Who are Migrants')
-disp(temp_migration)
+disp(params.m_season./migration.AVG_C)
+disp('Fraction of Rural Who are Migrants, Control and Experiment')
+disp([migration.control.y1, migration.experiment.y1])
 disp('Fraction with ~ No Assets')
 disp(frac_no_assets)
 disp('Expr Elasticity: Year One, Two, Four')
-disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3])
+disp([migration.elasticity.y1, migration.elasticity.y2, migration.elasticity.y4])
 disp('Control: Year One, Repeat Two, Four')
-disp([temp_migration, control_migration_cont_y2 , control_migration_cont_y3])
+disp([migration.control.y1, migration.control_cont.y2, migration.control_cont.y4])
 disp('Cash: Year One, Two')
-disp([cash_elasticity , cash_elasticity_y2])
+disp([cash.elasticity.y1 , cash.elasticity.y2])
 disp('OLS Estimate')
-disp(OLS)
+disp(migration.OLS)
 disp('LATE Estimate')
-disp(LATE)
+disp(migration.LATE)
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 
 cd('..\plotting')
 
-m_rates = [migration_elasticity, migration_elasticity_y2, NaN, migration_elasticity_y3, NaN, migration_elasticity_y5];
+m_rates = [migration.elasticity.y1, migration.elasticity.y2, NaN, migration.elasticity.y4, NaN, migration.elasticity.y5];
 m_rates_model = 100.*m_rates';
 
 save migration_model m_rates_model
