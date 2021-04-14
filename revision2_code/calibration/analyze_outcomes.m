@@ -55,9 +55,9 @@ shock_std = cal_params(1).*sqrt((1-shock_rho).^2); % Standard Deviation of shock
 
 perm_shock_u_std = cal_params(2); % Permenant ability differs in the urban area.
 
-urban_tfp = cal_params(3); 
+params.urban_tfp = cal_params(3); 
 
-rural_tfp = 1./urban_tfp; % Urban TFP
+params.rural_tfp = 1./params.urban_tfp; % Urban TFP
 
 params.seasonal_factor = cal_params(11); % The seasonal fluctuation part. 
 
@@ -163,7 +163,7 @@ else
 
 end
 
-solve_types = [rural_tfp.*types(:,1), types(:,2)];
+solve_types = [params.rural_tfp.*types(:,1), types(:,2)];
 
 if isempty(vft_fun) 
     
@@ -323,37 +323,10 @@ end
 % TODO: setup simmilar to GE, TAX, Effecient, accounting framework.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% First devine some indicator variables...
-
-rural = data_panel(:,4)==1;
-rural_monga = data_panel(:,4)==1 & data_panel(:,9)==1;
-rural_not_monga = data_panel(:,4)==1 & data_panel(:,9)~=1;
-
-% urban_monga = data_panel(:,4)~=1 & data_panel(:,end)==1;
-% urban_not_monga = data_panel(:,4)~=1 & data_panel(:,end)~=1;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part just focuses on the entire sample...
 
-% Income earned by rural residents relative to urban...
-m_income = [mean((data_panel(rural,1))), mean((data_panel(~rural,1)))];
+[~, ~, tfp, wages, aggstats] = just_aggregate(params,data_panel,[],[],flag);
 
-% Income in monga relative to non-monga...
-m_income_season = [mean((data_panel(rural_monga,1))), mean((data_panel(rural_not_monga,1)))];
-
-% Consumption...
-m_consumption = [mean((data_panel(rural,2))), mean((data_panel(~rural,2)))];
-
-% Fraction of residents residing in the rural area...
-avg_rural = sum(rural)./length(data_panel);
-
-var_income = [var(log(data_panel(rural,1))), var(log(data_panel(~rural,1)))];
-
-var_consumption = [var(log(data_panel(rural,2))), var(log(data_panel(~rural,2)))];
-
-perm_moves = sum(data_panel(rural,6)==1)./length(data_panel);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Now use the control and expirement stuff...
@@ -463,18 +436,6 @@ var_consumption_no_migrate_control = var(log(c_noerror_no_migrate));
 income_noerror = [control_data(:,1,2); expermt_data(:,1,2)];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Welfare gains
-induced = temp_migrate_expr ~= temp_migrate_cntr;
-
-all_stay = (~temp_migrate_expr) & (~temp_migrate_cntr);
-
-induced_cash = cash_data(:,7,1) ~= temp_migrate_cntr;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-welfare_expr = expermt_data(:,10,1);
-welfare_all = 100.*[zeros(length(temp_migrate_cntr),1); welfare_expr];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % To remember the ordering of the 
 % panel = [labor_income, consumption, assets, live_rural, work_urban, move, move_seasn, move_cost, season, welfare, experiment_flag];
 % This whole section reports the welfare numbers... 
@@ -483,40 +444,33 @@ welfare_all = 100.*[zeros(length(temp_migrate_cntr),1); welfare_expr];
 
 income_assets = [control_data(:,1,1), control_data(:,3,1), expermt_data(:,10,1), temp_migrate_expr];
 
-income_gain = log(expermt_data(:,1,2)) - log(control_data(:,1,2));
-cons_gain = log(expermt_data(:,2,2)) - log(control_data(:,2,2));
 urban_prd = expermt_data(:,11,2);
 expr_prd = expermt_data(:,12,1);
 
-report_welfare_quintiles
+[bin] = report_welfare_quintiles(income_assets,urban_prd,expr_prd);
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('PE Conditional Migration Transfer: Welfare by Income Quintile: Welfare, Migration Rate, Z, Experience')
-disp(round(100.*[welfare_bin, migration_bin, urban_bin./100, expr_bin],2))
+disp(round(100.*[bin.welfare, bin.migration, bin.urban./100, bin.expr],2))
 disp('Averages: Welfare, Migration Rate, Experince')
 disp(round(100.*[mean(expermt_data(:,10,1)),mean(expermt_data(:,7,1)),mean(expr_prd(temp_migrate_expr))],2))
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The unconditional cash transfer
 income_assets = [control_data(:,1,1), control_data(:,3,1), cash_data(:,10,1), cash_data(:,7,1)];
 
-income_gain = log(control_data(:,1,2)) - log(control_data(:,1,1));
-cons_gain = log(control_data(:,2,2)) - log(control_data(:,2,1));
 urban_prd = expermt_data(:,11,2);
 expr_prd = expermt_data(:,12,1);
 
-report_welfare_quintiles
+[bin] = report_welfare_quintiles(income_assets,urban_prd,expr_prd);
 
-disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('PE Unconditional Cash Transfer: Welfare and Migration by Income Quintile ')
-disp(round(100.*[welfare_bin, migration_bin],2))
+disp(round(100.*[bin.welfare, bin.migration],2))
 disp('PE Unconditional Cash Transfer: Average Welfare Gain, Migration Rate')
 disp(round(100.*[mean(cash_data(:,10,1)),mean(cash_data(:,7,1))],2))
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -547,7 +501,9 @@ cd('..\calibration')
 % Assets...
 %frac_no_assets = sum(control_data(:,3,1) < asset_space(2))./sum(rural_cntr);
 
-frac_no_assets = 0.95*(sum(control_data(:,3,1) == params.asset_space(1)))/sum(rural_cntr) + 0.05*(sum(control_data(:,3,1) == params.asset_space(2)))/sum(rural_cntr);
+frac_no_assets = 0.95*(sum(control_data(:,3,1) == params.asset_space(1)))/sum(rural_cntr)...
+    + 0.05*(sum(control_data(:,3,1) == params.asset_space(2)))/sum(rural_cntr);
+
 % Trying to smmoth this thing out
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -565,7 +521,7 @@ frac_no_assets = 0.95*(sum(control_data(:,3,1) == params.asset_space(1)))/sum(ru
 % 
 % experiment_hybrid = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS, var_cons_growth];
 
-aggregate_moments = [m_income(2)./m_income(1), avg_rural, var_income(2), frac_no_assets];
+aggregate_moments = [aggstats.income.urban./aggstats.income.rural, aggstats.avg_rural, aggstats.var_income.urban, frac_no_assets];
 
 experiment_hybrid_v2 = [temp_migration, migration_elasticity, migration_elasticity_y2, LATE, OLS,...
     control_migration_cont_y2./temp_migration, var_cons_growth];
@@ -578,15 +534,15 @@ targets = [aggregate_moments, experiment_hybrid_v2] ;
 if flag == 1
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('Statistics From Model')
+disp('Control and Experiment Statistics From Model')
 disp('')
 disp('')
-disp('Average Rural Population')
-disp(avg_rural)
 disp('Temporary Moving Cost Relative to Mean Consumption')
 disp(params.m_season./mean(AVG_C))
 disp('Fraction of Rural Who are Migrants')
 disp(temp_migration)
+disp('Fraction with ~ No Assets')
+disp(frac_no_assets)
 disp('Expr Elasticity: Year One, Two, Four')
 disp([migration_elasticity, migration_elasticity_y2, migration_elasticity_y3])
 disp('Control: Year One, Repeat Two, Four')
@@ -597,18 +553,8 @@ disp('OLS Estimate')
 disp(OLS)
 disp('LATE Estimate')
 disp(LATE)
-disp('Wage Gap')
-disp(m_income(2)./m_income(1))
-disp('Mean Consumption Rural and Urban')
-disp(m_consumption)
-disp('Variance of Consumption Rural and Urban')
-disp(var_consumption)
-disp('Variance of Log Income Rural and Urban')
-disp(var_income)
-disp('Fraction of Rural with No Assets')
-disp(frac_no_assets)
-disp('Permenant Moves')
-disp(perm_moves)
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
 
 cd('..\plotting')
 

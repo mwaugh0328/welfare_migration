@@ -1,3 +1,4 @@
+function [bin] = report_welfare_quintiles(income_assets,urban_prd,expr_prd)
 
 income_assets(:,[1,2]) = income_assets(:,[1,2]) + .001.*randn(size(income_assets(:,[1,2])));
 % Add just a bit of noise to smooth stuf out...
@@ -6,13 +7,13 @@ income_prct = 20:20:80;
 edges_income = prctile(income_assets(:,1),income_prct);
 edges_income = [0, edges_income, 10];
 
-welfare_bin = zeros(length(edges_income)-1,1);
+bin.welfare = zeros(length(edges_income)-1,1);
 
-migration_bin = zeros(length(edges_income)-1,1);
+bin.migration = zeros(length(edges_income)-1,1);
 counts = zeros(length(edges_income)-1,1);
 
-urban_bin = zeros(length(edges_income)-1,1);
-expr_bin = zeros(length(edges_income)-1,1);
+bin.urban = zeros(length(edges_income)-1,1);
+bin.expr = zeros(length(edges_income)-1,1);
 
 for xxx = 1:length(edges_income)-1
         
@@ -24,11 +25,11 @@ for xxx = 1:length(edges_income)-1
         
         counts(xxx) = sum(test);
         
-        welfare_bin(xxx) = mean(income_assets(test,3));
-        migration_bin(xxx) = mean(income_assets(test,4));
+        bin.welfare(xxx) = mean(income_assets(test,3));
+        bin.migration(xxx) = mean(income_assets(test,4));
 
-        urban_bin(xxx) = mean(urban_prd(test_migrate));
-        expr_bin(xxx) = mean(expr_prd(test_migrate));
+        bin.urban(xxx) = mean(urban_prd(test_migrate));
+        bin.expr(xxx) = mean(expr_prd(test_migrate));
 
 end
 
