@@ -195,14 +195,17 @@ govbc = params.R.*(accounting.all.monga.tax - accounting.all.monga.fiscalcost) +
 
 if flag == 1
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('Production Side Accounting: Production, Consumption, Moving Costs')
+disp('Accounting (Production Side): Production, Consumption, Moving Costs')
 disp([(aggproduction.rural.monga + aggproduction.urban.monga), accounting.all.monga.consumption, accounting.all.monga.movingcosts])
 disp([(aggproduction.rural.notmonga + aggproduction.urban.notmonga), accounting.all.notmonga.consumption, accounting.all.notmonga.movingcosts])
 disp('Resource Constraint (Production Side): Monga, Non Monga')
 disp([rc_monga, rc_not_monga])
 disp('Gov Budget Constraint')
 disp([govbc])
-
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('Labor Demand and Labor Supply')
+disp([labor.demand.monga, labor.supply.monga])
+disp([labor.demand.notmonga, labor.supply.notmonga])
 end
 
 
