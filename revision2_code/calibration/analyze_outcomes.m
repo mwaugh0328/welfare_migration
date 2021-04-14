@@ -1,4 +1,4 @@
-function [targets] = analyze_outcomes(cal_params, specs, wages, meanstest, vft_fun, flag)
+function [targets, wages] = analyze_outcomes(cal_params, specs, wages, meanstest, vft_fun, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the driver file for the code which is consistent with RR2 paper at
 % Econometrica (late 2020-on).
