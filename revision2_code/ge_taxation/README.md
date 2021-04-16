@@ -10,7 +10,7 @@ This all shows up in [``\revision2_code\calibration\labor_income_tax.m``](https:
 
 I explored several things. One was tax urban, permanent residents only. This is less distortionary and hence gives the highest welfare gains. The baseline (as done below) is that it hits everybody. It is probably less realistic, but this is the most distortionary since affects both the permanent location decision and the seasonal migration decision. From this standpoint, what we present below is a lower bound.
 
-To explore a situation where only urban guys are taxed goto [``\revision2_code\ge_taxation\just_policy.m``](https://github.com/mwaugh0328/welfare_migration/blob/master/revision2_code/ge_taxation/just_policy.m) and change the location specification. So the defalut is
+To explore a situation where only urban guys are taxed go to [``\revision2_code\ge_taxation\just_policy.m``](https://github.com/mwaugh0328/welfare_migration/blob/master/revision2_code/ge_taxation/just_policy.m) and change the location specification. So the default is
 ```
 params.tax.rate = tax(1);
 params.tax.prog = tax(2);
@@ -22,7 +22,7 @@ params.tax.rate = tax(1);
 params.tax.prog = tax(2);
 params.tax.location = 'urban';
 ```
-
+Everything below is presented under the default. 
 
 A second one was progressivity. This is less interesting than I thought. The key issue here is (i) now the tax system starts to play a public insurance role and confused what's up with the migration subsidy and (ii) while labor supply is,  in a sense, elastic across space, it's very inelastic within a location. So the gov can really exploit people without much behavioral cost, I saw this by trying to find the optimal ``tax.prog`` and the solver was pushing things to a corner with complete redistribution.
 
@@ -32,7 +32,7 @@ params.R.*(accounting.all.monga.tax - accounting.all.monga.fiscalcost) + (accoun
 ```
 So the government gets some revenues during the Monga and pays out some moving costs but saves it hence the R showing up there, then the next period gets some more revenue and pays out more moving costs. So at the end of the fiscal year, this is what it has and has paid out. We want this to be zero. I played with other versions of this and it did not matter a whole lot.
 
-What is not possible is period by period zero. Since migration is varying by season, then the government would have to have a seasonal varying tax rate todo this period by period. This would carry an additional welfare cost since tax rates are now moving around, makes less sense relative to practical realities of of how tax systems actually work, etc.
+What is not possible is period by period zero. Since migration is varying by season, then the government would have to have a seasonal varying tax rate todo this period by period. This would carry an additional welfare cost since tax rates are now moving around, makes less sense relative to practical realities of how tax systems actually work, etc.
 
 ---
 **Results GE + Taxation**
