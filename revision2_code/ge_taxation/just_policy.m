@@ -13,13 +13,13 @@ if isempty(tax)
     
     params.tax.rate = cal_params(15);
     params.tax.prog = cal_params(16);
-    params.tax.location = 'all';
-    
+   
 else
     params.tax.rate = tax(1);
     params.tax.prog = tax(2);
-    params.tax.location = 'urban';
 end
+
+params.tax.location = 'all';
 
 %Preferences
 params.sigma_nu_not = cal_params(9); %These are the logit shocks
@@ -111,11 +111,9 @@ params.n_shocks = length(shocks_trans_u);
 % normal distribution and then the transition matrix will determine the
 % relative weights of the guys in the population. 
 
-[zurban , zurban_prob] = pareto_approx(params.n_perm_shocks, 1./params.perm_shock_u_std);
+[zurban , ~] = pareto_approx(params.n_perm_shocks, 1./params.perm_shock_u_std);
 
 types = [ones(params.n_perm_shocks,1), zurban];
-
-type_weights = zurban_prob;
 
 [n_types , ~] = size(types);
 

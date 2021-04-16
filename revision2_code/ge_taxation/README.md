@@ -12,17 +12,13 @@ I explored several things. One was tax urban, permanent residents only. This is 
 
 To explore a situation where only urban guys are taxed go to [``\revision2_code\ge_taxation\just_policy.m``](https://github.com/mwaugh0328/welfare_migration/blob/master/revision2_code/ge_taxation/just_policy.m) and change the location specification. So the default is
 ```
-params.tax.rate = tax(1);
-params.tax.prog = tax(2);
 params.tax.location = 'all';
 ```
 and then change it to
 ```
-params.tax.rate = tax(1);
-params.tax.prog = tax(2);
 params.tax.location = 'urban';
 ```
-Everything below is presented under the default. 
+Everything below is presented under the default.
 
 A second one was progressivity. This is less interesting than I thought. The key issue here is (i) now the tax system starts to play a public insurance role and confused what's up with the migration subsidy and (ii) while labor supply is,  in a sense, elastic across space, it's very inelastic within a location. So the gov can really exploit people without much behavioral cost, I saw this by trying to find the optimal ``tax.prog`` and the solver was pushing things to a corner with complete redistribution.
 
