@@ -34,8 +34,9 @@ cft = params.means_test; % this is the means test, like in mushfiqu's world
 taxprog = 0.0;
 % The tax code can do progressivity.
 
-disp('Taxing...')
+disp('Location of Taxation')
 disp(params.tax.location)
+disp('')
 
 policyfun.move = move;
 policyfun.assets = assets;

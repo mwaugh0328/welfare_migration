@@ -292,6 +292,19 @@ parfor xxx = 1:n_types
         
 end
 
+
+lowz_expr = flipud(move_temp(8).rural_not(:,seasont==1,1));
+medz_expr  = flipud(move_temp(11).rural_not(:,seasont==1,1));
+lowz_exp_expr  = flipud(move_temp(8).rural_exp(:,seasont==1,1));
+% visually, it's better to run this on the equally spaced grid.
+
+cd('..\plotting')
+
+save movepolicy_exp.mat lowz_expr medz_expr lowz_exp_expr 
+
+cd('..\calibration')
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Now the code below constructs a panel so the approriate types are where
