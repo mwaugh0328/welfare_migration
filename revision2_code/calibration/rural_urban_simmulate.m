@@ -102,7 +102,7 @@ for xxx = 1:time_series
                 
         
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
-            labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax);
+            labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax, 'rural');
         
         welfare(xxx,1) = vfun.rural_not(asset_state,shock_states(xxx));
         
@@ -130,7 +130,7 @@ for xxx = 1:time_series
         welfare(xxx,1) = vfun.seasn_not(asset_state,shock_states(xxx));
        
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] ...
-            = labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
+            = labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax, 'urban');
  
         asset_state_p = assets_policy.seasn_not(asset_state,shock_states(xxx));
                 
@@ -155,7 +155,7 @@ for xxx = 1:time_series
         welfare(xxx,1) = vfun.rural_exp(asset_state,shock_states(xxx));
                 
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
-            labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax);
+            labor_income_tax(z_rural.*r_shocks(shock_states(xxx)), params.tax, 'rural');
         
         asset_state_p = assets_policy.rural_exp(asset_state,shock_states(xxx),choice);
         
@@ -190,7 +190,7 @@ for xxx = 1:time_series
         welfare(xxx,1) = vfun.seasn_exp(asset_state,shock_states(xxx));
         
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
-            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
+            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax, 'urban');
  
         asset_state_p = assets_policy.seasn_exp(asset_state,shock_states(xxx));
         
@@ -211,7 +211,7 @@ for xxx = 1:time_series
         welfare(xxx,1) = vfun.urban_new(asset_state,shock_states(xxx));
 
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
-            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
+            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax, 'urban');
  
         asset_state_p = assets_policy.urban_new(asset_state,shock_states(xxx),choice);
 
@@ -238,7 +238,7 @@ for xxx = 1:time_series
         welfare(xxx,1) = vfun.urban_old(asset_state,shock_states(xxx));
    
         [labor_income(xxx,1), tax(xxx,1), production(xxx,1)] =...
-            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax);
+            labor_income_tax(z_urban.*u_shocks(shock_states(xxx)), params.tax, 'urban');
  
         asset_state_p = assets_policy.urban_old(asset_state,shock_states(xxx),choice);
         % asset state is policy, location (urban, EXPERINCE), asset

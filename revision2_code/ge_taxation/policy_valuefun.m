@@ -81,7 +81,7 @@ mtest_move = m_seasn.*(~mtest)';
 
 for zzz = 1:n_shocks
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax, 'rural') - abar;
     
     feasible_rural = consumption > 0;
     
@@ -90,7 +90,7 @@ for zzz = 1:n_shocks
     utility_rural(:,:,zzz) = utility_rural(:,:,zzz) + -1e10.*(~feasible_rural);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - mtest_move - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax, 'rural') - mtest_move - abar;
     
     feasible_move_seasn = consumption > 0;
     
@@ -99,7 +99,7 @@ for zzz = 1:n_shocks
     utility_move_seasn(:,:,zzz)= utility_move_seasn(:,:,zzz) + -1e10.*(~feasible_move_seasn);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax) - abar;
+    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax, 'urban') - abar;
     
     feasible_urban = consumption >  0;
     
@@ -107,7 +107,7 @@ for zzz = 1:n_shocks
     
     utility_urban(:,:,zzz) = utility_urban(:,:,zzz) + -1e10.*(~feasible_urban); 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax) - m - abar;
+    consumption = net_assets + labor_income_tax(z_rural.*shocks_rural(zzz), params.tax, 'rural') - m - abar;
     
     feasible_move_rural = consumption > 0;
     
@@ -116,7 +116,7 @@ for zzz = 1:n_shocks
     utility_move_rural(:,:,zzz) = utility_move_rural(:,:,zzz) + -1e10.*(~feasible_move_rural); 
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax) - m - abar;
+    consumption = net_assets + labor_income_tax(z_urban.*shocks_urban(zzz), params.tax, 'urban') - m - abar;
     
     feasible_move_urban = consumption > 0;
     

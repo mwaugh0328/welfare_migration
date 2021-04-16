@@ -24,6 +24,7 @@ params.urban_options = 2;
 
 params.tax.rate = cal_params(15);
 params.tax.prog = cal_params(16);
+params.tax.location = 'all';
 
 
 %Preferences
