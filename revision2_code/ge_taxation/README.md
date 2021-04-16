@@ -55,6 +55,8 @@ Social Welfare: All, Rural, Urban
      0     0     0
 ```  
 
+---
+
 2. Next, let's put in the free moving costs, **but do not let people change their behavior**
 
 ```
@@ -87,6 +89,8 @@ Social Welfare: All, Rural, Urban
 Just to confirm note how the moving quantities did not change, but welfare went up. Basically, this is like relaxing the budget constraint for all the guys who move and it gets pushed into consumption (note assets are fixed here as well). Obviously everyone gains here, it's just free money. This is the problem with what we had in the paper, social welfare has to go up when you give out free money---its only a question of how much.
 
 With a labor income tax, it's not obvious that performing the migration subsidy will help because the tax will hurt people too. So now there is an inherent tension between the tax and migration subsidy. And, we need to remind ourselves and the reader, if the allocation were efficient this kind of policy has to hurt. If it helps, then this is also evidence suggesting that economy we are working with is not efficient / has some form of misallocation.
+
+---
 
 3. Now put the tax in and find the tax to the government budget constraint is satisfied, **but do not let people change their behavior**
 
@@ -123,6 +127,8 @@ Again, confirm to your self, note that moving quantities did not change. But her
 
 But from a social perspective, the migration subsidy + labor income tax leads to higher welfare. Now the next step is to let behavior change. This is important because the standard argument would work something like this more people with migrate -> higher fiscal burden -> lower welfare (relative to what we have above). And again, behavioral reactions could in fact overturn the positive welfare result as guys will not be internalizing the fiscal cost of their actions.
 
+---
+
 4. **Let behavior change.** And then clear labor markets and the governments budget constraint.
 
 ```
@@ -156,8 +162,8 @@ The tax rate here is ``1.18`` percent. So about 1.20 on 100 dollars. Consistent 
 
 This is where it gets interesting. Urban guys are hurt by this, again by the same amount as the tax. But here, **social welfare is larger when people can change their actions (0.63 vs 0.52).**
 
-What is going on here? I think the issue that much of the rural population substitutes into migration in several ways (1) migration rates go up a bunch (2) experience goes up a bunch too (from about 0.23 to 0.41) so a migrant now receives higher utility from the migration experience than before and (3) notice how the fraction of rural with access to the subsidy increased (50 percent in baseline to 72 percent in GE). So guys are **decumulating** assets to get under the asset threshold and take advantage of the subsidy. This is exactly the issue that a policy maker would be worried about (think means tested welfare state) as it increases the fiscal burden. But I think it's ok, because now those guys are gaining even more (in utils) from migration.
+What is going on here? I think the issue that much of the rural population substitutes into migration in several ways (1) migration rates go up a bunch (2) experience goes up a bunch too (from about 0.23 to 0.41) so a migrant now receives higher utility from the migration experience than before and (3) notice how the fraction of rural with access to the subsidy increased (50 percent in baseline to 72 percent in GE). So guys are **decumulating** assets to get under the asset threshold and take advantage of the subsidy. This is exactly the issue that a policy maker would be worried about (think means tested welfare state) as it increases the fiscal burden. But from a social perspective it's ok, because now those guys are gaining even more (in utils) from migration.
 
-What is hard to figure out is the role of better insurance (the free migration option) or that the migration experience improved. In a sense, these are fundamentally linked...the more you do it, the better of an option that it becomes. 
+What is hard to figure out is the role of better insurance (the free migration option) or that the migration experience improved. In a sense, these are fundamentally linked...the more you do it, the better of an option that it becomes.
 
 One interesting point here too is the political economy of this. The urban guys would be against this. Not because of congestion externalities, but that the fiscal burden (while modest) hit them directly. They get no benefit from this policy, just higher taxes. But from a social welfare perspective it's welfare enhancing.
