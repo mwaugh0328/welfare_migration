@@ -10,6 +10,20 @@ This all shows up in [``\revision2_code\calibration\labor_income_tax.m``](https:
 
 I explored several things. One was tax urban, permanent residents only. This is less distortionary and hence gives the highest welfare gains. The baseline (as done below) is that it hits everybody. It is probably less realistic, but this is the most distortionary since affects both the permanent location decision and the seasonal migration decision. From this standpoint, what we present below is a lower bound.
 
+To explore a situation where only urban guys are taxed goto [``\revision2_code\ge_taxation\just_policy.m``](https://github.com/mwaugh0328/welfare_migration/blob/master/revision2_code/ge_taxation/just_policy.m) and change the location specification. So the defalut is
+```
+params.tax.rate = tax(1);
+params.tax.prog = tax(2);
+params.tax.location = 'all';
+```
+and then change it to
+```
+params.tax.rate = tax(1);
+params.tax.prog = tax(2);
+params.tax.location = 'urban';
+```
+
+
 A second one was progressivity. This is less interesting than I thought. The key issue here is (i) now the tax system starts to play a public insurance role and confused what's up with the migration subsidy and (ii) while labor supply is,  in a sense, elastic across space, it's very inelastic within a location. So the gov can really exploit people without much behavioral cost, I saw this by trying to find the optimal ``tax.prog`` and the solver was pushing things to a corner with complete redistribution.
 
 The second issue is the government budget constraint. Since we have two periods within a year, the question is does the government run a balanced budget every period or over the fiscal year. I opted for over the year and set it up like this.

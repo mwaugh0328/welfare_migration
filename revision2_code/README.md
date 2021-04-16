@@ -23,7 +23,7 @@ and things will run in about 36 seconds on my laptop.
 ```
 >> load('calibration_final.mat')
 
->> analyze_outcomes(exp(new_val),[], 1)
+>> analyze_outcomes(exp(new_val), [], [], [], [], 1)
 ```
 Then it should compute everything and then spit out the moments. In ``analyze_outcomes.m`` you can see each step (o) ``preamble.m`` loads fixed parameter values (e.g. the discount factor) and technichal specifications associated with grid and number of simmulations (i) value function iteration in ``rural_urban_value.m`` (ii) simulation to construct stationary distribution ``rural_urban_simmulate.m`` (iii) implementation of experiment (bus ticket ``field_experiment_welfare`` and cash transfer ``cash_experiment_welfare`` and ``experiment_driver`` to simmulat sample paths and then (iv) collect results. The results should mimic (or come very close) to those in Table 2, 6, and 8 in the January 2020 version of the paper.
 

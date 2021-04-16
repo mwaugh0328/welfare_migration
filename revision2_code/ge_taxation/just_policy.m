@@ -19,7 +19,7 @@ if isempty(tax)
 else
     params.tax.rate = tax(1);
     params.tax.prog = tax(2);
-    params.tax.location = 'all';
+    params.tax.location = 'urban';
 end
 
 %Preferences
