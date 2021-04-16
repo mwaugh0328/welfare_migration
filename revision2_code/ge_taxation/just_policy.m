@@ -14,9 +14,12 @@ if isempty(tax)
     
     params.tax.rate = cal_params(15);
     params.tax.prog = cal_params(16);
+    params.tax.location = 'all';
+    
 else
     params.tax.rate = tax(1);
     params.tax.prog = tax(2);
+    params.tax.location = 'all';
 end
 
 %Preferences
