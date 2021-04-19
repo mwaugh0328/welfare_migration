@@ -15,7 +15,7 @@ ubar = params.ubar; lambda = params.lambda; pi_prob = params.pi_prob;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_iterations = 500;
-tol = 10^-4;
+tol = 10^-2;
 
 n_shocks = params.n_shocks;
 
@@ -73,14 +73,14 @@ for zzz = 1:n_shocks
          
 end
 
-v_old_rural_not = (ones(n_shocks,1))./(1-beta);
-v_old_rural_exp = v_old_rural_not;
+v_old_rural_not = (utility.rural_not)./(1-beta);
+v_old_rural_exp = (utility.rural_exp)./(1-beta);
 
-v_old_seasn_not = v_old_rural_not;
-v_old_seasn_exp = v_old_rural_not;
+v_old_seasn_not = (utility.seasn_not)./(1-beta);
+v_old_seasn_exp = (utility.seasn_exp)./(1-beta);
 
-v_old_urban_new = v_old_rural_not;
-v_old_urban_old = v_old_rural_not;
+v_old_urban_new = (utility.urban_new)./(1-beta);
+v_old_urban_old = (utility.urban_old)./(1-beta);
 
 v_prime_rural_not = zeros(n_shocks,1);
     
@@ -270,7 +270,6 @@ for iter = 1:n_iterations
     v_prime_urban_old(zzz,1)= sum(pitest.*(sigma_nu_not.*log(1./max(pitest, 10^-25))  + [v_stay_urban_old, v_move_urban_old]),2);
         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     v_hat_rural_not(zzz,1) = v_prime_rural_not(zzz,1); 
     
     v_hat_rural_exp(zzz,1) = v_prime_rural_exp(zzz,1); 
@@ -282,7 +281,6 @@ for iter = 1:n_iterations
     v_hat_seasn_not(zzz,1) = v_seasn_not(zzz,1);
     
     v_hat_seasn_exp(zzz,1) = v_seasn_exp(zzz,1);
-    
 
     end
     
@@ -297,7 +295,7 @@ for iter = 1:n_iterations
        urban_old < tol
 %         disp('value function converged')
 %         disp(toc)
-         %disp(iter)
+%         disp(iter)
         break
     else
 

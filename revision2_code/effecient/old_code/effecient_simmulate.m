@@ -1,4 +1,5 @@
-function [data_panel, params, state_panel] = effecient_simmulate(params, move_policy, cons_policy, solve_types, vfun, muc)
+function [data_panel, params, sim_panel] = effecient_simmulate(params, move_policy,...
+                cons_policy, solve_types, vfun, muc, sim_panel, position)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_sims = 5000;
 time_series = 100000;
@@ -40,20 +41,23 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sim_panel = zeros(N_obs,11,params.n_types);
-states = zeros(N_obs,3,params.n_types); 
+if isempty(sim_panel)
     
-parfor xxx = 1:params.n_types 
+    sim_panel = zeros(N_obs,11,params.n_types);   
+    
+    parfor xxx = 1:params.n_types 
 
-% Interestingly, this is not a good part of the code to use parfor... it
-% runs much faster with just a for loop.
-
-    [sim_panel(:,:,xxx), states(:,:,xxx)] = simmulate_effecient(cons_policy(xxx), move_policy(xxx), ...
+    [sim_panel(:,:,xxx), ~] = simmulate_effecient(cons_policy(xxx), move_policy(xxx), ...
                     params, solve_types(xxx,:), params.trans_shocks, shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx), vfun(xxx), muc(xxx));
                 
     % This is the same one as in baseline model
-end
+    end
+else
     
+    [sim_panel(:,:,position), ~] = simmulate_effecient(cons_policy(position), move_policy(position), ...
+                    params, solve_types(position,:), params.trans_shocks, shock_states_p, pref_shocks(:,position), move_shocks(:,position), vfun(position), muc(position));
+
+end
     
 n_draws = floor(N_obs/max(N_obs*type_weights)); % this computes the number of draws.
 sample = min(n_draws.*round(N_obs*type_weights),N_obs); % Then the number of guys to pull.
@@ -64,8 +68,6 @@ for xxx = 1:params.n_types
     e_count = s_count + sample(xxx)-1;
         
     data_panel(s_count:e_count,:) = sim_panel(N_obs-(sample(xxx)-1):end,:,xxx);
-    
-    state_panel(s_count:e_count,:) = [states(N_obs-(sample(xxx)-1):end,:,xxx), xxx.*ones(length(states(N_obs-(sample(xxx)-1):end,:,xxx)),1)];
     
     s_count = e_count+1;
    

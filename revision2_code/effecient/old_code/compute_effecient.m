@@ -1,4 +1,4 @@
-function [social_welfare] = compute_effecient(c, cal, tfp, flag)
+function [social_welfare, sim_panel] = compute_effecient(c, cal, tfp, move, position, sim_panel, flag);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nshocks = 5;
 ntypes = 24;
@@ -18,17 +18,19 @@ for xxx = 1:ntypes
     
 end 
 
-move = make_movepolicy(c, nshocks*2, ntypes);
-
 [solve_types, params] = effecient_preamble(cal, tfp); 
+
+movefoo = make_movepolicy(c,position,params);
+
+move(position) = movefoo(position);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%[vfun, muc] = effecient_policy(params, move, consumption);
-
-[data_panel, params, state_panel] = effecient_simmulate(params, move, consumption, solve_types, [], []);
-
-[~, ~, cons_fix] = effecient_aggregate(params,tfp, data_panel,0);
+[data_panel, params, sim_panel] = effecient_simmulate(params, move, consumption,...
+                                        solve_types, [], [], sim_panel, position);
+ 
+                                                                      
+[~, ~, cons_fix] = effecient_aggregate(params, tfp, data_panel,[]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -49,10 +51,12 @@ end
 
 [vfun, muc] = effecient_policy(params, move, consumption);
 
-%[data_panel, params] = effecient_simmulate(params, move, consumption, solve_types, vfun, muc);
-[data_panel] = quick_sim(data_panel, state_panel, vfun, muc, consumption);
+[data_panel, params, ~] = effecient_simmulate(params, move, consumption,...
+                            solve_types, vfun, muc, [], position);
+                      
 
-[social_welfare, ~] = effecient_aggregate(params,tfp, data_panel, flag);
+[social_welfare, ~] = effecient_aggregate(params,tfp, data_panel,flag);
+
 
 social_welfare = ((-1).*social_welfare);
 % [labor, govbc] = just_aggregate(params, data_panel, wages, tfp, flag);

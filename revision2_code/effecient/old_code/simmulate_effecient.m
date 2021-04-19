@@ -46,36 +46,7 @@ season = zeros(time_series,1);
 welfare = zeros(time_series,1);
 marg_utility = zeros(time_series,1);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Here is the deal...I like the .indexing a lot which I got used ot in
-% python and julia. This is slow in matlab especially with many function
-% evaluations. 
 
-move_policy_rural_not = move_policy.rural_not(:,:);
-move_policy_rural_exp = move_policy.rural_exp(:,:);
-move_policy_urban_new = move_policy.urban_new(:,:);
-move_policy_urban_old = move_policy.urban_old(:,:);
-
-muc_rural_not = muc.rural_not(:);
-muc_rural_exp = muc.rural_exp(:);
-muc_seasn_not = muc.seasn_not(:);
-muc_seasn_exp = muc.seasn_exp(:);
-muc_urban_new = muc.urban_new(:);
-muc_urban_old = muc.urban_old(:); 
-
-cons_policy_rural_not = cons_policy.rural_not(:);
-cons_policy_rural_exp = cons_policy.rural_exp(:);
-cons_policy_seasn_not = cons_policy.seasn_not(:);
-cons_policy_seasn_exp = cons_policy.seasn_exp(:);
-cons_policy_urban_new = cons_policy.urban_new(:);
-cons_policy_urban_old = cons_policy.urban_old(:);
-
-vfun_rural_not = vfun.rural_not(:);
-vfun_rural_exp = vfun.rural_exp(:);
-vfun_seasn_not = vfun.seasn_not(:);
-vfun_seasn_exp = vfun.seasn_exp(:);
-vfun_urban_new = vfun.urban_new(:);
-vfun_urban_old = vfun.urban_old(:); 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin simmulation...
 
@@ -102,9 +73,8 @@ for xxx = 1:time_series
         % Then we take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        %choice = find(move_policy.rural_not(shock_states(xxx),:) > logit_shock,1);
-        %p = move_policy_rural_not(shock_states(xxx),:);
-        choice = hard_rural_choice(move_policy_rural_not(shock_states(xxx),:) > logit_shock);
+        %choice = find((move_policy.rural_not(asset_state,shock_states(xxx),:)) > logit_shock,1);
+        choice = hard_rural_choice(move_policy.rural_not(shock_states(xxx),:) > logit_shock);
         choice = choice(1);
         
         %choice = -(sum((move_policy_rural_not(asset_state,shock_states(xxx),:)) > logit_shock)-4);
@@ -114,12 +84,12 @@ for xxx = 1:time_series
         move(xxx,1) = (choice == 3); % move if choice above is 3
         move_seasn(xxx,1) = (choice == 2); % seasonal move if choice above is 2.
                 
-        consumption(xxx,1) = cons_policy_rural_not(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.rural_not(shock_states(xxx));
         
         production(xxx,1) = z_rural.*r_shocks(shock_states(xxx));
                 
-        welfare(xxx,1) = vfun_rural_not(shock_states(xxx));
-        marg_utility(xxx,1) = muc_rural_not(shock_states(xxx));
+        welfare(xxx,1) = vfun.rural_not(shock_states(xxx));
+        marg_utility(xxx,1) = muc.rural_not(shock_states(xxx));
         
         location(xxx+1) = location(xxx);
                     
@@ -137,10 +107,10 @@ for xxx = 1:time_series
         
     elseif location(xxx) == 2 % seasonal movers....
         
-        welfare(xxx,1) = vfun_seasn_not(shock_states(xxx));
-        marg_utility(xxx,1) = muc_seasn_not(shock_states(xxx));
+        welfare(xxx,1) = vfun.seasn_not(shock_states(xxx));
+        marg_utility(xxx,1) = muc.seasn_not(shock_states(xxx));
         
-        consumption(xxx,1) = cons_policy_seasn_not(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.seasn_not(shock_states(xxx));
         
         production(xxx,1) = z_urban.*u_shocks(shock_states(xxx));
                 
@@ -163,18 +133,18 @@ for xxx = 1:time_series
         % Then we  take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_rural_choice(move_policy_rural_exp(shock_states(xxx),:) > logit_shock);
+        choice = hard_rural_choice(move_policy.rural_exp(shock_states(xxx),:) > logit_shock);
         choice = choice(1);
                
         move(xxx,1) = (choice == 3); % move if choice above is 3
         move_seasn(xxx,1) = (choice == 2); % seasonal move if choice above is 2.
         
-        welfare(xxx,1) = vfun_rural_exp(shock_states(xxx));
-        marg_utility(xxx,1) = muc_rural_exp(shock_states(xxx));
+        welfare(xxx,1) = vfun.rural_exp(shock_states(xxx));
+        marg_utility(xxx,1) = muc.rural_exp(shock_states(xxx));
         
         production(xxx,1) = z_rural.*r_shocks(shock_states(xxx));
         
-        consumption(xxx,1) = cons_policy_rural_exp(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.rural_exp(shock_states(xxx));
 
         location(xxx+1) = location(xxx);
         
@@ -203,12 +173,12 @@ for xxx = 1:time_series
 
     elseif location(xxx) == 4
         
-        welfare(xxx,1) = vfun_seasn_exp(shock_states(xxx));
-        marg_utility(xxx,1) = muc_seasn_exp(shock_states(xxx));
+        welfare(xxx,1) = vfun.seasn_exp(shock_states(xxx));
+        marg_utility(xxx,1) = muc.seasn_exp(shock_states(xxx));
                 
         production(xxx,1) = z_urban.*u_shocks(shock_states(xxx));
         
-        consumption(xxx,1) = cons_policy_seasn_exp(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.seasn_exp(shock_states(xxx));
      
         location(xxx+1) = 3;
                 
@@ -225,18 +195,18 @@ for xxx = 1:time_series
         % Then we take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_urban_choice(move_policy_urban_new(shock_states(xxx),:) > logit_shock);
+        choice = hard_urban_choice(move_policy.urban_new(shock_states(xxx),:) > logit_shock);
         choice = choice(1);
 
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
         
-        welfare(xxx,1) = vfun_urban_new(shock_states(xxx));
-        marg_utility(xxx,1) = muc_urban_new(shock_states(xxx));
+        welfare(xxx,1) = vfun.urban_new(shock_states(xxx));
+        marg_utility(xxx,1) = muc.urban_new(shock_states(xxx));
         
         production(xxx,1) = z_urban.*u_shocks(shock_states(xxx));
         
-        consumption(xxx,1) = cons_policy_urban_new(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.urban_new(shock_states(xxx));
 
         location(xxx+1) = location(xxx);
         
@@ -259,18 +229,18 @@ for xxx = 1:time_series
         % Then we take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_urban_choice(move_policy_urban_old(shock_states(xxx),:) > logit_shock);
+        choice = hard_urban_choice(move_policy.urban_old(shock_states(xxx),:) > logit_shock);
         choice = choice(1);        
         
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
         
-        welfare(xxx,1) = vfun_urban_old(shock_states(xxx));
-        marg_utility(xxx,1) = muc_urban_old(shock_states(xxx));
+        welfare(xxx,1) = vfun.urban_old(shock_states(xxx));
+        marg_utility(xxx,1) = muc.urban_old(shock_states(xxx));
         
         production(xxx,1) = z_urban.*u_shocks(shock_states(xxx));
         
-        consumption(xxx,1) = cons_policy_urban_old(shock_states(xxx));
+        consumption(xxx,1) = cons_policy.urban_old(shock_states(xxx));
 
         
         location(xxx+1) = location(xxx);
@@ -306,7 +276,6 @@ panel = [consumption, live_rural, work_urban, move, ...
 states = [location, season, shock_states'];
 
 panel = panel(time_series-(N_obs-1):end,:);
-states = states(time_series-(N_obs-1):end,:);
 
 
 
