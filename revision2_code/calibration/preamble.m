@@ -44,8 +44,8 @@ if isempty(specs)
     %specs.asset_space = [linspace(grid1(2),grid1(3),grid1(1)), linspace(grid2(2),grid2(3),grid2(1))];
     specs.asset_space = linspace(0,2,100); % this is the equally spaced grid
 
-    specs.n_perm_shocks = 48;
-    specs.n_trans_shocks = 30;
+    specs.n_perm_shocks = 25;
+    specs.n_trans_shocks = 5;
 
     specs.time_series = 100000; % length of the time series for each perm type
     specs.N_obs = 25000; % grab last number of observations

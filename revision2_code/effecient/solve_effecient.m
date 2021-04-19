@@ -1,21 +1,19 @@
 
 
 addpath('../calibration')
+addpath('../ge_taxation')
 
 load calibration_final
 load wages
-
-
-[move_de, solve_types, assets, params, vfun, ce] = just_policy(exp(new_val), wages, [], [], [], []);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is the stuff from the most recent set of code...not local on my nyu
+% computer
 
-[data_panel, params] = just_simmulate(params, move_de, solve_types, assets, vfun, []);
+[move_de, solve_types, assets, params, specs, vfun, ce] = just_policy(exp(new_val), testwage, [], [], [], []);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[data_panel, params] = just_simmulate(params, move_de, solve_types, assets, specs, ce, []);
 
-[labor, govbc, tfp] = just_aggregate(params,data_panel, wages, [], 0);
-
+[labor, govbc, tfp] = aggregate(params, data_panel, testwage, [], 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ntypes = 24;
@@ -91,40 +89,38 @@ b = ones(length(x0),1);
 % 
 % [x1] = fmincon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0), x1,A,b,[],[],(LB),(UB),[],opts);
 % 
-% two = load('move_psearch_best1.mat','x1');
+
 % two = load('move_psearch_best2.mat','x1');
 % thr = load('move_psearch_best3.mat','x1');
 % xinit = [x0'; one.x1';two.x1';thr.x1'];
 
-tic
-
-opts = optimoptions('ga','Display','iter','UseParallel',true,'MaxGenerations',100,'TolFun',10^-3);
-
-[x1] = ga(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),length(x0), A,b,[],[],(LB),(UB),[],opts);
-
-x1 = x1';
-
-toc
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% tic
 % 
-
-tic
-
-opts = optimoptions('patternsearch','Display','iter','UseParallel',true,'MaxFunEvals',10000,'TolFun',10^-3,'TolX',10^-3);
-
-x1 = patternsearch(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),x1, A,b,[],[],(LB),(UB),[],opts);
-
-save move_psearch_best7 x1
-
-toc
-
-% two = load('move_psearch_best2.mat','x1');
+% opts = optimoptions('ga','Display','iter','UseParallel',true,'MaxGenerations',100,'TolFun',10^-3);
 % 
-% opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',2000,'TolFun',10^-3,'TolX',10^-3);
+% [x1] = ga(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),length(x0), A,b,[],[],(LB),(UB),[],opts);
 % 
-% x1 = fminsearchcon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),two.x1,LB,UB,A,b,[],opts);
+% x1 = x1';
 % 
-% save move_fminsearch_best7 x1
+% toc
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % 
+% 
+% tic
+% 
+% opts = optimoptions('patternsearch','Display','iter','UseParallel',true,'MaxFunEvals',10000,'TolFun',10^-3,'TolX',10^-3);
+% 
+% x1 = patternsearch(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),x1, A,b,[],[],(LB),(UB),[],opts);
+% 
+% save move_psearch_best7 x1
+% 
+% toc
+
+best = load('move_psearch_best2.mat','x1');
+
+opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',2000,'TolFun',10^-3,'TolX',10^-3);
+
+x1 = fminsearchcon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),best.x1,LB,UB,A,b,[],opts);
 
 
 tic
