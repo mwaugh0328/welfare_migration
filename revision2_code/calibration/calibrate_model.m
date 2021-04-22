@@ -12,7 +12,7 @@ function theta = calibrate_model(cal_params,specs,flag)
 % 9: Logit shocks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[yyy] = compute_outcomes(cal_params, specs,1);
+[yyy] = compute_outcomes(cal_params, specs,0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aggregate Moments....

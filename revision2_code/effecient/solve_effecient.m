@@ -115,16 +115,20 @@ b = ones(length(x0),1);
 % save move_psearch_best7 x1
 % 
 % toc
+% tic 
+% 
+% opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',50000,'TolFun',10^-3,'TolX',10^-3);
+% 
+% x1 = fminsearchcon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0), best.x1,LB,UB,A,b,[],opts);
+% 
+% save move_fminsearch_surf x1
+% 
+% toc
 
-best = load('move_psearch_best2.mat','x1');
-
-opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',2000,'TolFun',10^-3,'TolX',10^-3);
-
-x1 = fminsearchcon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0),best.x1,LB,UB,A,b,[],opts);
-
+best = load('move_fminsearch.mat','x1');
 
 tic
-[social_welfare] = compute_effecient(x1,  exp(new_val), tfp, 1);
+[social_welfare] = compute_effecient(best.x1,  exp(new_val), tfp, 1);
 toc
 
 
