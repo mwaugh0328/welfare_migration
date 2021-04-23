@@ -11,8 +11,8 @@ warning('off','stats:regress:RankDefDesignMat');
 % 
 % %guess = [1.0333    0.5488    1.5184    0.6904    0.8454    0.4534    0.6359    0.7371]
 % 
-% upper_bound = [1.75, 0.60, 1.70, 0.95, 1.9, 0.85, 0.85, 0.95, 0.30]; 
-% lower_bound = [1.00, 0.40, 1.20, 0.25, 1.1, 0.20, 0.35, 0.15, 0.01]; 
+% upper_bound = [1.75, 0.60, 1.70, 0.95, 1.9, 0.85, 0.85, 0.95, 0.30];
+% lower_bound = [1.00, 0.40, 1.20, 0.25, 1.1, 0.20, 0.35, 0.15, 0.01];
 
 % ObjectiveFunction = @(x) calibrate_model((exp(x)),1);
 % 
@@ -29,17 +29,42 @@ warning('off','stats:regress:RankDefDesignMat');
 
 % ObjectiveFunction = @(x) calibrate_model(exp(x),1);
 % 
-% options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',2e3);
-% 
-% new_cal = patternsearch(ObjectiveFunction,log(guess),[],[],[],[],[],[],[],options_pa) 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-options = optimset('Display','iter','MaxFunEvals',100);
 
-load('calibration_final.mat')
+ObjectiveFunction = @(xxx) calibrate_model((xxx),[],1);
+
+load('calibration_r2.mat')
+
+UB = [1.75, 0.60, 1.70, 0.95, 1.9, 0.85, 0.85, 0.95, 0.30];
+LB = [1.00, 0.40, 1.20, 0.25, 1.1, 0.20, 0.35, 0.15, 0.01];
+
+% options_pa = optimoptions('patternsearch','Display','iter','MaxFunEvals',200);
+% 
+% new_cal = patternsearch(ObjectiveFunction,(new_cal),[],[],[],[],log(LB),log(UB),[],options_pa) ;
+
+opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',1000,'TolFun',10^-3,'TolX',10^-3);
 
 tic
-[new_cal, fval] =fminsearch(@(xxx) calibrate_model(exp(xxx),[],1),new_val,options);
+[new_cal, fval] = fminsearchcon(ObjectiveFunction,exp(new_cal),(LB),(UB),[],[],[], opts);
 toc
+
+save calibration_r2 new_cal
+
+
+% 
+% optsNM = optimset('Display','iter','MaxFunEvals',100);
+% 
+% opts = optimoptions('patternsearch','Display','iter','UseParallel',true,'MaxFunEvals',100,'TolFun',10^-3,'TolX',10^-3,...
+%     'SearchFcn',{@searchneldermead});
+% 
+% x1 = patternsearch(@(xxx) calibrate_model((xxx),[],1),exp(new_val), [],[],[],[],(LB),(UB),[],opts);
+% 
+% 
+% opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',50000,'TolFun',10^-3,'TolX',10^-3);
+% 
+% x1 = fminsearchcon(@(xxx) compute_effecient(xxx, exp(new_val), tfp, 0), best.x1,LB,UB,A,b,[],opts);
+
 
 
