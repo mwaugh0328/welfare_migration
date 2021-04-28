@@ -68,20 +68,19 @@ number_workers = sum(labor_units.rural.monga) + sum(labor_units.urban.monga);
 
 % outside of monga, number of guys in total...
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-social_welfare = mean(data_panel(:, welfare));
-rural_welfare = mean(data_panel(data_panel(:,live_rural)==1, welfare));
-urban_welfare = mean(data_panel(data_panel(:,live_rural)~=1, welfare));
+social_welfare.all = mean(data_panel(:, welfare));
+social_welfare.rural = mean(data_panel(data_panel(:,live_rural)==1, welfare));
+social_welfare.urban  = mean(data_panel(data_panel(:,live_rural)~=1, welfare));
 
 std_maringal_u.monga = std(data_panel(data_panel(:,season)==1, maringal_utility));
 std_maringal_u.notmonga = std(data_panel(data_panel(:,season)~=1, maringal_utility));
 
 if flag == 1
 
-disp('Social Welfare: All, Rural, Urban')
-disp([social_welfare, rural_welfare, urban_welfare])
-disp('Standard Deviation of Marginal Utility')
-disp([std_maringal_u.monga, std_maringal_u.notmonga])
+    disp('Social Welfare: All, Rural, Urban')
+    disp([social_welfare.all, social_welfare.rural, social_welfare.urban])
+    disp('Standard Deviation of Marginal Utility')
+    disp([std_maringal_u.monga, std_maringal_u.notmonga])
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

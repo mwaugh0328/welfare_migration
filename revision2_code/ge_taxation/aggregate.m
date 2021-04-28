@@ -1,4 +1,4 @@
-function [labor, govbc, tfp, wages] = aggregate(params,data_panel,wages,tfp,flag)
+function [labor, govbc, tfp, wages, welfare_stats] = aggregate(params,data_panel,wages,tfp,flag)
 params.alpha = 0.845;
 
 wage.monga = wages(1);
@@ -73,11 +73,11 @@ number_workers = sum(labor_units.rural.monga) + sum(labor_units.urban.monga);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag == 1
-all_welfare = mean(data_panel(:, welfare));
-rural_welfare = mean(data_panel(data_panel(:,live_rural)==1, welfare));
-urban_welfare = mean(data_panel(data_panel(:,live_rural)~=1, welfare));
+welfare_stats.all = mean(data_panel(:, welfare));
+welfare_stats.rural = mean(data_panel(data_panel(:,live_rural)==1, welfare));
+welfare_stats.urban = mean(data_panel(data_panel(:,live_rural)~=1, welfare));
 disp('Social Welfare: All, Rural, Urban')
-disp(100.*[all_welfare, rural_welfare, urban_welfare])
+disp(100.*[welfare_stats.all, welfare_stats.rural, welfare_stats.urban])
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

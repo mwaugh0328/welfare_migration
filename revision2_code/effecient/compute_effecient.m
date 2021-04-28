@@ -1,4 +1,4 @@
-function [social_welfare] = compute_effecient(c, cal, tfp, flag)
+function [objective, social_welfare] = compute_effecient(c, cal, tfp, flag)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nshocks = 5;
 ntypes = 24;
@@ -54,7 +54,8 @@ end
 
 [social_welfare, ~] = effecient_aggregate(params,tfp, data_panel, flag);
 
-social_welfare = ((-1).*social_welfare);
+objective = ((-1).*social_welfare.all);
+
 % [labor, govbc] = just_aggregate(params, data_panel, wages, tfp, flag);
 % 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
