@@ -165,11 +165,11 @@ iwage.rural = (mpl.rural.monga.*sum((1./(params.rural_tfp.*tfp.monga)).*rural_mo
 
 iwage.urban = sum(urban(:,production)./number_workers)./(length(urban)./number_workers);
 
-disp('Implied Wage Gap')
-disp(iwage.urban./iwage.rural)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 if flag == 1
-    
+disp('Implied Wage Gap')
+disp(iwage.urban./iwage.rural)      
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Accounting')
 disp('')

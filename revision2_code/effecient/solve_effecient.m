@@ -1,15 +1,22 @@
 
-
+clear 
 addpath('../calibration')
 addpath('../ge_taxation')
 
 load calibration_final
-load wages
+%load wages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the stuff from the most recent set of code...not local on my nyu
-% computer
+% % computer
+new_cal = exp(new_val);
 
-[move_de, solve_types, assets, params, specs, vfun, ce] = just_policy(exp(new_val), testwage, [], [], [], []);
+[targets, wage] = analyze_outcomes(new_cal, [], [], [], [], 1);
+
+cd('..\effecient')
+
+testwage = [wage.monga, wage.notmonga];
+
+[move_de, solve_types, assets, params, specs, vfun, ce] = just_policy(new_cal, testwage, [], [], [], []);
 
 [data_panel, params] = just_simmulate(params, move_de, solve_types, assets, specs, ce, []);
 
@@ -71,9 +78,9 @@ testmove = make_movepolicy(move_vec,n_shocks,ntypes);
 
 x0 = move_vec;
 
-tic
-[social_welfare] = compute_effecient(x0, exp(new_val), tfp, 1);
-toc
+%tic
+%[social_welfare] = compute_effecient(x0, new_cal, tfp, 1);
+%toc
 
 LB = (zeros(length(x0),1));
 UB = (ones(length(x0),1));
@@ -127,8 +134,12 @@ b = ones(length(x0),1);
 
 best = load('move_fminsearch.mat','x1');
 
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('The Effecient Allocation...')
+
 tic
-[social_welfare] = compute_effecient(best.x1,  exp(new_val), tfp, 1);
+[social_welfare] = compute_effecient(best.x1,  new_cal, tfp, 1);
 toc
 
 
