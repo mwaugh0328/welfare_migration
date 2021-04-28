@@ -46,11 +46,13 @@ LB = [1.00, 0.40, 1.20, 0.25, 1.1, 0.20, 0.35, 0.15, 0.01];
 
 opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',1000,'TolFun',10^-3,'TolX',10^-3);
 
+%+ .001*randn(1,length(LB))
+
 tic
-[new_cal, fval] = fminsearchcon(ObjectiveFunction,exp(new_cal),(LB),(UB),[],[],[], opts);
+[new_cal, fval] = fminsearchcon(ObjectiveFunction,(new_cal)+ .000075*randn(1,length(LB)),(LB),(UB),[],[],[], opts);
 toc
 
-save calibration_r2 new_cal
+save calibration_r2 new_cal fval
 
 
 % 
