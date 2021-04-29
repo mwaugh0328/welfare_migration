@@ -77,16 +77,25 @@ cd('..\plotting')
 
 seasont = repmat([0,1],1,params.n_shocks/2);
 
-foo = move_planner(4).rural_not(:,1)'; 
+foo = move_planner(4).rural_not(:,2)' - move_planner(4).rural_not(:,1)'; 
 % this is pobaility of staying...in planner
 
 foo = repmat(foo,length(params.asset_space),1);
 
 lowz_planner = flipud(foo(:,seasont==1));
 
-lowz_ce = flipud(move_de(4).rural_not(:,seasont==1,1));
+foo = move_planner(6).rural_not(:,2)' - move_planner(6).rural_not(:,1)'; 
+% this is pobaility of staying...in planner
 
-save movepolicy_planner.mat lowz_planner lowz_ce
+foo = repmat(foo,length(params.asset_space),1);
+
+medz_planner = flipud(foo(:,seasont==1));
+
+lowz_ce = flipud(move_de(4).rural_not(:,seasont==1,2) - move_de(4).rural_not(:,seasont==1,1));
+medz_ce = flipud(move_de(6).rural_not(:,seasont==1,2) - move_de(6).rural_not(:,seasont==1,1));
+
+
+save movepolicy_planner.mat lowz_planner lowz_ce medz_planner medz_ce
 
 cd('..\effecient')
 
