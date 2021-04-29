@@ -12,7 +12,6 @@ cons_policy_rural_not = reshape([cons_policy(:).rural_not],10,24);
 vfun_rural_not = reshape([vfun(:).rural_not],10,24);
 muc_rural_not= reshape([muc(:).rural_not],10,24);
 
-
 cons_policy_rural_exp = reshape([cons_policy(:).rural_exp],10,24);
 vfun_rural_exp = reshape([vfun(:).rural_exp],10,24);
 muc_rural_exp= reshape([muc(:).rural_exp],10,24);

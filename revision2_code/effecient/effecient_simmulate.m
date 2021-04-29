@@ -45,13 +45,9 @@ states = zeros(N_obs,3,params.n_types);
     
 parfor xxx = 1:params.n_types 
 
-% Interestingly, this is not a good part of the code to use parfor... it
-% runs much faster with just a for loop.
-
     [sim_panel(:,:,xxx), states(:,:,xxx)] = simmulate_effecient(cons_policy(xxx), move_policy(xxx), ...
                     params, solve_types(xxx,:), params.trans_shocks, shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx), vfun(xxx), muc(xxx));
-                
-    % This is the same one as in baseline model
+
 end
     
     

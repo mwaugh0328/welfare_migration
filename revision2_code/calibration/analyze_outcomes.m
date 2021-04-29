@@ -189,7 +189,7 @@ end
 
 seasont = repmat([0,1],1,n_tran_shocks);
 
-lowz = flipud(move(8).rural_not(:,seasont==1,1));
+lowz = flipud(move(5).rural_not(:,seasont==1,1));
 medz = flipud(move(11).rural_not(:,seasont==1,1));
 lowz_exp = flipud(move(8).rural_exp(:,seasont==1,1));
 % visually, it's better to run this on the equally spaced grid.
@@ -293,7 +293,7 @@ parfor xxx = 1:n_types
 end
 
 
-lowz_expr = flipud(move_temp(8).rural_not(:,seasont==1,1));
+lowz_expr = flipud(move_temp(4).rural_not(:,seasont==1,1));
 medz_expr  = flipud(move_temp(11).rural_not(:,seasont==1,1));
 lowz_exp_expr  = flipud(move_temp(8).rural_exp(:,seasont==1,1));
 % visually, it's better to run this on the equally spaced grid.

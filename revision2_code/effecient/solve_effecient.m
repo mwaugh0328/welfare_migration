@@ -27,10 +27,39 @@ wage_de = [wage.monga, wage.notmonga];
 %initial guess for the optimization and bounds on the problem.
 
 [move_de, solve_types, assets, params, specs, vfun, ce] = just_policy(new_cal, wage_de, [], [], [], []);
+% What this does is construct the policy functions and value functions
+% given the wage.
 
 [data_panel, params] = just_simmulate(params, move_de, solve_types, assets, specs, vfun, []);
+% this then simmulates the economy
 
 [labor, govbc, tfp, ~, welfare_decentralized] = aggregate(params, data_panel, wage_de, [], 1);
+% then aggregates.
+
+% The key here is the results should be exactly the same as the
+% analyze_outcomes code. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+[~, fullinsruance_welfare] = compute_fullinsurance(assets, move_de, new_cal, tfp, params, specs, 1);
+
+cons_eqiv.all = ((fullinsruance_welfare.all ./ welfare_decentralized.all)).^(1./(1-params.pref_gamma)) - 1;
+% This is just the standard thing. Think of guys behind the vale, so social
+% welfare in the effecient allocation relative to decentralized. This is
+% what each should recive (expost paths and outcomes may be different) but
+% this is again a behind the vale calcuation.
+
+% you could also compute, take this compared to a rural guy, what would he
+% get in expectation if living in the effecient world or urban.
+cons_eqiv.rural = ((fullinsruance_welfare.all ./ welfare_decentralized.rural)).^(1./(1-params.pref_gamma)) - 1;
+cons_eqiv.urban = ((fullinsruance_welfare.all ./ welfare_decentralized.urban)).^(1./(1-params.pref_gamma)) - 1;
+
+disp("Al, Welfare Gain in %: From Decentralized to Full Insurance, Fixed Allocation")
+disp(100.*cons_eqiv.all)
+% disp("Rural, Welfare Gain in %: From Decentralized to Full Insurance, Fixed Allocation")
+% disp(100.*cons_eqiv.rural)
+% disp("Urban, Welfare Gain in %: From Decentralized to Full Insurance, Fixed Allocation")
+% disp(100.*cons_eqiv.urban)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,6 +69,28 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('')
 disp('Now Compute the Effecient Allocation...')
+
+move_planner = make_movepolicy(best.x1, params.n_shocks, params.n_perm_shocks);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cd('..\plotting')
+
+seasont = repmat([0,1],1,params.n_shocks/2);
+
+foo = move_planner(4).rural_not(:,1)'; 
+% this is pobaility of staying...in planner
+
+foo = repmat(foo,length(params.asset_space),1);
+
+lowz_planner = flipud(foo(:,seasont==1));
+
+lowz_ce = flipud(move_de(4).rural_not(:,seasont==1,1));
+
+save movepolicy_planner.mat lowz_planner lowz_ce
+
+cd('..\effecient')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 tic
 [~, social_welfare] = compute_effecient(best.x1,  new_cal, tfp, 1);
@@ -58,10 +109,10 @@ cons_eqiv.urban = ((social_welfare.all ./ welfare_decentralized.urban)).^(1./(1-
 
 disp("Al, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
 disp(100.*cons_eqiv.all)
-disp("Rural, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
-disp(100.*cons_eqiv.rural)
-disp("Urban, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
-disp(100.*cons_eqiv.urban)
+% disp("Rural, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
+% disp(100.*cons_eqiv.rural)
+% disp("Urban, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
+% disp(100.*cons_eqiv.urban)
 
 rmpath('../calibration')
 rmpath('../ge_taxation')

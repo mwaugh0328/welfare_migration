@@ -1,4 +1,4 @@
-function [data_panel, params] = just_simmulate(params, move, solve_types, assets, specs, vfun, cft_params)
+function [data_panel, params, state_panel] = just_simmulate(params, move, solve_types, assets, specs, vfun, cft_params)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_sims = specs.n_sims; %10000;
 time_series = specs.time_series; %100000;
@@ -17,26 +17,15 @@ move_shocks = rand(time_series,specs.n_perm_shocks);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%params.means_test = 0;
-
-% mtest = params.asset_space < params.means_test;
-% mtest_move = params.m_season.*(~mtest)';
-% params.m_season = mtest_move;
-% params.m_fiscal = params.m_season(end) - params.m_season;
-
 sim_panel = zeros(N_obs,15,specs.n_perm_shocks);   
+states = zeros(N_obs,4,specs.n_perm_shocks);  
     
 parfor xxx = 1:specs.n_perm_shocks
 
-
-
-    [sim_panel(:,:,xxx), ~] = rural_urban_simmulate(...
+    [sim_panel(:,:,xxx), states(:,:,xxx)] = rural_urban_simmulate(...
                                 assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p,...
                                 pref_shocks(:,xxx), move_shocks(:,xxx), vfun(xxx));
-       
-%     [sim_panel(:,:,xxx), ~] = simmulate_prefshock_welfare(...
-%         assets(xxx), move(xxx),params, solve_types(xxx,:), params.trans_shocks, shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx), vfun(xxx));
-    % This is the same one as in baseline model
+
 end
     
     
@@ -49,6 +38,9 @@ for xxx = 1:specs.n_perm_shocks
     e_count = s_count + sample(xxx)-1;
         
     data_panel(s_count:e_count,:) = sim_panel(N_obs-(sample(xxx)-1):end,:,xxx);
+    state_panel(s_count:e_count,:) = [states(N_obs-(sample(xxx)-1):end,:,xxx), xxx.*ones(length(states(N_obs-(sample(xxx)-1):end,:,xxx)),1)];
+    % this last value entry in the row indicates the permenant type of the
+    % person in the panel. 
     
     s_count = e_count+1;
    
