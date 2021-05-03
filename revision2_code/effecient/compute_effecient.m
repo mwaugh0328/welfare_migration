@@ -50,7 +50,7 @@ end
 [vfun, muc] = effecient_policy(params, move, consumption);
 
 %[data_panel, params] = effecient_simmulate(params, move, consumption, solve_types, vfun, muc);
-[data_panel] = quick_sim(data_panel, state_panel, vfun, muc, consumption);
+[data_panel] = quick_sim(data_panel, state_panel, vfun, muc, consumption, params);
 
 [social_welfare, ~] = effecient_aggregate(params,tfp, data_panel, flag);
 

@@ -67,6 +67,8 @@ for xxx = 1:params.n_types
    
 end
 
+data_panel = [data_panel, zeros(length(data_panel),1)];
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % income = 1; consumption = 2; assets = 3; live_rural = 4; work_urban = 5;
 % move = 6; move_season = 7; movingcosts = 8; season = 9; net_asset = 10;

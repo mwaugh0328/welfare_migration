@@ -123,25 +123,25 @@ disp(100.*cons_eqiv.all)
 % disp("Urban, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton")
 % disp(100.*cons_eqiv.urban)
 
-x1 = best.x1;
-
-load bounds
-
-for zzz = 1:2
-
-tic
-
-opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',2000,'TolFun',10^-3,'TolX',10^-3);
- 
-x1 = fminsearchcon(@(xxx) compute_effecient(xxx, new_cal, tfp, 0), x1,LB,UB,A,b,[],opts);
-
-[social_welfare] = compute_effecient(x1, new_cal, tfp, 1);
-
-save move_fminsearch x1
-
-toc
-
-end
+% x1 = best.x1;
+% 
+% load bounds
+% 
+% for zzz = 1:2
+% 
+% tic
+% 
+% opts = optimset('Display','iter','UseParallel',true,'MaxFunEvals',2000,'TolFun',10^-3,'TolX',10^-3);
+%  
+% x1 = fminsearchcon(@(xxx) compute_effecient(xxx, new_cal, tfp, 0), x1,LB,UB,A,b,[],opts);
+% 
+% [social_welfare] = compute_effecient(x1, new_cal, tfp, 1);
+% 
+% save move_fminsearch x1
+% 
+% toc
+% 
+% end
 
 rmpath('../calibration')
 rmpath('../ge_taxation')

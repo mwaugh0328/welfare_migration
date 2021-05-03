@@ -6,7 +6,7 @@ function [social_welfare, rc, cfix] = effecient_aggregate(params,tfp,data_panel,
 
 consumption = 1; live_rural = 2; work_urban = 3; move = 4;
 move_season  = 5; movingcosts = 6; season = 7; welfare = 8; experince = 9; production = 10;
-maringal_utility = 11;
+maringal_utility = 11; ubar_cost = 12;
 
 % income = 1; consumption = 2; assets = 3; live_rural = 4; work_urban = 5;
 % move = 6; move_season = 7; movingcosts = 8; season = 9; net_asset = 10;
@@ -82,8 +82,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 location = {'rural'; 'urban'; 'all'};
-acct_measure = {'production', 'consumption','movingcosts','welfare'};
-acct_measure_var = [production, consumption, movingcosts, welfare];
+acct_measure = {'production', 'consumption','movingcosts','welfare','ubarcost'};
+acct_measure_var = [production, consumption, movingcosts, welfare, ubar_cost];
 season_lbl = {'monga', 'notmonga', 'all'};
 
 for xxx = 1:length(location)
@@ -169,10 +169,10 @@ disp(iwage.urban./iwage.rural)
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Accounting')
 disp('')
-disp('Monga: Production, Consumption, Moving Costs')
-disp([(aggproduction.rural.monga + aggproduction.urban.monga), accounting.all.monga.consumption, accounting.all.monga.movingcosts])
-disp('Not Monga: Production, Consumption, Moving Costs')
-disp([(aggproduction.rural.notmonga + aggproduction.urban.notmonga), accounting.all.notmonga.consumption, accounting.all.notmonga.movingcosts])
+disp('Monga: Production, Consumption, Moving Costs, Utility Costs')
+disp([(aggproduction.rural.monga + aggproduction.urban.monga), accounting.all.monga.consumption, accounting.all.monga.movingcosts, accounting.all.monga.ubarcost ])
+disp('Not Monga: Production, Consumption, Moving Costs, Utility Costs')
+disp([(aggproduction.rural.notmonga + aggproduction.urban.notmonga), accounting.all.notmonga.consumption, accounting.all.notmonga.movingcosts, accounting.all.notmonga.ubarcost])
 disp('Resource Constraint: Monga, Non Monga')
 disp([resource_constriant.monga, resource_constriant.notmonga])
 
