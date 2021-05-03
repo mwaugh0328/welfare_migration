@@ -1,5 +1,5 @@
 function [labor, govbc, tfp, wage, aggstats] = just_aggregate(params,data_panel,wages,tfp,flag)
-params.alpha = 0.845;
+
 
 %wage.monga = wages(1);
 %wage.notmonga = wages(2);

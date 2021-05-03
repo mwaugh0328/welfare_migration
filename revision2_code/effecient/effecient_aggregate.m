@@ -1,7 +1,4 @@
 function [social_welfare, rc, cfix] = effecient_aggregate(params,tfp,data_panel,flag)
-
-params.alpha = 0.845;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This stuff is to figure out the correct scaling parameter.

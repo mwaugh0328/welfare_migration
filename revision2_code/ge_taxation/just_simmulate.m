@@ -20,7 +20,7 @@ move_shocks = rand(time_series,specs.n_perm_shocks);
 sim_panel = zeros(N_obs,15,specs.n_perm_shocks);   
 states = zeros(N_obs,4,specs.n_perm_shocks);  
     
-parfor xxx = 1:specs.n_perm_shocks
+for xxx = 1:specs.n_perm_shocks
 
     [sim_panel(:,:,xxx), states(:,:,xxx)] = rural_urban_simmulate(...
                                 assets(xxx), move(xxx), params, solve_types(xxx,:), shock_states_p,...

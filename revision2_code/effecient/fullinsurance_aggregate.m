@@ -1,7 +1,4 @@
 function [social_welfare, rc, cfix] = fullinsurance_aggregate(params,tfp,data_panel,flag)
-
-params.alpha = 0.845;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This stuff is to figure out the correct scaling parameter.
@@ -87,7 +84,7 @@ end
 location = {'rural'; 'urban'; 'all'};
 acct_measure = {'production', 'consumption','movingcosts','welfare'};
 acct_measure_var = [production, consumption, movingcosts, welfare];
-season_lbl = {'monga', 'notmonga', 'all'};
+season_lbl = {'monga', 'notmonga'};
 
 for xxx = 1:length(location)
     
@@ -105,7 +102,7 @@ for xxx = 1:length(location)
                 
                 foo = labor_units.(location{xxx}).(season_lbl{yyy});
            
-                accounting.(location{xxx}).(season_lbl{yyy}).(acct_measure{zzz}) = sum(data_panel( foo, acct_measure_var(zzz)))./number_workers;
+                accounting.(location{xxx}).(season_lbl{yyy}).(acct_measure{zzz}) = sum(data_panel(foo, acct_measure_var(zzz)))./number_workers;
             
             end
             

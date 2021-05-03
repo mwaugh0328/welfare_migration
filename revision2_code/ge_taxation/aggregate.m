@@ -1,5 +1,4 @@
 function [labor, govbc, tfp, wages, welfare_stats] = aggregate(params,data_panel,wages,tfp,flag)
-params.alpha = 0.845;
 
 wage.monga = wages(1);
 wage.notmonga = wages(2);

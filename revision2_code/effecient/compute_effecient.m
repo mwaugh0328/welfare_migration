@@ -20,7 +20,7 @@ end
 
 move = make_movepolicy(c, nshocks*2, ntypes);
 
-[solve_types, params] = effecient_preamble(cal, tfp); 
+[solve_types, params] = effecient_preamble(cal, tfp, []); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
