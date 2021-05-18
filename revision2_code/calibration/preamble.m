@@ -35,7 +35,7 @@ cal_params(15) = 1.0; % this value is 1 - the average tax rate
 
 cal_params(16) = 0.0; % this is the tax progresivity
 
-cal_params(17) = 0.845; % this is the extent of decreasing returns in rural area
+cal_params(17) = 0.70; % this is the extent of decreasing returns in rural area
                         % it was hand calibrated to mach the AKM experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -16,11 +16,14 @@ new_cal = exp(new_val);
 % Now let's run the main file, this creates the wages for the decentralized
 % equillibrium
 
-[targets, wage] = analyze_outcomes(new_cal, [], [], [], [], 1);
+%[targets, wage] = analyze_outcomes(new_cal, [], [], [], [], 1);
+
+load wages
+wage_de = testwage';
 
 cd('..\effecient')
 
-wage_de = [wage.monga, wage.notmonga];
+%wage_de = [wage.monga, wage.notmonga];
 %These are teh wages in the decentralized equillibrium, then we are going
 %to pass this through one last time to get policy functions and the
 %primitive TFP. The move policy function below is used to construct a good
@@ -63,7 +66,7 @@ disp(100.*cons_eqiv.all)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-best = load('move_fminsearch.mat','x1');
+best = load('move_psearch_best_alpha_70.mat','x1');
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
