@@ -54,7 +54,7 @@ So the main code is:
 Several things to notice. First, rural population and migration rates (all, not just mushfiq's) and the wage gap are exactly as they are in the calibration/decentralized allocation. Now what is different is that marginal utility is equated. So that's what the standard deviation of it reports and it's zero. But the key thing where is that welfare went up a lot, by 37 percent. So this takes a guy, behind the vale, in the calibrated economy and asks how much would he get, again, behind the vale, in this economy with the new allocation. And again, it's purely because full insurance/risk sharing is implemented. The pie is diviede up in a better way, but the size of the pie is the same.
 
 
-2. Now let's implement the fully efficient allocation. So this is equating marginal utility of consumption AND finding the optimal migration rates. We need to make this point clear, this last part is not trivial. With the 5 transitory shocks and 24 permanent shocks, this worked out to picking 1440 migration rates. I think we are a good as we can get, but the thing that generated the most systematic progress was (i) randomly try different migration policies from the calibrated economy and use the one that gave the highest social welfare as a starting point and then (ii) use ``fminsearch`` with tight restart (so stop after 3000 function evaluations) and restart it. This process eventually lead to the point that is evaluated below:
+2. Now let's implement the fully efficient allocation. So this is equating marginal utility of consumption AND finding the optimal migration rates. We need to make this point clear, this last part is not trivial. With the 5 transitory shocks and 24 permanent shocks, this worked out to picking 1440 migration rates. I think we are a good as we can get, but the thing that generated the most systematic progress was (i) randomly try different migration policies from the calibrated economy and use the one that gave the highest social welfare as a starting point and then (ii) use ``patternsearch`` and run for 100,000 to 200,000 function iterations. Usually this puts it in a close place. Then use ``fminsearch`` with tight restart (so stop after 3000 function evaluations) and restart it (about 30 times or until it stops improving). As a check, one can place this back into ``patternsearch`` to see if there is any large improvements (usually not). This process eventually lead to the point that is evaluated below:
 
 ```
 Now Compute the Efficient Allocation...
@@ -120,7 +120,8 @@ And it's the same deal. All the intensity at the bottom end goes away.
 
 ** \alpha = 0.995***
 
-First, remember that everything in the initial allocation is always the same. There is never a change given the way things are set up. The only thing changing is the efficient allocation.
+First, remember that everything in the initial allocation is always the same. There is never a change given the way things are set up. The only thing changing is the efficient allocation. So this one leaves more guys in the rural economy. Also the welfare gains are not much larger than simply dividing up the output and handing it out (i.e. 38.58 vs. 36.7 when moving decisions are fixed). One way to think about this (maybe) is that there are a lot of guys on the margin, so moving them into urban or rural really does not do much.
+
 
 ```
 Aggregate Statistics
@@ -166,6 +167,7 @@ Al, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton
 
 ** \alpha = 0.70***
 
+Then this is the other extreme. So here the planner pushes more guys into the urban area, welfare and the welfare from moving guys around optimally becomes much larger.
 
 ```
 Aggregate Statistics
