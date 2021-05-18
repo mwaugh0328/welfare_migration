@@ -79,12 +79,12 @@ vfun_urban_old = vfun.urban_old(:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin simmulation...
 
-hard_rural_choice = cast([1,2,3],'uint8');
-hard_urban_choice = cast([1,2],'uint8');
+%hard_rural_choice = cast([1,2,3],'uint8');
+%hard_urban_choice = cast([1,2],'uint8');
 
 for xxx = 1:time_series
     
-    logit_shock = moveshock(xxx); % this is the logit shock, each period.
+    %logit_shock = moveshock(xxx); % this is the logit shock, each period.
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Work through stuff conditional on a location....
@@ -104,8 +104,11 @@ for xxx = 1:time_series
         
         %choice = find(move_policy.rural_not(shock_states(xxx),:) > logit_shock,1);
         %p = move_policy_rural_not(shock_states(xxx),:);
-        choice = hard_rural_choice(move_policy_rural_not(shock_states(xxx),:) > logit_shock);
-        choice = choice(1);
+        %test = 
+        %choice = hard_rural_choice(move_policy_rural_not(shock_states(xxx),:) > logit_shock);
+        %choice = choice(1);
+        
+        choice = find(move_policy_rural_not(shock_states(xxx),:) > moveshock(xxx), 1);
         
         %choice = -(sum((move_policy_rural_not(asset_state,shock_states(xxx),:)) > logit_shock)-4);
         % given the logit shock above, we just find which choice this guy
@@ -163,8 +166,10 @@ for xxx = 1:time_series
         % Then we  take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_rural_choice(move_policy_rural_exp(shock_states(xxx),:) > logit_shock);
-        choice = choice(1);
+        %choice = hard_rural_choice(move_policy_rural_exp(shock_states(xxx),:) > logit_shock);
+        %choice = choice(1);
+        
+        choice = find(move_policy_rural_exp(shock_states(xxx),:) > moveshock(xxx),1);
                
         move(xxx,1) = (choice == 3); % move if choice above is 3
         move_seasn(xxx,1) = (choice == 2); % seasonal move if choice above is 2.
@@ -225,8 +230,10 @@ for xxx = 1:time_series
         % Then we take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_urban_choice(move_policy_urban_new(shock_states(xxx),:) > logit_shock);
-        choice = choice(1);
+        %choice = hard_urban_choice(move_policy_urban_new(shock_states(xxx),:) > logit_shock);
+        %choice = choice(1);
+        
+        choice = find(move_policy_urban_new(shock_states(xxx),:) > moveshock(xxx),1);
 
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
@@ -259,8 +266,10 @@ for xxx = 1:time_series
         % Then we take cummulative sum. So the interpertation is
         % a cummulative probability distribution over the shocks.
         
-        choice = hard_urban_choice(move_policy_urban_old(shock_states(xxx),:) > logit_shock);
-        choice = choice(1);        
+        choice = find(move_policy_urban_old(shock_states(xxx),:) > moveshock(xxx),1);
+        
+        %choice = hard_urban_choice(move_policy_urban_old(shock_states(xxx),:) > logit_shock);
+        %choice = choice(1);        
         
         move(xxx,1) = (choice == 2);
         % If choice equals 2, then move back.
@@ -284,8 +293,10 @@ for xxx = 1:time_series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Record stuf to move to the next state!
         
-    season(xxx,1) = mod(shock_states(xxx),2);   
+
 end
+
+season = mod(shock_states(:),2);   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Record the stuff....

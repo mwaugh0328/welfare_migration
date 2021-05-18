@@ -43,7 +43,7 @@ end
 sim_panel = zeros(N_obs,11,params.n_types);
 states = zeros(N_obs,3,params.n_types); 
     
-parfor xxx = 1:params.n_types 
+for xxx = 1:params.n_types 
 
     [sim_panel(:,:,xxx), states(:,:,xxx)] = simmulate_effecient(cons_policy(xxx), move_policy(xxx), ...
                     params, solve_types(xxx,:), params.trans_shocks, shock_states_p, pref_shocks(:,xxx), move_shocks(:,xxx), vfun(xxx), muc(xxx));
