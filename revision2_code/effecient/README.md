@@ -208,3 +208,75 @@ Elapsed time is 2.201875 seconds.
 Al, Welfare Gain in %: From Decentralized to Centralized/Effecient Allocaiton
    42.3690
    ```
+
+---
+
+** \alpha = 0.70 **, RENTS INCLUDED
+
+```
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Aggregate Statistics
+Average Rural Population
+    0.4545
+
+Seasonal Migrants
+    0.1631
+
+Experince
+    0.1877
+
+Social Welfare: All, Rural, Urban
+  -16.5165  -16.5022  -16.5285
+
+Standard Deviation of Marginal Utility
+   1.0e-14 *
+
+    0.2206    0.7384
+
+Implied Wage Gap
+    1.5366
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Accounting
+Monga: Production, Consumption, Moving Costs, Utility Costs
+    0.9891    0.9849    0.0042    0.0150
+
+Not Monga: Production, Consumption, Moving Costs, Utility Costs
+    1.6104    1.6002    0.0102    0.0028
+```
+
+---
+
+** \alpha = 0.845 ** (BASELINE) RENTS INCLUDED
+
+```
+Aggregate Statistics
+Average Rural Population
+    0.5076
+
+Seasonal Migrants
+    0.1994
+
+Experince
+    0.1948
+
+Social Welfare: All, Rural, Urban
+  -17.1368  -17.1307  -17.1432
+
+Standard Deviation of Marginal Utility
+   1.0e-13 *
+
+    0.1645    0.0028
+
+Implied Wage Gap
+    1.5357
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Accounting
+Monga: Production, Consumption, Moving Costs, Utility Costs
+    0.9566    0.9532    0.0034    0.0175
+
+Not Monga: Production, Consumption, Moving Costs, Utility Costs
+    1.5576    1.5460    0.0117    0.0023
+
+```

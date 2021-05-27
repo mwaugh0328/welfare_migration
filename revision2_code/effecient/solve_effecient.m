@@ -98,7 +98,7 @@ lowz_ce = flipud(move_de(4).rural_not(:,seasont==1,2) - move_de(4).rural_not(:,s
 medz_ce = flipud(move_de(6).rural_not(:,seasont==1,2) - move_de(6).rural_not(:,seasont==1,1));
 
 
-save movepolicy_planner.mat lowz_planner lowz_ce medz_planner medz_ce
+%save movepolicy_planner.mat lowz_planner lowz_ce medz_planner medz_ce
 
 cd('..\effecient')
 
